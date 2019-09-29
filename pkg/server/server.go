@@ -25,6 +25,7 @@ func Serve() {
   // register entrypoint
   store.AttachUpdate(r);
   store.AttachGet(r);
+  store.AttachList(r);
 
   r.Run();
 }

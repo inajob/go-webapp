@@ -28,3 +28,17 @@ func Load (user string, id string) (body []byte, err error) {
   }
   return bytes, nil
 }
+
+func List (user string) (files []string, err error) {
+  dirPath := filepath.Join(BASEDIR, user)
+  fs, err := ioutil.ReadDir(dirPath)
+  if err != nil {
+    return nil, err
+  }
+  var l []string
+
+  for _, f := range fs {
+    l = append(l, f.Name());
+  }
+  return l, nil
+}
