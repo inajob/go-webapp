@@ -1,0 +1,27 @@
+settings:
+  legacy:
+    force: false
+    interval: 0s
+schema:
+- name: go-webapp
+  path: .
+  commands: 
+    install:
+      status: false
+      method: go build cmd/server/main.go
+    run:
+      status: true
+      method: ./main.exe
+  watcher:
+    extensions:
+    - go
+    paths:
+    - /
+    ignore:
+      paths:
+      - .git
+      - .realize
+      - vendor
+    scripts:
+    - type: before # Windows only
+      command: taskkill /im main.exe /F
