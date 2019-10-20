@@ -3,8 +3,7 @@
 **WEB APP**
 
 - web
-  - :user
-    - :id
+  - simple web frontend
 
 **DATA API**
 
