@@ -45,6 +45,10 @@ function getList(user){
 function postPage(user, id, body){
   return post('/page/' + user + '/' + id, {body: body});
 }
+function postCheck(){
+  return post('/check', {})
+}
+
 
 
 function getQuery(){
@@ -92,6 +96,15 @@ window.addEventListener('load', () => {
   idElm.value = id;
   userElm.value = user;
 
+  let editElm =  document.getElementById("edit");
+  editElm.style.display = "none";
+  // check
+  postCheck().then((res) => {
+    console.log("check",res);
+    if(res.login != "" && res.login == user){
+      editElm.style.display = "block";
+    }
+  })
 
   // page
   getPage(user, id).then((d) => {
@@ -125,7 +138,8 @@ window.addEventListener('load', () => {
     let bodyElm = document.getElementById("page-body");
     let body = bodyElm.value
     postPage(user, id, body).then((res) => {
-      document.location.reload();
+      console.log(res)
+      //document.location.reload();
     });
   })
 

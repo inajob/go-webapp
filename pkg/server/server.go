@@ -9,6 +9,10 @@ import (
 type Health struct {
   Status string `json:"status"`
 }
+type CheckResponse struct {
+  Login string `json:"login"`
+}
+
 
 func Serve() {
   r := gin.Default()
@@ -22,10 +26,19 @@ func Serve() {
     c.JSON(200, result)
   })
 
+  r.POST("/check", func(c *gin.Context){
+    login := c.GetHeader("User") // TODO: not enough
+    result := CheckResponse {
+      Login: login,
+    }
+    c.JSON(200, result)
+  })
+
+
   // register entrypoint
   store.AttachUpdate(r);
   store.AttachGet(r);
   store.AttachList(r);
 
-  r.Run();
+  r.Run(":8088");
 }

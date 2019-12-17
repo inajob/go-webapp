@@ -25,16 +25,21 @@
   <body>
     <h1 id="title"></h1>
     <div id="page"></div>
-    <div id="edit">
-      <input name="id" id="page-id" />
-      <input name="user" id="page-user" />
-      <textarea name="body" id="page-body">aa</textarea>
-      <button id="update-button">Update</button>
+    <div id="login">
+      <a href="/auth/login">login</a>
     </div>
-    <hr />
-    <div>
-      <button id="junk-button">Create Junk Page</button>
-      <button id="new-button">Create New Page</button>
+    <div id="edit">
+      <div>
+        <input name="id" id="page-id" />
+        <input name="user" id="page-user" />
+        <textarea name="body" id="page-body">aa</textarea>
+        <button id="update-button">Update</button>
+      </div>
+      <hr />
+      <div>
+        <button id="junk-button">Create Junk Page</button>
+        <button id="new-button">Create New Page</button>
+      </div>
     </div>
     <div id="list"></div>
     <script type="text/mustache" id="page_list">

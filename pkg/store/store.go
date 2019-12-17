@@ -17,9 +17,12 @@ type PageList struct {
 
 func AttachUpdate(r *gin.Engine) {
   r.POST("/page/:user/:id", func(c *gin.Context){
-    // TODO: login token
-    // TODO: only write author
+    login := c.GetHeader("User") // TODO: not enough
     user := c.Param("user")
+    if(login != user){
+      c.JSON(401, gin.H{"error": "login user is not page author"})
+      return
+    }
     id := c.Param("id")
 
     body := c.PostForm("body")
