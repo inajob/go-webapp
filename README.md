@@ -14,3 +14,16 @@
     - :id
       - GET
       - POST
+
+## How to debug Backend
+
+```
+$ make debug
+```
+
+## How to debug Frontend
+
+```
+$ cd front
+$ yarn run watch
+```
