@@ -1,0 +1,5 @@
+data
+*.swp
+front/node_modules
+front/npm-debug.log
+main.exe
