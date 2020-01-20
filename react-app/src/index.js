@@ -2,12 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
-import rootReducer from './reducers'
-import App from './components/App'
-import {insertLine} from './actions'
-import './index.css';
+import rootReducer from './inline-editor/reducers'
+import App from './inline-editor/components/App'
+import {insertLine} from './inline-editor/actions'
+import './inline-editor/index.css';
 import 'highlight.js/styles/github.css';  // choose your style!
-import {Render} from './utils/render'
+import {Render} from './inline-editor/utils/render'
 import {mermaidAPI} from 'mermaid'
 
 const store = createStore(rootReducer)
