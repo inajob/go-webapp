@@ -3,3 +3,4 @@ data
 front/node_modules
 front/npm-debug.log
 main.exe
+react-app/node_modules
