@@ -4,6 +4,10 @@
   "private": true,
   "homepage":"/web",
   "dependencies": {
+    "highlight.js": "^9.15.10",
+    "react-redux": "^7.0.3",
+    "redux": "^4.0.1",
+    "mermaid": "^8.3.1",
     "@babel/core": "7.7.4",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
