@@ -1,6 +1,7 @@
 package server
 
 import (
+  "log"
   "net/http"
   "github.com/gin-gonic/gin"
   "go-webapp/pkg/store"
@@ -13,9 +14,17 @@ type CheckResponse struct {
   Login string `json:"login"`
 }
 
+func addHeader() gin.HandlerFunc {
+  return func(c *gin.Context){
+    log.Println("here is Header middleware")
+    // for debug
+    c.Writer.Header().Set("Access-Control-Allow-Origin","*");
+  }
+}
 
 func Serve() {
   r := gin.Default()
+  r.Use(addHeader())
 
   r.StaticFS("/web", http.Dir("web"))
 
