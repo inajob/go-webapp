@@ -54,7 +54,12 @@ let opts = getOpts()
 console.log("opts", opts)
 getPage(opts.user, opts.id).then(function(resp){
   console.log(resp)
+  if(resp.ok == false){
+    loadLine(0, "# " + opts.id)
+    return
+  }
   resp.json().then(function(o){
+    console.log(o)
     o.body.split(/[\r\n]/).forEach(function(line, i){
       loadLine(i, line)
     })
