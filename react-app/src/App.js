@@ -9,7 +9,7 @@ class App extends React.Component{
   <div>
     <div style={{paddingLeft:"100px"}}>
       <div>
-        <button>New</button>
+        <button onClick={this.props.onSave}>Save</button>
       </div>
 
       <Lines lines={this.props.lines} cursor={this.props.cursor} />

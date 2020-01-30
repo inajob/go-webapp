@@ -19,6 +19,8 @@ func addHeader() gin.HandlerFunc {
     log.Println("here is Header middleware")
     // for debug
     c.Writer.Header().Set("Access-Control-Allow-Origin","*");
+    // for debug
+    c.Writer.Header().Set("Access-Control-Allow-Headers","User,Content-type,Accept");
   }
 }
 

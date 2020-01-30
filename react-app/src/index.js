@@ -36,6 +36,20 @@ function getOpts(){
   return ret
 }
 
+function postPage(user, id, body){
+  let f = new FormData()
+  f.append('body', body)
+  var req = new Request("http://localhost:8088/page/" + user + "/" + id, {
+    method: "POST",
+    headers: {
+      'Accept': 'applicatoin/json',
+      'User': user, // this header is deleted by login-proxy but useful for debug
+    },
+    body: f,
+  })
+  return fetch(req)
+}
+
 function getPage(user, id){
   var req = new Request("http://localhost:8088/page/" + user + "/" + id, {
     method: "GET"
@@ -48,7 +62,6 @@ function getList(user){
   })
   return fetch(req)
 }
-
 
 let opts = getOpts()
 console.log("opts", opts)
@@ -65,6 +78,13 @@ getPage(opts.user, opts.id).then(function(resp){
     })
   })
 })
+
+function save(o){
+  let rawLines = store.getState().lines.map((item) => {return item.text}).join("\n")
+  console.log(rawLines)
+  postPage(opts.user, opts.id, rawLines)
+}
+
 
 getList(opts.user).then(function(resp){
   resp.json().then(function(o){
@@ -95,7 +115,7 @@ loadLine(13, "https://github.com/inajob/inline-editor")
 ReactDOM.render(
   <Provider store={store}>
     <div>
-      <App user={opts.user} />
+      <App user={opts.user} onSave={save} />
     </div>
   </Provider>,
   document.getElementById('root')

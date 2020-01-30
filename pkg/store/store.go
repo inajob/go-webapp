@@ -16,6 +16,9 @@ type PageList struct {
 
 
 func AttachUpdate(r *gin.Engine) {
+  r.OPTIONS("/page/:user/:id", func(c *gin.Context){
+    c.String(200, "OK")
+  })
   r.POST("/page/:user/:id", func(c *gin.Context){
     login := c.GetHeader("User") // TODO: not enough
     user := c.Param("user")
