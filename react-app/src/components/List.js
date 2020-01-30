@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux'
 
 class List extends React.Component{
   constructor(props) {
@@ -11,7 +10,7 @@ class List extends React.Component{
         <div>List Component</div>
         <ul>
           {this.props.items.map((item, index) => (
-            <li key={index}>[{item.text}]</li>
+            <li key={index}><a href={"?user="+ this.props.user +"&id="+item.text}>{item.text}</a></li>
           ))}
         </ul>
       </div>
@@ -19,17 +18,4 @@ class List extends React.Component{
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    items: state.lines
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-  }
-}
-
-const ListContainer = connect(mapStateToProps, mapDispatchToProps)(List)
-
-export default ListContainer
+export default List

@@ -7,10 +7,10 @@ import 'highlight.js/styles/github.css';  // choose your style!
 import {mermaidAPI} from 'mermaid'
 
 // --- inline editor ---
-//import rootReducer from './reducers'
-import rootReducer from './inline-editor/reducers'
+import rootReducer from './reducers'
 import App from './App'
 import {insertLine} from './inline-editor/actions'
+import {insertItem} from './actions'
 import './inline-editor/index.css';
 import {Render} from './inline-editor/utils/render'
 // -- -- --
@@ -64,6 +64,9 @@ getPage(opts.user, opts.id).then(function(resp){
 getList(opts.user).then(function(resp){
   resp.json().then(function(o){
     console.log("getList", o.pages)
+    o.pages.forEach(function(item){
+      store.dispatch(insertItem(item))
+    })
   })
 })
 
@@ -87,7 +90,7 @@ loadLine(13, "https://github.com/inajob/inline-editor")
 ReactDOM.render(
   <Provider store={store}>
     <div>
-      <App />
+      <App user={opts.user} />
     </div>
   </Provider>,
   document.getElementById('root')

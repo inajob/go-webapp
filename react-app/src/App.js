@@ -16,7 +16,7 @@ class App extends React.Component{
     </div>
 
     <div style={{position:"absolute",top:"0px",left:"0px",backgroundColor:"#fdd",width:"100px"}}>
-      <List />
+      <List items={this.props.items} user={this.props.user} />
     </div>
 
   </div>
@@ -25,7 +25,8 @@ class App extends React.Component{
 const mapStateToProps = (state, ownProps) => {
   return {
     lines: state.lines,
-    cursor: state.cursor
+    cursor: state.cursor,
+    items: state.items,
   }
 }
 const mapDispatchToProps = (dispatch) => {
