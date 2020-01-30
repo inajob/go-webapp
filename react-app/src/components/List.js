@@ -11,7 +11,7 @@ class List extends React.Component{
         <div>List Component</div>
         <ul>
           {this.props.items.map((item, index) => (
-            <li>[{item.text}]</li>
+            <li key={index}>[{item.text}]</li>
           ))}
         </ul>
       </div>

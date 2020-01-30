@@ -1,15 +1,18 @@
 import React from 'react'
 import Lines from './inline-editor/components/Lines'
 import List from './components/List'
+import { connect } from 'react-redux'
 
-const App = () => (
+class App extends React.Component{
+  render() {
+  return (
   <div>
     <div style={{paddingLeft:"100px"}}>
       <div>
         <button>New</button>
       </div>
 
-      <Lines />
+      <Lines lines={this.props.lines} cursor={this.props.cursor} />
     </div>
 
     <div style={{position:"absolute",top:"0px",left:"0px",backgroundColor:"#fdd",width:"100px"}}>
@@ -18,5 +21,18 @@ const App = () => (
 
   </div>
 )
+  }}
+const mapStateToProps = (state, ownProps) => {
+  return {
+    lines: state.lines,
+    cursor: state.cursor
+  }
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+  }
+}
 
-export default App
+const AppContainer = connect(mapStateToProps, mapDispatchToProps)(App)
+
+export default AppContainer

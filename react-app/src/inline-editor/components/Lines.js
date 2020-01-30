@@ -16,6 +16,11 @@ class Lines extends React.Component{
           <Line
                 key={index}
                 {...line}
+                {...calcFocus(this.props.cursor.col, this.props.cursor.row, this.props.cursor.dirty, index)}
+                no={index}
+                height={numLines(line.text)*16 + "px"}
+                isBlock={isBlock(line.text)}
+                className={calcClassName(line.text)}
                 onChange={this.props.onChange}
                 onUp={this.props.onUp(
                         index===0?"":this.props.lines[index - 1])}
@@ -44,24 +49,20 @@ Lines.propTypes = {
   onBSfunc: PropTypes.func.isRequired,
 }
 
-const addNumber = (lines => {
-  return lines.map((line, index) => {
-    line.no = index
-    return line;
-  })
-})
-const addFocus = ((col, row, dirty, lines) => {
-  return lines.map((line, index) => {
-    if(index === row){
-      line.isFocus = true;
-      line.column = col;
-      line.dirty = dirty;
-    }else{
-      line.isFocus = false;
+const calcFocus = ((col, row, dirty, index) => {
+  if(index === row){
+    return {
+      isFocus: true,
+      column: col,
+      dirty: dirty
     }
-    return line;
-  });
+  }else{
+    return {
+      isFocus: false
+    }
+  }
 })
+
 const calcClassName = (text) => {
   let className = "normal"
   if(isBlock(text)){
@@ -77,36 +78,12 @@ const calcClassName = (text) => {
   }
   return className;
 }
-const addClassName = (lines => {
-  return lines.map(line => {
-    line.className = calcClassName(line.text);
-    if(line.isFocus){
-      line.className += " focus"
-    }
-    return line;
-  })
-})
-const addHeight = (lines => {
-  return lines.map(line => {
-    line.height = numLines(line.text)*16 + "px"
-    return line;
-  })
-})
-
-const addIsBlock = (lines => {
-  return lines.map(line => {
-    line.isBlock = isBlock(line.text)
-    return line;
-  })
-})
-
 
 const mapStateToProps = (state, ownProps) => {
-  return {
-    lines: addClassName(addIsBlock(addHeight(addFocus(state.cursor.col, state.cursor.row, state.cursor.dirty, addNumber(state.lines))))),
-    cursor: state.cursor
-  }
+  return {}
 }
+
+
 const mapDispatchToProps = (dispatch) => {
   return {
     onChange: (no,text) => {
