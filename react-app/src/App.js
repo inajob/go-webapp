@@ -9,10 +9,10 @@ class App extends React.Component{
   <div>
     <div style={{paddingLeft:"100px"}}>
       <div>
-        <button onClick={this.props.onSave}>Save</button>
+        <button onClick={this.props.onUpdate}>Save</button>
       </div>
 
-      <Lines lines={this.props.lines} cursor={this.props.cursor} />
+      <Lines lines={this.props.lines} cursor={this.props.cursor} onUpdate={this.props.onUpdate} />
     </div>
 
     <div style={{position:"absolute",top:"0px",left:"0px",backgroundColor:"#fdd",width:"100px"}}>

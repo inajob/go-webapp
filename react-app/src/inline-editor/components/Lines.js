@@ -22,6 +22,7 @@ class Lines extends React.Component{
                 isBlock={isBlock(line.text)}
                 className={calcClassName(line.text)}
                 onChange={this.props.onChange}
+                onUpdate={this.props.onUpdate}
                 onUp={this.props.onUp(
                         index===0?"":this.props.lines[index - 1])}
                 onDown={this.props.onDown(

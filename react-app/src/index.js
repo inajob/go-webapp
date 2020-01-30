@@ -85,6 +85,14 @@ function save(o){
   postPage(opts.user, opts.id, rawLines)
 }
 
+var timerID = null
+function onUpdate(o){
+  if(timerID != null){
+    clearTimeout(timerID)
+    timerID = null
+  }
+  timerID = setTimeout(() => (() => {save(o)})(o), 1000)
+}
 
 getList(opts.user).then(function(resp){
   resp.json().then(function(o){
@@ -115,7 +123,7 @@ loadLine(13, "https://github.com/inajob/inline-editor")
 ReactDOM.render(
   <Provider store={store}>
     <div>
-      <App user={opts.user} onSave={save} />
+      <App user={opts.user} onUpdate={onUpdate} />
     </div>
   </Provider>,
   document.getElementById('root')

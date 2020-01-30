@@ -10,6 +10,7 @@ class Line extends React.Component{
   }
   send(e){
     this.props.onChange(this.props.no, e.target.value)
+    this.props.onUpdate() // trigger save or something
     return;
   }
   keyHandler(e){
