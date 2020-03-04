@@ -12,12 +12,13 @@ import App from './App'
 import {insertLine} from './inline-editor/actions'
 import {insertItem} from './actions'
 import './inline-editor/index.css';
-import {Render} from './inline-editor/utils/render'
+import {Render, isBlock} from './inline-editor/utils/render'
 // -- -- --
 
 const store = createStore(rootReducer)
 //const unsubscribe = store.subscribe(() => console.log("state",store.getState()))
 
+const API_SERVER=process.env.REACT_APP_API_SERVER
 mermaidAPI.initialize({startOnLoad: true, theme: 'forest'});
 
 function loadLine(no, text){
@@ -39,7 +40,7 @@ function getOpts(){
 function postPage(user, id, body){
   let f = new FormData()
   f.append('body', body)
-  var req = new Request("http://localhost:8088/page/" + user + "/" + id, {
+  var req = new Request(API_SERVER + "/page/" + user + "/" + id, {
     method: "POST",
     headers: {
       'Accept': 'applicatoin/json',
@@ -51,13 +52,13 @@ function postPage(user, id, body){
 }
 
 function getPage(user, id){
-  var req = new Request("http://localhost:8088/page/" + user + "/" + id, {
+  var req = new Request(API_SERVER + "/page/" + user + "/" + id, {
     method: "GET"
   })
   return fetch(req)
 }
 function getList(user){
-  var req = new Request("http://localhost:8088/page/" + user, {
+  var req = new Request(API_SERVER + "/page/" + user, {
     method: "GET"
   })
   return fetch(req)
@@ -73,14 +74,39 @@ getPage(opts.user, opts.id).then(function(resp){
   }
   resp.json().then(function(o){
     console.log(o)
-    o.body.split(/[\r\n]/).forEach(function(line, i){
-      loadLine(i, line)
+    let inBlock = false
+    let blockBody;
+    let index = 0;
+    o.body.split(/[\r\n]/).forEach(function(line){
+      if(inBlock){
+        if(line == "<<"){ // end of block
+          loadLine(index, blockBody)
+          inBlock = false
+          index ++;
+        }else{
+          blockBody += "\n" + line
+        }
+      }else{
+        if(isBlock(line)){ // start of block
+          inBlock = true
+          blockBody = line
+        }else{ // not block line
+          loadLine(index, line)
+          index ++;
+        }
+      }
     })
   })
 })
 
-function save(o){
-  let rawLines = store.getState().lines.map((item) => {return item.text}).join("\n")
+function save(){
+  let rawLines = store.getState().lines.map((item) => {
+    if(isBlock(item.text)){
+      return item.text + "\n<<"
+    }else{
+      return item.text
+    }
+  }).join("\n")
   console.log(rawLines)
   postPage(opts.user, opts.id, rawLines)
 }
@@ -91,7 +117,21 @@ function onUpdate(o){
     clearTimeout(timerID)
     timerID = null
   }
-  timerID = setTimeout(() => (() => {save(o)})(o), 1000)
+  timerID = setTimeout(save, 1000)
+}
+
+function uploadFile(file){
+  let f = new FormData()
+  f.append('img', file)
+  var req = new Request(API_SERVER + "/img/" + opts.user + "/" + opts.id, {
+    method: "POST",
+    headers: {
+      'Accept': 'applicatoin/json',
+      'User': opts.user, // this header is deleted by login-proxy but useful for debug
+    },
+    body: f,
+  })
+  return fetch(req)
 }
 
 getList(opts.user).then(function(resp){
@@ -128,3 +168,36 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('root')
 )
+
+function setupPaste(){
+  console.log("setupPaste");
+  // --- only supports chrome/edge ---
+  document.addEventListener("paste", function(event){
+    console.log("paste");
+    var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    console.log(items.length);
+    for(var i = 0; i < items.length; i ++){
+      console.log(items[i]);
+      if(items[i].type.indexOf("image") != -1){
+        // find image
+        console.log("capture image");
+        var blob = items[i].getAsFile();
+
+        uploadFile(blob).then(function(resp){
+          resp.json().then(function(o){
+            let no = store.getState().cursor.row;
+            let imgId = o.imgId
+            let line = ">> img\n" + imgId
+            store.dispatch(insertLine(no,line , Render(no, line)))
+            save()
+          })
+        })
+        return false;
+      }
+    }
+    //event.preventDefault();
+    return true;
+  });
+}
+setupPaste();
+

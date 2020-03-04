@@ -2,11 +2,39 @@ package file
 
 import (
   "os"
+  "io"
   "io/ioutil"
   "path/filepath"
+  "mime/multipart"
 )
 
 const BASEDIR = "data" // TODO: only support 1 depth dir
+const IMGDIR = "imgs"
+
+func SaveImg(user string, id string, imgId string, image multipart.File) (err error){
+  dirPath := filepath.Join(IMGDIR, user, id)
+  if _, err := os.Stat(dirPath); err != nil{
+    if err := os.MkdirAll(dirPath, 0775); err != nil{
+      return err
+    }
+  }
+
+  // todo: extension
+  saveFile, err := os.Create(GetImgPath(user, id, imgId))
+  if err != nil {
+    return err
+  }
+
+  defer saveFile.Close()
+  io.Copy(saveFile, image)
+
+  return
+}
+
+func GetImgPath(user string, id string, imgId string) (path string){
+  return filepath.Join(IMGDIR, user, id, imgId)
+}
+
 
 func Save (user string, id string, body string) (err error) {
   dirPath := filepath.Join(BASEDIR, user)

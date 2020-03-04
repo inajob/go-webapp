@@ -4,6 +4,10 @@
 
 - front
   - soure of web
+- img
+  - :user
+    - :id
+      - :imgid
 - web
   - simple web frontend
 

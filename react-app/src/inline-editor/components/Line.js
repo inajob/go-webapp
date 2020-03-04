@@ -16,7 +16,8 @@ class Line extends React.Component{
   keyHandler(e){
     switch(e.keyCode){
       case 9: // tab
-      this.props.onTab(this.props.no, this.props.text, e.shiftKey);
+      this.props.onTab(this.props.no, this.props.text, e.shiftKey)
+      this.props.onUpdate()
       e.preventDefault()
       break
       case 38: //up
@@ -43,6 +44,7 @@ class Line extends React.Component{
       if(!this.props.onEnter(this.props.no, this.props.text, e.target.selectionStart, e.shiftKey)){
         e.preventDefault()
       }
+      this.props.onUpdate()
       break;
       case 8: //BS
       // when cursor is head
@@ -50,6 +52,7 @@ class Line extends React.Component{
         this.props.onBS(this.props.no, this.props.text)
         e.preventDefault()
       }
+      this.props.onUpdate()
       break;
       default:
         // pass

@@ -47,6 +47,8 @@ func Serve() {
 
 
   // register entrypoint
+  store.AttachImgUpdate(r);
+  store.AttachImgGet(r);
   store.AttachUpdate(r);
   store.AttachGet(r);
   store.AttachList(r);

@@ -2,6 +2,7 @@ package store
 
 import (
   "github.com/gin-gonic/gin"
+  "github.com/google/uuid"
   "go-webapp/pkg/file"
 )
 
@@ -12,6 +13,53 @@ type Page struct {
 }
 type PageList struct {
   Pages []string `json:"pages"`
+}
+type ImgId struct {
+  ImgId string `json:"imgId"`
+  User string `json:"user"`
+}
+
+func AttachImgUpdate(r *gin.Engine) {
+  r.OPTIONS("/img/:user/:id", func(c *gin.Context){
+    c.String(200, "OK")
+  })
+  r.POST("/img/:user/:id", func(c *gin.Context){
+    login := c.GetHeader("User") // TODO: not enough
+    user := c.Param("user")
+    if(login != user){
+      c.JSON(401, gin.H{"error": "login user is not page author"})
+      return
+    }
+    id := c.Param("id")
+    uuidObj,_ := uuid.NewUUID()
+    imgId := uuidObj.String()
+
+    image, _, err := c.Request.FormFile("img");
+    if  err != nil{
+      c.JSON(500, gin.H{"error": err.Error()})
+    }
+
+    if err := file.SaveImg(user, id, imgId, image); err != nil{
+      c.JSON(500, gin.H{"error": err.Error()})
+      return
+    }
+
+    result := ImgId {
+      ImgId: imgId,
+      User: user,
+    }
+    c.JSON(200, result)
+    return
+  })
+}
+func AttachImgGet(r *gin.Engine) {
+  r.GET("/img/:user/:id/:imgid", func(c *gin.Context){
+    user := c.Param("user")
+    id := c.Param("id")
+    imgId := c.Param("imgid")
+
+    c.File(file.GetImgPath(user, id, imgId))
+  })
 }
 
 

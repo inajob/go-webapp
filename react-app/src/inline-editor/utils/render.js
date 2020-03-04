@@ -2,6 +2,8 @@ import {mermaidRender} from '../render/mermaid'
 import {hljsRender} from '../render/hljs'
 import {parse, htmlEncode}  from '../utils/inlineDecorator'
 
+const API_SERVER=process.env.REACT_APP_API_SERVER
+
 export const Render = (no, text) => {
   // TODO: sanitize!!
   if(isBlock(text)){
@@ -25,6 +27,13 @@ export const Render = (no, text) => {
           ret += "<span class='mode'>&gt;&gt; code</span>";
           console.log("CODE PART",lastPart);
           ret += hljsRender(no, lastPart);
+        break;
+        case "img":
+          let pageName = "test"
+          let userName = "inajob"
+          ret += '<img src="'+
+            API_SERVER + '/img/' +
+            userName +'/'+ pageName +'/' + lastPart + '">'
         break;
         default:
           ret += "<pre>" + text + "</pre>";

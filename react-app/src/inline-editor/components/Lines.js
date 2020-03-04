@@ -75,6 +75,8 @@ const calcClassName = (text) => {
       className = "h2"
     }else if(text.indexOf("#") === 0){
       className = "h1"
+    }else if(text.length === 0){
+      className = "empty"
     }
   }
   return className;

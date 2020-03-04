@@ -15,7 +15,7 @@ class App extends React.Component{
       <Lines lines={this.props.lines} cursor={this.props.cursor} onUpdate={this.props.onUpdate} />
     </div>
 
-    <div style={{position:"absolute",top:"0px",left:"0px",backgroundColor:"#fdd",width:"100px"}}>
+    <div style={{position:"absolute",top:"0px",left:"0px",backgroundColor:"#ddd",width:"100px"}}>
       <List items={this.props.items} user={this.props.user} />
     </div>
 

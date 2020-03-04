@@ -80,6 +80,11 @@ line{
 .normal{
   margin-left: 20px;
 }
+.empty{
+  height: 1em;
+  margin-left: 20px;
+  background-color: #eee;
+}
 .error{
   color: red;
 }
