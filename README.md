@@ -4,6 +4,10 @@
 
 - front
   - soure of web
+- img
+  - :user
+    - :id
+      - :imgid
 - web
   - simple web frontend
 
@@ -14,3 +18,16 @@
     - :id
       - GET
       - POST
+
+## How to debug Backend
+
+```
+$ make debug
+```
+
+## How to debug Frontend
+
+```
+$ cd front
+$ yarn run watch
+```
