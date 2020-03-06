@@ -32,8 +32,7 @@ export const Render = (no, text) => {
           let pageName = "test"
           let userName = "inajob"
           ret += '<img src="'+
-            API_SERVER + '/img/' +
-            userName +'/'+ pageName +'/' + lastPart + '">'
+            API_SERVER + '/img/' + lastPart + '">'
         break;
         default:
           ret += "<pre>" + text + "</pre>";

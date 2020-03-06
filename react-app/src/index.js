@@ -187,7 +187,7 @@ function setupPaste(){
           resp.json().then(function(o){
             let no = store.getState().cursor.row;
             let imgId = o.imgId
-            let line = ">> img\n" + imgId
+            let line = ">> img\n" + opts.user + '/'+ opts.id + '/' + imgId
             store.dispatch(insertLine(no,line , Render(no, line)))
             save()
           })
