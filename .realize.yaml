@@ -5,6 +5,8 @@ settings:
 schema:
 - name: go-webapp
   path: .
+  env:
+    ALLOW_ORIGIN: http://localhost:3000
   commands: 
     install:
       status: false
