@@ -18,7 +18,7 @@ class Lines extends React.Component{
                 {...line}
                 {...calcFocus(this.props.cursor.col, this.props.cursor.row, this.props.cursor.dirty, index)}
                 no={index}
-                height={numLines(line.text)*16 + "px"}
+                height={numLines(line.text)*24 + "px"}
                 isBlock={isBlock(line.text)}
                 className={calcClassName(line.text)}
                 onChange={this.props.onChange}
