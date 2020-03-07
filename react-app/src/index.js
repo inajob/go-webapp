@@ -126,6 +126,7 @@ function uploadFile(file){
   f.append('img', file)
   var req = new Request(API_SERVER + "/img/" + opts.user + "/" + opts.id, {
     method: "POST",
+    credentials: "include", // for save another domain
     headers: {
       'Accept': 'applicatoin/json',
       'User': opts.user, // this header is deleted by login-proxy but useful for debug
