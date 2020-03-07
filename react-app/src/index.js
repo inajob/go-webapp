@@ -137,9 +137,11 @@ function uploadFile(file){
 getList(opts.user).then(function(resp){
   resp.json().then(function(o){
     console.log("getList", o.pages)
-    o.pages.forEach(function(item){
-      store.dispatch(insertItem(item))
-    })
+    if(o.pages){
+      o.pages.forEach(function(item){
+        store.dispatch(insertItem(item))
+      })
+    }
   })
 })
 
