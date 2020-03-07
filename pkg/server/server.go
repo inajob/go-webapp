@@ -1,6 +1,7 @@
 package server
 
 import (
+  "os"
   "log"
   "net/http"
   "github.com/gin-gonic/gin"
@@ -18,9 +19,12 @@ func addHeader() gin.HandlerFunc {
   return func(c *gin.Context){
     log.Println("here is Header middleware")
     // for debug
-    c.Writer.Header().Set("Access-Control-Allow-Origin","*");
+    origin := os.Getenv("ALLOW_ORIGIN")
+    c.Writer.Header().Set("Access-Control-Allow-Origin", origin);
     // for debug
     c.Writer.Header().Set("Access-Control-Allow-Headers","User,Content-type,Accept");
+    // for send cookie from another origin(danger!)
+    c.Writer.Header().Set("Access-Control-Allow-Credentials","true");
   }
 }
 
