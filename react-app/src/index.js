@@ -10,7 +10,7 @@ import {mermaidAPI} from 'mermaid'
 import rootReducer from './reducers'
 import App from './App'
 import {insertLine, setReadOnly} from './inline-editor/actions'
-import {insertItem} from './actions'
+import {insertItem, logined} from './actions'
 import './inline-editor/index.css';
 import {Render, isBlock} from './inline-editor/utils/render'
 // -- -- --
@@ -121,6 +121,10 @@ loginCheck(opts.user).then(function(resp){
     console.log("loginCheck", o)
     if(!o.editable){
       setReadOnly()
+      store.dispatch(setReadOnly())
+    }
+    if(o.login){
+      store.dispatch(logined(o.user))
     }
   })
 })
@@ -144,6 +148,14 @@ function onUpdate(o){
     timerID = null
   }
   timerID = setTimeout(save, 1000)
+}
+
+function onLoginClick(){
+  document.location.href = API_SERVER + "/auth/login"
+}
+function onLogoutClick(){
+  console.log("click logout")
+  document.location.href = API_SERVER + "/auth/logout"
 }
 
 function uploadFile(file){
@@ -192,7 +204,7 @@ loadLine(13, "https://github.com/inajob/inline-editor")
 ReactDOM.render(
   <Provider store={store}>
     <div>
-      <App user={opts.user} onUpdate={onUpdate} />
+      <App user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} />
     </div>
   </Provider>,
   document.getElementById('root')

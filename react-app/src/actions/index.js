@@ -3,3 +3,7 @@ export const insertItem = (text) => ({
   text,
 })
 
+export const logined = (user) => ({
+  type: 'LOGINED',
+  user: user,
+})
