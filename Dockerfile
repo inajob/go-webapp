@@ -10,6 +10,7 @@ RUN make build
 FROM scratch
 
 COPY --from=builder /go/src/github.com/inajob/go-webapp/server /server
+COPY ./web /web
 
 ENTRYPOINT ["/server"]
 
