@@ -8,17 +8,20 @@ class App extends React.Component{
   render() {
   return (
   <div>
-    <div style={{paddingLeft:"120px"}}>
-      <div style={{backgroundColor: "#ddd", fontSize:"small"}}>"inline" はインライン編集できるWIKIのようなものです</div>
-      <Lines lines={this.props.lines} cursor={this.props.cursor} onUpdate={this.props.onUpdate} />
-    </div>
 
-    <div style={{position:"absolute",top:"0px",left:"0px",backgroundColor:"#ddd",width:"120px"}}>
-      <h1>inline</h1>
+    <div className="header">
+      <h1 className="logo">inline</h1>
       <LoginButton logined={this.props.loginButton.login} user={this.props.loginButton.user} onLoginClick={this.props.onLoginClick} onLogoutClick={this.props.onLogoutClick} />
-      <List items={this.props.items} user={this.props.user} />
     </div>
-
+    <div className="contents">
+      <div className="main">
+        <div style={{backgroundColor: "#ddd", fontSize:"small"}}>"inline" はインライン編集できるWIKIのようなものです</div>
+        <Lines lines={this.props.lines} cursor={this.props.cursor} onUpdate={this.props.onUpdate} />
+      </div>
+      <div className="side">
+        <List items={this.props.items} user={this.props.user} />
+      </div>
+    </div>
   </div>
 )
   }}

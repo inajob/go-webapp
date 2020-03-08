@@ -1,0 +1,31 @@
+@media screen and (min-width:480px) {
+
+.contents{
+  position:relative;
+}
+.main{
+  padding-left:120px;
+}
+
+.side {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color: #ddd;
+  width: 120px
+}
+
+}
+
+.header{
+  display:flex;
+  background-color: #ddd;
+}
+
+.logo{
+  flex-grow:1;
+}
+.login-button {
+  background-color: #ffd;
+  margin-bottom: 1em;
+}

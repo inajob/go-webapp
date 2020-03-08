@@ -7,13 +7,13 @@ class LoginButton extends React.Component{
   render() {
     if(!this.props.logined){
       return (
-        <div style={{backgroundColor: "#ffd", marginBottom:"1em"}}>
+        <div className="login-button">
           <button onClick={this.props.onLoginClick}>LOGIN</button>
         </div>
       )
     }else{
       return (
-        <div style={{backgroundColor: "#ffd", marginBottom:"1em"}}>
+        <div className="login-button">
           <div>Login as {this.props.user}</div>
           <button onClick={this.props.onLogoutClick}>LOGOUT</button>
         </div>

@@ -12,6 +12,7 @@ import App from './App'
 import {insertLine, setReadOnly} from './inline-editor/actions'
 import {insertItem, logined} from './actions'
 import './inline-editor/index.css';
+import './index.css';
 import {Render, isBlock} from './inline-editor/utils/render'
 // -- -- --
 
