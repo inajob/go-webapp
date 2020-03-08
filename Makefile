@@ -7,19 +7,17 @@ build:
 buildweb:
 	cd react-app &&  REACT_APP_API_SERVER=http://inline.inajob.tk yarn run build
 
-build-backend-image: buildweb
+build-backend: buildweb
 	docker build -t kinadu/go-webapp-backend .
 
-push-backend-image: build-backend-image
+push-backend: build-backend
 	docker push kinadu/go-webapp-backend
 
-build-frontend-image:
+build-frontend:
 	docker build -t kinadu/go-webapp-frontend ./react-app
 
-push-frontend-image: build-frontend-image
+push-frontend: build-frontend
 	docker push kinadu/go-webapp-frontend
-
-all: push-backend-image push-frontend-image
 
 test:
 	go test pkg/server
