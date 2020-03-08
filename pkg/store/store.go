@@ -18,6 +18,29 @@ type ImgId struct {
   ImgId string `json:"imgId"`
   User string `json:"user"`
 }
+type CheckResponse struct {
+  Editable bool `json:"editable"`
+  Login bool `json:"login"`
+  User string `json:"user"`
+}
+
+func AttachLoginCheck(r *gin.Engine) {
+  r.OPTIONS("/loginCheck", func(c *gin.Context){
+    c.String(200, "OK")
+  })
+  r.POST("/loginCheck", func(c *gin.Context){
+    login := c.GetHeader("User") // TODO: not enough
+    user := c.PostForm("user")
+
+    result := CheckResponse {
+      Editable: login == user,
+      Login: len(login) > 0,
+      User: user,
+    }
+    c.JSON(200, result)
+    return
+  })
+}
 
 func AttachImgUpdate(r *gin.Engine) {
   r.OPTIONS("/img/:user/:id", func(c *gin.Context){

@@ -51,6 +51,7 @@ func Serve() {
 
 
   // register entrypoint
+  store.AttachLoginCheck(r);
   store.AttachImgUpdate(r);
   store.AttachImgGet(r);
   store.AttachUpdate(r);

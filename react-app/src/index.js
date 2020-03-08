@@ -9,7 +9,7 @@ import {mermaidAPI} from 'mermaid'
 // --- inline editor ---
 import rootReducer from './reducers'
 import App from './App'
-import {insertLine} from './inline-editor/actions'
+import {insertLine, setReadOnly} from './inline-editor/actions'
 import {insertItem} from './actions'
 import './inline-editor/index.css';
 import {Render, isBlock} from './inline-editor/utils/render'
@@ -41,6 +41,21 @@ function postPage(user, id, body){
   let f = new FormData()
   f.append('body', body)
   var req = new Request(API_SERVER + "/page/" + user + "/" + id, {
+    method: "POST",
+    credentials: "include", // for save another domain
+    headers: {
+      'Accept': 'applicatoin/json',
+      'User': user, // this header is deleted by login-proxy but useful for debug
+    },
+    body: f,
+  })
+  return fetch(req)
+}
+
+function loginCheck(user){
+  let f = new FormData()
+  f.append('user', user)
+  var req = new Request(API_SERVER + "/loginCheck", {
     method: "POST",
     credentials: "include", // for save another domain
     headers: {
@@ -97,6 +112,16 @@ getPage(opts.user, opts.id).then(function(resp){
         }
       }
     })
+  })
+})
+
+loginCheck(opts.user).then(function(resp){
+  console.log(resp)
+  resp.json().then(function(o){
+    console.log("loginCheck", o)
+    if(!o.editable){
+      setReadOnly()
+    }
   })
 })
 

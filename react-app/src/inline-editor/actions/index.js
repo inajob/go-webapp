@@ -32,3 +32,7 @@ export const setCursor = (row, col, dirty) => ({
   dirty,
 })
 
+export const setReadOnly = () => ({
+  type: 'SET_READONLY',
+})
+

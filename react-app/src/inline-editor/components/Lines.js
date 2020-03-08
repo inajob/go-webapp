@@ -16,7 +16,7 @@ class Lines extends React.Component{
           <Line
                 key={index}
                 {...line}
-                {...calcFocus(this.props.cursor.col, this.props.cursor.row, this.props.cursor.dirty, index)}
+                {...calcFocus(this.props.cursor.editable, this.props.cursor.col, this.props.cursor.row, this.props.cursor.dirty, index)}
                 no={index}
                 height={numLines(line.text)*24 + "px"}
                 isBlock={isBlock(line.text)}
@@ -50,8 +50,8 @@ Lines.propTypes = {
   onBSfunc: PropTypes.func.isRequired,
 }
 
-const calcFocus = ((col, row, dirty, index) => {
-  if(index === row){
+const calcFocus = ((editable, col, row, dirty, index) => {
+  if(index === row && editable){
     return {
       isFocus: true,
       column: col,
