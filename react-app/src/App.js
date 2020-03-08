@@ -8,10 +8,6 @@ class App extends React.Component{
   return (
   <div>
     <div style={{paddingLeft:"100px"}}>
-      <div>
-        <button onClick={this.props.onUpdate}>Save</button>
-      </div>
-
       <Lines lines={this.props.lines} cursor={this.props.cursor} onUpdate={this.props.onUpdate} />
     </div>
 
