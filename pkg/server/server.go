@@ -2,7 +2,9 @@ package server
 
 import (
   "os"
+  "strings"
   "log"
+  "net/url"
   "net/http"
   "github.com/gin-gonic/gin"
   "go-webapp/pkg/store"
@@ -31,15 +33,27 @@ func addHeader() gin.HandlerFunc {
 
 func AttachFileServer(r *gin.Engine) {
   fs := http.Dir("web")
-  fileServer :=http.StripPrefix("/test/", http.FileServer(fs))
-  r.GET("/test/*filepath", func(c *gin.Context){
+  fileServer :=http.StripPrefix("/web/", http.FileServer(fs))
+  r.GET("/web/*filepath", func(c *gin.Context){
     filePath := c.Param("filepath")
-    log.Println(filePath)
+    log.Println("filepath: " + filePath+"\n")
     if filePath == "/" {
       id := c.Query("id")
       user := c.Query("user")
       body,_ := file.Load(user, id)
+      rawDescription := []rune(string(body))
+      description := ""
+      if len(description) > 140 {
+        description = string(rawDescription[:140]) + "..."
+      }else{
+        description = string(rawDescription)
+      }
+      description = strings.Replace(description, "\n", " ", -1)
+
       c.HTML(http.StatusOK, "index.html", gin.H{
+        "title": id,
+        "url": "/web/?user=" + url.QueryEscape(user) + "&id=" + url.QueryEscape(id),
+        "description": description,
         "body": string(body),
       })
     }else{
@@ -59,7 +73,6 @@ func Serve() {
   r.Use(addHeader())
 
   r.LoadHTMLGlob("web/index.html")
-  r.StaticFS("/web", http.Dir("web"))
 
   r.GET("/healthz", func(c *gin.Context){
     result := Health {
