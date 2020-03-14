@@ -36,7 +36,6 @@ func AttachFileServer(r *gin.Engine) {
     filePath := c.Param("filepath")
     log.Println(filePath)
     if filePath == "/" {
-      //c.String(200, "index")
       id := c.Query("id")
       user := c.Query("user")
       body,_ := file.Load(user, id)
