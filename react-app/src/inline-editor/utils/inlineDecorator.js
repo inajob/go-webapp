@@ -31,9 +31,9 @@
       while(true){
         var cap;
         if(level === 0){
-          cap = capture(body, ["{{","}}", "http://", "https://"], pos);
+          cap = capture(body, ["{{","}}", "[", "]", "http://", "https://"], pos);
         }else{
-          cap = capture(body, ["{{","}}"], pos);
+          cap = capture(body, ["{{","}}","[", "]"], pos);
         }
         if(cap.target === "{{"){
           out.push(newPiece("text", body.slice(pos, cap.pos)));
@@ -42,6 +42,16 @@
         }else if(cap.target === "}}"){
           out.push(newPiece("text", body.slice(pos, cap.pos)));
           pos = cap.pos + "}}".length;
+          if(level > 0){
+            break;
+          }
+        }else if(cap.target === "["){
+          out.push(newPiece("text", body.slice(pos, cap.pos)));
+          pos = cap.pos + "[".length;
+          out.push(inner(level + 1));
+        }else if(cap.target === "]"){
+          out.push(newPiece("wikilink", body.slice(pos, cap.pos)));
+          pos = cap.pos + "]".length;
           if(level > 0){
             break;
           }
@@ -98,6 +108,9 @@
         switch(v.kind){
           case "text":
             out.push(v.body);
+            break;
+          case "wikilink":
+            out.push("<a href='?&user=" + global.user + "&id=" + v.body + "'>" + v.body + "</a>");
             break;
           case "url":
             // todo: escape

@@ -83,6 +83,9 @@ function getList(user){
 
 let opts = getOpts()
 console.log("opts", opts)
+global.user = opts.user // TODO: manage context?
+
+
 getPage(opts.user, opts.id).then(function(resp){
   console.log(resp)
   if(resp.ok == false){
