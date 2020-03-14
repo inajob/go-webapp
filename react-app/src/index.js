@@ -116,6 +116,12 @@ getPage(opts.user, opts.id).then(function(resp){
   })
 })
 
+try{
+  document.getElementById("body").style.display = "none"
+}catch(e){
+  console.log(e)
+}
+
 loginCheck(opts.user).then(function(resp){
   console.log(resp)
   resp.json().then(function(o){
