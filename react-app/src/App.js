@@ -2,6 +2,7 @@ import React from 'react'
 import Lines from './inline-editor/components/Lines'
 import List from './components/List'
 import LoginButton from './components/LoginButton'
+import Controller from './components/Controller'
 import { connect } from 'react-redux'
 
 class App extends React.Component{
@@ -13,6 +14,7 @@ class App extends React.Component{
       <h1 className="logo">inline</h1>
       <LoginButton logined={this.props.loginButton.login} user={this.props.loginButton.user} onLoginClick={this.props.onLoginClick} onLogoutClick={this.props.onLogoutClick} />
     </div>
+    <Controller logined={this.props.loginButton.login} onNewDiary={this.props.onNewDiary} onNewJunk={this.props.onNewJunk} />
     <div className="contents">
       <div className="main">
         <div style={{backgroundColor: "#ddd", fontSize:"small"}}>"inline" はインライン編集できるWIKIのようなものです</div>

@@ -21,6 +21,15 @@
   display:flex;
   background-color: #ddd;
 }
+.controller{
+  text-align:right;
+  background-color: #ddd;
+}
+.controller button{
+  border: solid 1px;
+  padding: 3px;
+  margin-right: 3px;
+}
 
 .logo{
   flex-grow:1;

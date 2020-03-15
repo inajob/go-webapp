@@ -167,6 +167,16 @@ function onLogoutClick(){
   console.log("click logout")
   document.location.href = API_SERVER + "/auth/logout"
 }
+function onNewDiary(){
+  let d = new Date();
+  let id = "" + d.getFullYear() + d.getMonth() + d.getDate()
+  document.location.href = "?user=" + opts.user + "&id=" + id
+}
+function onNewJunk(){
+  let d = new Date();
+  let id = "" + d.getFullYear() + d.getMonth() + d.getDate() + d.getHours() + d.getMinutes() + d.getSeconds()
+  document.location.href = "?user=" + opts.user + "&id=" + id
+}
 
 function uploadFile(file){
   let f = new FormData()
@@ -214,7 +224,7 @@ loadLine(13, "https://github.com/inajob/inline-editor")
 ReactDOM.render(
   <Provider store={store}>
     <div>
-      <App user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} />
+      <App user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} onNewDiary={onNewDiary} onNewJunk={onNewJunk} />
     </div>
   </Provider>,
   document.getElementById('root')
