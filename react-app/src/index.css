@@ -12,9 +12,18 @@
   top: 0px;
   left: 0px;
   background-color: #ddd;
-  width: 120px
+  width: 120px;
+  min-height: 100%;
+  border:solid #ccc;
+  border-width: 0px 3px 0px 0px;
 }
 
+}
+
+.main{
+  padding-top: 0.5em;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
 }
 
 .header{
@@ -24,15 +33,21 @@
 .controller{
   text-align:right;
   background-color: #ddd;
+  padding-bottom:0.5em;
+  border:solid #ccc;
+  border-width: 0px 0px 3px 0px;
 }
 .controller button{
   border: solid 1px;
-  padding: 3px;
+  padding: 5px;
   margin-right: 3px;
+  background-color: #333;
+  color: #fff;
 }
 
 .logo{
   flex-grow:1;
+  padding-left: 1em;
 }
 .login-button {
   background-color: #ffd;

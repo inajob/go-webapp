@@ -11,13 +11,17 @@ class App extends React.Component{
   <div>
 
     <div className="header">
-      <h1 className="logo">inline</h1>
+      <div className="logo">
+      <h1>inline</h1>
+      <div style={{backgroundColor: "#ddd", fontSize:"small"}}>"inline" はインライン編集できるWIKIのようなものです</div>
+      </div>
       <LoginButton logined={this.props.loginButton.login} user={this.props.loginButton.user} onLoginClick={this.props.onLoginClick} onLogoutClick={this.props.onLogoutClick} />
     </div>
-    <Controller logined={this.props.loginButton.login} onNewDiary={this.props.onNewDiary} onNewJunk={this.props.onNewJunk} />
+    <div>
+      <Controller logined={this.props.loginButton.login} onNewDiary={this.props.onNewDiary} onNewJunk={this.props.onNewJunk} />
+    </div>
     <div className="contents">
       <div className="main">
-        <div style={{backgroundColor: "#ddd", fontSize:"small"}}>"inline" はインライン編集できるWIKIのようなものです</div>
         <Lines lines={this.props.lines} cursor={this.props.cursor} onUpdate={this.props.onUpdate} />
       </div>
       <div className="side">
