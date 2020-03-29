@@ -24,6 +24,7 @@ schema:
       - .git
       - .realize
       - vendor
+      - web
     scripts:
     - type: before # Windows only
       command: taskkill /im main.exe /F
