@@ -4,9 +4,17 @@ import (
   "os"
   "io"
   "io/ioutil"
+  "strings"
   "path/filepath"
   "mime/multipart"
 )
+
+type SearchResult struct {
+  User string `json:"user"`
+  Id string `json:"id"`
+  LineNo int `json:"lineNo"`
+  Text string `json:"text"`
+}
 
 var CONTENTS_DIR = filepath.Join("data/contents") // TODO: only support 1 depth dir
 var IMG_DIR = filepath.Join("data/imgs")
@@ -35,6 +43,20 @@ func GetImgPath(user string, id string, imgId string) (path string){
   return filepath.Join(IMG_DIR, user, id, imgId)
 }
 
+func Search(keyword string) []SearchResult{
+  gr := Grep(CONTENTS_DIR, keyword)
+  r := make([]SearchResult, len(gr))
+  for i := 0; i < len(gr); i ++ {
+    path := strings.Split(gr[i].Path, string(os.PathSeparator))
+    r[i] = SearchResult {
+      User: path[len(path) - 2],
+      Id: path[len(path) - 1],
+      LineNo: gr[i].LineNo,
+      Text: gr[i].Text,
+    }
+  }
+  return r
+}
 
 func Save (user string, id string, body string) (err error) {
   dirPath := filepath.Join(CONTENTS_DIR, user)

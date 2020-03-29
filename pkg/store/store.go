@@ -24,6 +24,25 @@ type CheckResponse struct {
   User string `json:"user"`
 }
 
+type SearchResponse struct {
+  Lines []file.SearchResult `json:"lines"`
+}
+
+func AttachSearch(r *gin.Engine) {
+  r.OPTIONS("/search", func(c *gin.Context){
+    c.String(200, "OK")
+  })
+  r.POST("/search", func(c *gin.Context){
+    keyword := c.PostForm("keyword")
+    lines := file.Search(keyword)
+    result := SearchResponse {
+      Lines: lines,
+    }
+    c.JSON(200, result)
+    return
+  })
+}
+
 func AttachLoginCheck(r *gin.Engine) {
   r.OPTIONS("/loginCheck", func(c *gin.Context){
     c.String(200, "OK")

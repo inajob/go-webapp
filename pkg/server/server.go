@@ -93,6 +93,7 @@ func Serve() {
   // register entrypoint
   AttachFileServer(r);
   store.AttachLoginCheck(r);
+  store.AttachSearch(r);
   store.AttachImgUpdate(r);
   store.AttachImgGet(r);
   store.AttachUpdate(r);
