@@ -1,9 +1,6 @@
 import React from 'react';
 
 class LoginButton extends React.Component{
-  constructor(props) {
-    super(props)
-  }
   render() {
     if(!this.props.logined){
       return (

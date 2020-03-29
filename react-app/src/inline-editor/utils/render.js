@@ -29,8 +29,6 @@ export const Render = (no, text) => {
           ret += hljsRender(no, lastPart);
         break;
         case "img":
-          let pageName = "test"
-          let userName = "inajob"
           ret += '<img src="'+
             API_SERVER + '/img/' + lastPart + '">'
         break;

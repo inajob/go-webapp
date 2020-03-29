@@ -1,5 +1,4 @@
 function loginButton(state = {login: false, user: null}, action){
-  let newState;
   switch(action.type){
     case 'LOGINED':
       console.log("LOGINED")
@@ -7,7 +6,6 @@ function loginButton(state = {login: false, user: null}, action){
     default:
       return state
   }
-  return state
 }
 
 export default loginButton

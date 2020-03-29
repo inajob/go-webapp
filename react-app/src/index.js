@@ -103,7 +103,7 @@ global.user = opts.user // TODO: manage context?
 
 getPage(opts.user, opts.id).then(function(resp){
   console.log(resp)
-  if(resp.ok == false){
+  if(resp.ok === false){
     loadLine(0, "# " + opts.id)
     return
   }
@@ -114,7 +114,7 @@ getPage(opts.user, opts.id).then(function(resp){
     let index = 0;
     o.body.split(/[\r\n]/).forEach(function(line){
       if(inBlock){
-        if(line == "<<"){ // end of block
+        if(line === "<<"){ // end of block
           loadLine(index, blockBody)
           inBlock = false
           index ++;
@@ -254,7 +254,7 @@ function setupPaste(){
     console.log(items.length);
     for(var i = 0; i < items.length; i ++){
       console.log(items[i]);
-      if(items[i].type.indexOf("image") != -1){
+      if(items[i].type.indexOf("image") !== -1){
         // find image
         console.log("capture image");
         var blob = items[i].getAsFile();

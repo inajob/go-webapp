@@ -1,5 +1,4 @@
 function search(state = {keyword: "", results:[]}, action){
-  let newState;
   switch(action.type){
     case 'SEARCH_UPDATE_KEYWORD':
       console.log(action)
@@ -9,7 +8,6 @@ function search(state = {keyword: "", results:[]}, action){
     default:
       return state
   }
-  return state
 }
 
 export default search
