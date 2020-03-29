@@ -14,6 +14,7 @@ import {insertItem, logined} from './actions'
 import './inline-editor/index.css';
 import './index.css';
 import {Render, isBlock} from './inline-editor/utils/render'
+import {parse} from './inline-editor/utils/inlineDecorator'
 // -- -- --
 
 const store = createStore(rootReducer)
@@ -131,6 +132,7 @@ getPage(opts.user, opts.id).then(function(resp){
         }
       }
     })
+    analysis()
   })
 })
 
@@ -154,6 +156,23 @@ loginCheck(opts.user).then(function(resp){
   })
 })
 
+function analysis(){
+  let keywords = []
+  // TODO: nested wiki link
+  let rawLines = store.getState().lines.forEach((item) => {
+    if(!isBlock(item.text)){
+      let parsed = parse(item.text)
+      parsed.forEach((l) => {
+        if(Array.isArray(l)){
+          if(l[0] == "wikilink"){
+            keywords.push(l[1].body)
+          }
+        }
+      })
+    }
+  })
+  console.log("ANALYSIS", keywords)
+}
 function save(){
   let rawLines = store.getState().lines.map((item) => {
     if(isBlock(item.text)){
