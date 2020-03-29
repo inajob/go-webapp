@@ -24,8 +24,8 @@ class App extends React.Component{
     </div>
     <div className="contents">
       <div className="main">
-        <Lines lines={this.props.lines} cursor={this.props.cursor} onUpdate={this.props.onUpdate} />
         <Search onUpdateKeyword={this.props.updateKeyword} onSearch={this.props.onSearch(this.props.sendSearch)} keyword={this.props.search.keyword} results={this.props.search.results} />
+        <Lines lines={this.props.lines} cursor={this.props.cursor} onUpdate={this.props.onUpdate} />
       </div>
       <div className="side">
         <List items={this.props.items} user={this.props.user} />

@@ -38,9 +38,9 @@
         if(cap.target === "{{"){
           out.push(newPiece("text", body.slice(pos, cap.pos)));
           pos = cap.pos + "{{".length;
-          out.push(inner(level + 1));
+          out.push(["command"].concat(inner(level + 1)));
         }else if(cap.target === "}}"){
-          out.push(newPiece("text", body.slice(pos, cap.pos)));
+          out.push(newPiece("command", body.slice(pos, cap.pos)));
           pos = cap.pos + "}}".length;
           if(level > 0){
             break;
@@ -48,9 +48,9 @@
         }else if(cap.target === "["){
           out.push(newPiece("text", body.slice(pos, cap.pos)));
           pos = cap.pos + "[".length;
-          out.push(inner(level + 1));
+          out.push(["wikilink"].concat(inner(level + 1)));
         }else if(cap.target === "]"){
-          out.push(newPiece("wikilink", body.slice(pos, cap.pos)));
+          out.push(newPiece("text", body.slice(pos, cap.pos)));
           pos = cap.pos + "]".length;
           if(level > 0){
             break;
@@ -86,31 +86,43 @@
     var cmd,remain;
     body.forEach(function(v){
       if(Array.isArray(v)){
-        tmp = htmlEncode(v);
-        list = tmp.split(/\s+/, 2); //  cmd, remain...
+        switch(v[0]){
+          case "command":
+            tmp = htmlEncode(v.slice(1));
+            list = tmp.split(/\s+/, 2); //  cmd, remain...
 
-        var m = tmp.match(/\s+/);
-        if(m){
-          var delimiter = m[0];
-          cmd = tmp.slice(0, m.index);
-        }else{
-          cmd = "";
-        }
+            var m = tmp.match(/\s+/);
+            if(m){
+              var delimiter = m[0];
+              cmd = tmp.slice(0, m.index);
+            }else{
+              cmd = "";
+            }
 
-        switch(cmd){
-          // TODO: implements new command
+            switch(cmd){
+              // TODO: implements new command
+              default:
+                out.push("{{")
+                out.push(tmp);
+                out.push("}}")
+            }
+            break;
+          case "wikilink":
+            tmp = htmlEncode(v.slice(1));
+            out.push("[")
+            out.push("<a href='?&user=" + global.user + "&id=" + tmp + "'>" + tmp + "</a>");
+            out.push("]")
+            break;
           default:
-            out.push("{{")
-            out.push(tmp);
-            out.push("}}")
+            throw new Error("unsupported kind: " + v.kind)
         }
       }else{
         switch(v.kind){
+          case "command":
+            out.push("" + v.body + "");
+            break;
           case "text":
             out.push(v.body);
-            break;
-          case "wikilink":
-            out.push("<a href='?&user=" + global.user + "&id=" + v.body + "'>" + v.body + "</a>");
             break;
           case "url":
             // todo: escape
