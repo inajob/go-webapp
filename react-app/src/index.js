@@ -100,7 +100,7 @@ function getList(user){
 function grepToInstantSearch(grepLines, user, id) {
   let resultMap = {}
   grepLines.forEach((l) => {
-    if(resultMap[l.user + "/" + l.id] || (l.user == user && l.id == id)){
+    if(resultMap[l.user + "/" + l.id] || (l.user === user && l.id === id)){
     }else{
       resultMap[l.user + "/" + l.id] = {user: l.user, id: l.id, text: l.text}
     }
@@ -181,12 +181,12 @@ loginCheck(opts.user).then(function(resp){
 function analysis(){
   let keywords = []
   // TODO: nested wiki link
-  let rawLines = store.getState().lines.forEach((item) => {
+  store.getState().lines.forEach((item) => {
     if(!isBlock(item.text)){
       let parsed = parse(item.text)
       parsed.forEach((l) => {
         if(Array.isArray(l)){
-          if(l[0] == "wikilink"){
+          if(l[0] === "wikilink"){
             keywords.push(l[1].body)
           }
         }
