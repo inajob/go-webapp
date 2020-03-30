@@ -12,13 +12,11 @@ class Search extends React.Component{
     return false
   }
   change(e) {
-    console.log(this.props)
     this.props.onUpdateKeyword(e.target.value)
     e.preventDefault()
     return false
   }
   render() {
-    console.log(this.props.results)
     return (
       <div className="search">
         <form onSubmit={this.submit}>

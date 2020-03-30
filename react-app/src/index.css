@@ -72,3 +72,24 @@
   background-color:white;
   margin-bottom: 2px;
 }
+.instant-search {
+}
+.instant-search .piece {
+  background-color: #eee;
+  margin:3px;
+  padding:3px;
+}
+
+.instant-search .piece .pages {
+  display: flex;
+  flex-wrap: wrap;
+}
+.instant-search .piece li {
+  width: 22%;
+  display: block;
+  border:solid 1px;
+  border-radius: 5px;
+  padding:3px;
+  margin: 3px;
+  background-color: white;
+}

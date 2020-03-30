@@ -17,3 +17,8 @@ export const updateResults = (results) => ({
   type: 'SEARCH_UPDATE_RESULTS',
   results: results,
 })
+export const updateInstantResults = (keyword, results) => ({
+  type: 'INSTANT_SEARCH_UPDATE_RESULT',
+  keyword: keyword,
+  results: results,
+})

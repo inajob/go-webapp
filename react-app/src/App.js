@@ -25,14 +25,29 @@ class App extends React.Component{
     <div className="contents">
       <div className="main">
         <Search onUpdateKeyword={this.props.updateKeyword} onSearch={this.props.onSearch(this.props.sendSearch)} keyword={this.props.search.keyword} results={this.props.search.results} />
+
         <Lines lines={this.props.lines} cursor={this.props.cursor} onUpdate={this.props.onUpdate} />
+
+        <div class="instant-search">
+          {Object.keys(this.props.instantSearch.results).map((k, j) => (
+            <div className="piece" key={j}>
+              <div>{k}</div>
+              <div className="pages">
+              {this.props.instantSearch.results[k].map((r, i) => (
+                <li key={i}><div><a href={"?user=" + r.user + "&id=" + r.id}>{r.id}</a></div><div>{r.text}</div></li>
+              ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
       </div>
       <div className="side">
         <List items={this.props.items} user={this.props.user} />
       </div>
     </div>
   </div>
-)
+  )
   }}
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -41,6 +56,7 @@ const mapStateToProps = (state, ownProps) => {
     items: state.items,
     loginButton: state.loginButton,
     search: state.search,
+    instantSearch: state.instantSearch,
   }
 }
 const mapDispatchToProps = (dispatch) => {

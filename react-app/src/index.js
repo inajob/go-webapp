@@ -10,7 +10,7 @@ import {mermaidAPI} from 'mermaid'
 import rootReducer from './reducers'
 import App from './App'
 import {insertLine, setReadOnly} from './inline-editor/actions'
-import {insertItem, logined} from './actions'
+import {insertItem, logined, updateInstantResults} from './actions'
 import './inline-editor/index.css';
 import './index.css';
 import {Render, isBlock} from './inline-editor/utils/render'
@@ -97,6 +97,21 @@ function getList(user){
   return fetch(req)
 }
 
+function grepToInstantSearch(grepLines, user, id) {
+  let resultMap = {}
+  grepLines.forEach((l) => {
+    if(resultMap[l.user + "/" + l.id] || (l.user == user && l.id == id)){
+    }else{
+      resultMap[l.user + "/" + l.id] = {user: l.user, id: l.id, text: l.text}
+    }
+  })
+  let result = []
+  Object.keys(resultMap).forEach((k) => {
+    result.push(resultMap[k])
+  })
+  return result;
+}
+
 let opts = getOpts()
 console.log("opts", opts)
 global.user = opts.user // TODO: manage context?
@@ -132,7 +147,16 @@ getPage(opts.user, opts.id).then(function(resp){
         }
       }
     })
-    analysis()
+    let keywords = analysis()
+    keywords.forEach((k) => {
+      sendSearch("[" + k + "]").then((resp) => {
+        resp.json().then((o) => {
+          let lines = o.lines
+          let is = grepToInstantSearch(lines, opts.user, opts.id)
+          store.dispatch(updateInstantResults(k, is))
+        })
+      })
+    })
   })
 })
 
@@ -143,9 +167,7 @@ try{
 }
 
 loginCheck(opts.user).then(function(resp){
-  console.log(resp)
   resp.json().then(function(o){
-    console.log("loginCheck", o)
     if(!o.editable){
       setReadOnly()
       store.dispatch(setReadOnly())
@@ -171,7 +193,7 @@ function analysis(){
       })
     }
   })
-  console.log("ANALYSIS", keywords)
+  return keywords
 }
 function save(){
   let rawLines = store.getState().lines.map((item) => {

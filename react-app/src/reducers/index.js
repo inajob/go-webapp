@@ -4,6 +4,7 @@ import cursor from '../inline-editor/reducers/cursor'
 import items from './items'
 import loginButton from './loginButton'
 import search from './search'
+import instantSearch from './instantSearch'
 
 export default combineReducers({
   lines,
@@ -11,4 +12,5 @@ export default combineReducers({
   items,
   loginButton,
   search,
+  instantSearch,
 })
