@@ -1,4 +1,6 @@
-  /*
+import {create, all} from 'mathjs'
+
+/*
   {{link url}}
   {{img img}}
   */
@@ -84,6 +86,7 @@
     var tmp;
     var list;
     var cmd,remain;
+    const math = create(all, {})
     body.forEach(function(v){
       if(Array.isArray(v)){
         switch(v[0]){
@@ -101,6 +104,18 @@
 
             switch(cmd){
               // TODO: implements new command
+              case "calc":
+                console.log(cmd, list)
+                out.push("<span style='border:solid 1px;'>{{")
+                out.push(tmp);
+                out.push("}}")
+                try{
+                  let result = math.evaluate(list[1]);
+                  out.push("<span style='background-color:#dff;user-select:none;'> = " + result + "</span></span>")
+                }catch(e){
+                  console.log("error: " + list[1])
+                }
+                break;
               default:
                 out.push("{{")
                 out.push(tmp);
