@@ -28,7 +28,7 @@ class App extends React.Component{
 
         <Lines lines={this.props.lines} cursor={this.props.cursor} onUpdate={this.props.onUpdate} />
 
-        <div class="instant-search">
+        <div className="instant-search">
           {Object.keys(this.props.instantSearch.results).map((k, j) => (
             <div className="piece" key={j}>
               <div>{k}</div>

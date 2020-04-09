@@ -85,7 +85,7 @@ import {create, all} from 'mathjs'
     var out = [];
     var tmp;
     var list;
-    var cmd,remain;
+    var cmd, remain;
     const math = create(all, {})
     body.forEach(function(v){
       if(Array.isArray(v)){
@@ -97,7 +97,8 @@ import {create, all} from 'mathjs'
             var m = tmp.match(/\s+/);
             if(m){
               var delimiter = m[0];
-              cmd = tmp.slice(0, m.index);
+              cmd = tmp.slice(0, m.index)
+              remain = tmp.slice(m.index + delimiter.length)
             }else{
               cmd = "";
             }
@@ -106,14 +107,14 @@ import {create, all} from 'mathjs'
               // TODO: implements new command
               case "calc":
                 console.log(cmd, list)
-                out.push("<span style='border:solid 1px;'>{{")
+                out.push("<span style='background-color:#eef;border-radius:1em;'>{{")
                 out.push(tmp);
                 out.push("}}")
                 try{
-                  let result = math.evaluate(list[1]);
+                  let result = math.evaluate(remain);
                   out.push("<span style='background-color:#dff;user-select:none;'> = " + result + "</span></span>")
                 }catch(e){
-                  console.log("error: " + list[1])
+                  console.log("math error: " + list[1], e)
                 }
                 break;
               default:
