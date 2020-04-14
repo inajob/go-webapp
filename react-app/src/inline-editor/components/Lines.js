@@ -26,7 +26,7 @@ class Lines extends React.Component{
                 onUp={this.props.onUp(
                         index===0?"":this.props.lines[index - 1])}
                 onDown={this.props.onDown(
-                        index>=this.props.lines.length - 1?"":this.props.lines[index + 1].text)}
+                        index>=this.props.lines.length - 1?"":this.props.lines[index + 1].text, index >= this.props.lines.length - 1)}
                 onEnter={this.props.onEnter}
                 onTab={this.props.onTab}
                 onClick={this.props.onClick}
@@ -109,7 +109,7 @@ const mapDispatchToProps = (dispatch) => {
         dispatch(setCursor(no - 1, col, true))
       }
     },
-    onDown: (downText) => (no, col, text) => {
+    onDown: (downText, lastLineFlag) => (no, col, text) => {
       let num = numLines(text);
       let pos = getCursorPos(col,text);
       if(isBlock(text) && pos[1] < num - 1){
@@ -120,7 +120,9 @@ const mapDispatchToProps = (dispatch) => {
         let firstLine = lines[0];
         dispatch(setCursor(no + 1, Math.min(col, firstLine.length), true))
       }else{
-        dispatch(setCursor(no + 1, col, true))
+        if(!lastLineFlag){
+          dispatch(setCursor(no + 1, col, true))
+        }
       }
     },
     onEnter: (no, text, pos, shift) => {
