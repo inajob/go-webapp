@@ -1,6 +1,7 @@
 import {mermaidRender} from '../render/mermaid'
 import {hljsRender} from '../render/hljs'
 import {parse, htmlEncode}  from '../utils/inlineDecorator'
+import {create, all} from 'mathjs'
 
 const API_SERVER=process.env.REACT_APP_API_SERVER
 
@@ -15,6 +16,18 @@ export const Render = (no, text) => {
     let ret = "";
     if(parts[0] === ">>"){
       switch(parts[1]){
+        case "calc":
+          const math = create(all, {})
+          const scope = {}
+          ret += "<span class='mode'>&gt;&gt; calc</span>";
+          lastPart.forEach((line) => {
+            try{
+            ret += "<div>" + line + '</div><div style="font-size:small;margin-left:1em;;background-color:#ddd;">&raquo; ' + math.evaluate(line, scope) + "</div>";
+            }catch(e){
+              // TODO: catch
+            }
+          })
+        break;
         case "pre":
           ret += "<span class='mode'>&gt;&gt; pre</span>";
           ret += "<pre>" + lastPart.join("\n") + "</pre>";
