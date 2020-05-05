@@ -118,43 +118,44 @@ global.user = opts.user // TODO: manage context?
 
 
 getPage(opts.user, opts.id).then(function(resp){
+  let keywords = [decodeURIComponent(opts.id)]
   console.log(resp)
   if(resp.ok === false){
-    loadLine(0, "# " + opts.id)
-    return
-  }
-  resp.json().then(function(o){
-    console.log(o)
-    let inBlock = false
-    let blockBody;
-    let index = 0;
-    o.body.split(/[\r\n]/).forEach(function(line){
-      if(inBlock){
-        if(line === "<<"){ // end of block
-          loadLine(index, blockBody)
-          inBlock = false
-          index ++;
+    loadLine(0, "# " + decodeURIComponent(opts.id))
+  }else{
+    resp.json().then(function(o){
+      console.log(o)
+      let inBlock = false
+      let blockBody;
+      let index = 0;
+      o.body.split(/[\r\n]/).forEach(function(line){
+        if(inBlock){
+          if(line === "<<"){ // end of block
+            loadLine(index, blockBody)
+            inBlock = false
+            index ++;
+          }else{
+            blockBody += "\n" + line
+          }
         }else{
-          blockBody += "\n" + line
+          if(isBlock(line)){ // start of block
+            inBlock = true
+            blockBody = line
+          }else{ // not block line
+            loadLine(index, line)
+            index ++;
+          }
         }
-      }else{
-        if(isBlock(line)){ // start of block
-          inBlock = true
-          blockBody = line
-        }else{ // not block line
-          loadLine(index, line)
-          index ++;
-        }
-      }
+      })
     })
-    let keywords = [decodeURIComponent(opts.id)].concat(analysis())
-    keywords.forEach((k) => {
-      sendSearch("[" + k + "]").then((resp) => {
-        resp.json().then((o) => {
-          let lines = o.lines
-          let is = grepToInstantSearch(lines, opts.user, opts.id)
-          store.dispatch(updateInstantResults(k, is))
-        })
+    keywords = keywords.concat(analysis())
+  }
+  keywords.forEach((k) => {
+    sendSearch("[" + k + "]").then((resp) => {
+      resp.json().then((o) => {
+        let lines = o.lines
+        let is = grepToInstantSearch(lines, opts.user, opts.id)
+        store.dispatch(updateInstantResults(k, is))
       })
     })
   })
