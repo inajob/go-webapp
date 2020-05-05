@@ -5,7 +5,7 @@ build:
 	go build -o server cmd/server/main.go
 
 buildweb:
-	cd react-app &&  REACT_APP_API_SERVER=http://inline.inajob.ml yarn run build
+	cd react-app &&  REACT_APP_API_SERVER=http://inline.inajob.tk yarn run build
 
 build-backend: buildweb
 	docker build -t kinadu/go-webapp-backend .
