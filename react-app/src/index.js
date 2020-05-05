@@ -147,7 +147,7 @@ getPage(opts.user, opts.id).then(function(resp){
         }
       }
     })
-    let keywords = analysis()
+    let keywords = [decodeURIComponent(opts.id)].concat(analysis())
     keywords.forEach((k) => {
       sendSearch("[" + k + "]").then((resp) => {
         resp.json().then((o) => {
