@@ -1,5 +1,7 @@
 import {create, all} from 'mathjs'
 
+const API_SERVER=process.env.REACT_APP_API_SERVER
+
 /*
   {{link url}}
   {{img img}}
@@ -104,7 +106,14 @@ import {create, all} from 'mathjs'
             }
 
             switch(cmd){
-              // TODO: implements new command
+              // inline commands
+              case "img":
+                out.push('<span class="inline-image">{{')
+                out.push('img')
+                out.push('<img src="'+
+                  API_SERVER + '/img/' + remain + '">')
+                out.push('}}</span>')
+                break;
               case "calc":
                 console.log(cmd, list)
                 out.push("<span style='background-color:#eef;border-radius:1em;'>{{")
