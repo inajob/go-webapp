@@ -13,6 +13,9 @@ build-backend: buildweb
 push-backend: build-backend
 	docker push kinadu/go-webapp-backend
 
+deploy: push-backend
+	kubectl rollout restart -n inline-editor
+
 build-frontend:
 	docker build -t kinadu/go-webapp-frontend ./react-app
 
