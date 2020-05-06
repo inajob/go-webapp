@@ -109,9 +109,16 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
               // inline commands
               case "link":
                 out.push('<span class="tiny">{{link ')
-                tmp = remain.split(/\s+/,2)
-                out.push(tmp[0]) // url
-                out.push(" </span><a target='_blank' href='"+ tmp[0] +"'>"+tmp[1]+"</a>") // label
+                let m = remain.match(/\s+/)
+                var url
+                var label
+                if(m){
+                  let delimiter = m[0];
+                  url = remain.slice(0, m.index)
+                  label = remain.slice(m.index + delimiter.length)
+                }
+                out.push(url) // url
+                out.push(" </span><a target='_blank' href='"+ url +"'>"+label+"</a>") // label
                 out.push('<span class="tiny">}}</span>')
                 break
               case "img":
