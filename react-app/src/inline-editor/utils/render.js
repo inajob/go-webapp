@@ -71,11 +71,11 @@ export const Render = (no, text) => {
     return ret;
   }else{
     if(text.indexOf("###") === 0){
-      return "<div>" + text + "<div>"
+      return "<div>" + escapeHTML(text) + "<div>"
     }else if(text.indexOf("##") === 0){
-      return "<div>" + text + "<div>"
+      return "<div>" + escapeHTML(text) + "<div>"
     }else if(text.indexOf("#") === 0){
-      return "<div>" + text + "<div>"
+      return "<div>" + escapeHTML(text) + "<div>"
     }
     return "<div>"+htmlEncode(parse(text))+"</div>"
   }
