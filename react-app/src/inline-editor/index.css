@@ -23,6 +23,13 @@ textarea {
 textarea:focus{
   outline: none;
 }
+table{
+  border: solid 1px;
+}
+table td{
+  border: solid 1px;
+  padding: 0.3em;
+}
 line{
   width: 100%;
 }

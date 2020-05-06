@@ -5,6 +5,10 @@ import {create, all} from 'mathjs'
 
 const API_SERVER=process.env.REACT_APP_API_SERVER
 
+function escapeHTML(s){
+  return htmlEncode(parse(s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")));
+}
+
 export const Render = (no, text) => {
   // TODO: sanitize!!
   if(isBlock(text)){
@@ -44,6 +48,19 @@ export const Render = (no, text) => {
         case "img":
           ret += '<img src="'+
             API_SERVER + '/img/' + lastPart + '">'
+        break;
+        case "table":
+          ret += "<table>";
+          lastPart.forEach(function(i){
+            ret += "<tr>";
+            i.split(",").forEach(function(j){
+              ret += "<td>";
+              ret += escapeHTML(j);
+              ret += "</td>";
+            });
+            ret += "</tr>";
+          });
+          ret += "</table>";
         break;
         default:
           ret += "<pre>" + text + "</pre>";
