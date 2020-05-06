@@ -118,11 +118,11 @@ global.user = opts.user // TODO: manage context?
 
 
 getPage(opts.user, opts.id).then(function(resp){
-  let keywords = [decodeURIComponent(opts.id)]
+  let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
   console.log(resp)
   let instantSearch = () => {
     keywords.forEach((k) => {
-      sendSearch("[" + k + "]").then((resp) => {
+      sendSearch(k).then((resp) => {
         resp.json().then((o) => {
           let lines = o.lines
           let is = grepToInstantSearch(lines, opts.user, opts.id)
@@ -133,6 +133,7 @@ getPage(opts.user, opts.id).then(function(resp){
   }
   if(resp.ok === false){
     loadLine(0, "# " + decodeURIComponent(opts.id))
+    keywords.push(decodeURIComponent(opts.id))
     instantSearch()
   }else{
     resp.json().then(function(o){
@@ -159,7 +160,8 @@ getPage(opts.user, opts.id).then(function(resp){
           }
         }
       })
-      keywords = keywords.concat(analysis())
+      keywords = keywords.concat(analysis().map((k) => "[" + k +"]"))
+      keywords.push(decodeURIComponent(opts.id)) // full search
       instantSearch()
     })
   }
