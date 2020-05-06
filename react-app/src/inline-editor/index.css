@@ -86,6 +86,14 @@ line{
   font-size: 10px;
   padding: 3px;
 }
+.tiny {
+  background-color: #eee;
+  border-radius: 3px;
+  color: gray;
+  font-size: 3px;
+  padding: 3px;
+}
+
 .inline-image {
   background-color: #666;
   border-radius: 3px;

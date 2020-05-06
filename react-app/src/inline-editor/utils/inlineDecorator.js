@@ -107,6 +107,13 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
 
             switch(cmd){
               // inline commands
+              case "link":
+                out.push('<span class="tiny">{{link ')
+                tmp = remain.split(/\s+/,2)
+                out.push(tmp[0]) // url
+                out.push(" </span><a target='_blank' href='"+ tmp[0] +"'>"+tmp[1]+"</a>") // label
+                out.push('<span class="tiny">}}</span>')
+                break
               case "img":
                 out.push('<span class="inline-image">{{')
                 out.push('img')
