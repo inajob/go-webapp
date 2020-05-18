@@ -8,9 +8,7 @@ import Controller from './components/Controller'
 import { connect } from 'react-redux'
 import {insertLine, setReadOnly, setReadWrite} from './inline-editor/actions'
 import {Render} from './inline-editor/utils/render'
-import { updateKeyword, updateResults,
-  modalListOpen
-} from './actions'
+import { updateKeyword, updateResults, modalListOpen} from './actions'
 
 class App extends React.Component{
   render() {
@@ -79,6 +77,9 @@ const mapDispatchToProps = (dispatch) => {
         })
       })
     },
+    updateKeyword: (keyword) => {
+      dispatch(updateKeyword(keyword))
+    },
     onSelectList: (cursor) => (text) => {
       dispatch(insertLine(cursor.row, text, Render(cursor.row, text)))
     },
@@ -91,9 +92,6 @@ const mapDispatchToProps = (dispatch) => {
     },
     onDebug: () => {
       dispatch(modalListOpen())
-    },
-    updateKeyword: (keyword) => {
-      dispatch(updateKeyword(keyword))
     },
   }
 }
