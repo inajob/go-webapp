@@ -12,7 +12,7 @@ import App from './App'
 import {insertLine, setReadOnly} from './inline-editor/actions'
 import {insertItem, logined, updateInstantResults,
   modalListUpdateProviders,
-  modalListOpen
+  modalListClose
 } from './actions'
 import './inline-editor/index.css';
 import './index.css';
@@ -126,7 +126,7 @@ getPage(opts.user, opts.id).then(function(resp){
     {name: "aliexpress"},
   ]))
 
-  store.dispatch(modalListOpen())
+  store.dispatch(modalListClose())
 
   let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
   console.log(resp)

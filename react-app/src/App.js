@@ -9,9 +9,8 @@ import { connect } from 'react-redux'
 import {insertLine, setReadOnly, setReadWrite} from './inline-editor/actions'
 import {Render} from './inline-editor/utils/render'
 import { updateKeyword, updateResults,
-  modalListUpdateList,modalListUp, modalListDown, modalListOpen, modalListClose, modalListUpdateQuery
+  modalListOpen
 } from './actions'
-import {jsonp} from './utils/jsonp';
 
 class App extends React.Component{
   render() {
@@ -53,9 +52,8 @@ class App extends React.Component{
     </div>
     <ModalList
       {...this.props.modalList}
-      cursor={this.props.cursor}
-      onKeyDown={this.props.onModalKeyDown}
-      onModalQueryChange={this.props.onModalQueryChange}
+      onSelectList={this.props.onSelectList(this.props.cursor)}
+      onClose={this.props.onModalListClose}
     />
   </div>
   )
@@ -73,56 +71,6 @@ const mapStateToProps = (state, ownProps) => {
 }
 const mapDispatchToProps = (dispatch) => {
   return {
-    onModalQueryChange: (e) =>{
-      dispatch(modalListUpdateQuery(e.target.value))
-    },
-    onModalKeyDown: (query, phase, provider, index, text, cursor) => (e) => {
-      switch(e.keyCode){
-        case 27: // esc
-        dispatch(modalListClose())
-        dispatch(setReadWrite())
-        break;
-        case 38: // up
-        dispatch(modalListUp())
-        break;
-        case 40: // down
-        dispatch(modalListDown())
-        break;
-        case 13: // enter
-          switch(phase){
-            case "PROVIDERS":
-              switch(provider.name){
-                case "amazon":
-                jsonp("amazon", "http://web.inajob.tk/ad/amz.php?callback=amazon&q=" + encodeURIComponent(query), function(data){
-                  let list = []
-                  data.forEach((i) => {
-                    list.push({
-                      title: i.title,
-                      image: i.mimage[0],
-                      text:  ">> item\n"+i.link[0]+ "\n" +i.mimage[0] + "\n" + i.title,
-                    })
-                  })
-                  dispatch(modalListUpdateList(list))
-                })
-                break
-                case "aliexpress":
-                  throw new Error("not implemented yet")
-                default:
-                  throw new Error("unknown provider",provider.name)
-              }
-              break;
-            case "LIST":
-              dispatch(setReadWrite())
-              dispatch(insertLine(cursor.row, text, Render(cursor.row, text)))
-              dispatch(modalListClose())
-              break;
-            default:
-              throw new Error("unknown phase", phase)
-          }
-        break;
-        default:
-      }
-    },
     onSearch: (sendSearch) => (keyword) => {
       console.log("search", keyword)
       sendSearch(keyword).then((resp) => {
@@ -130,6 +78,12 @@ const mapDispatchToProps = (dispatch) => {
           dispatch(updateResults(o.lines))
         })
       })
+    },
+    onSelectList: (cursor) => (text) => {
+      dispatch(insertLine(cursor.row, text, Render(cursor.row, text)))
+    },
+    onModalListClose: () => {
+      dispatch(setReadWrite())
     },
     onMagic: () => {
       dispatch(setReadOnly())
