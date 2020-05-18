@@ -15,6 +15,7 @@ class Controller extends React.Component{
           */}
           <button onClick={this.props.onNewDiary}>New Diary</button>
           <button onClick={this.props.onNewJunk}>New Junk</button>
+          <button onClick={this.props.onDebug}>onDebug</button>
           {/*
           <button>Rename</button>
           <button>Delete</button>

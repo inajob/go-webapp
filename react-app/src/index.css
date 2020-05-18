@@ -93,3 +93,11 @@
   margin: 3px;
   background-color: white;
 }
+
+.modal-list-ul li{
+  display: block;
+  border: solid 1px;
+}
+.modal-list-ul li.active{
+  background-color: #ddf;
+}

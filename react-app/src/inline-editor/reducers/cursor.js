@@ -7,6 +7,13 @@ function cursor(state = {col: 0, row: 0, dirty: false, editable: true}, action){
         dirty: state.dirty,
         editable: false,
       }
+    case 'SET_READWRITE':
+      return {
+        row: state.row,
+        col: state.col,
+        dirty: state.dirty,
+        editable: true,
+      }
     case 'SET_CURSOR':
       return {
         row: action.row,

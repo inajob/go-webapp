@@ -5,6 +5,7 @@ import items from './items'
 import loginButton from './loginButton'
 import search from './search'
 import instantSearch from './instantSearch'
+import modalList from './modalList'
 
 export default combineReducers({
   lines,
@@ -13,4 +14,5 @@ export default combineReducers({
   loginButton,
   search,
   instantSearch,
+  modalList,
 })

@@ -36,3 +36,7 @@ export const setReadOnly = () => ({
   type: 'SET_READONLY',
 })
 
+export const setReadWrite = () => ({
+  type: 'SET_READWRITE',
+})
+

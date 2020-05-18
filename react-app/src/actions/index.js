@@ -22,3 +22,28 @@ export const updateInstantResults = (keyword, results) => ({
   keyword: keyword,
   results: results,
 })
+export const modalListUp = () => ({
+  type: 'MODAL_LIST_UP',
+})
+export const modalListDown = () => ({
+  type: 'MODAL_LIST_DOWN',
+})
+export const modalListUpdateProviders = (providers) => ({
+  type: 'MODAL_LIST_UPDATE_PROVIDERS',
+  providers: providers
+})
+export const modalListUpdateList = (list) => ({
+  type: 'MODAL_LIST_UPDATE_LIST',
+  list: list
+})
+export const modalListUpdateQuery = (query) => ({
+  type: 'MODAL_LIST_UPDATE_QUERY',
+  query: query
+})
+export const modalListOpen = () => ({
+  type: 'MODAL_LIST_OPEN',
+})
+export const modalListClose = () => ({
+  type: 'MODAL_LIST_CLOSE',
+})
+

@@ -27,7 +27,7 @@ class Lines extends React.Component{
                         index===0?"":this.props.lines[index - 1])}
                 onDown={this.props.onDown(
                         index>=this.props.lines.length - 1?"":this.props.lines[index + 1].text, index >= this.props.lines.length - 1)}
-                onEnter={this.props.onEnter}
+                onEnter={this.props.onEnter(this.props.onMagic)}
                 onTab={this.props.onTab}
                 onClick={this.props.onClick}
                 onLeftUp={this.props.onLeftUp(
@@ -125,7 +125,7 @@ const mapDispatchToProps = (dispatch) => {
         }
       }
     },
-    onEnter: (no, text, pos, shift) => {
+    onEnter: (onMagic) => (no, text, pos, shift) => {
       if(isBlock(text)){
         if(shift){
           dispatch(insertLine(no + 1, "", ""))
@@ -134,13 +134,17 @@ const mapDispatchToProps = (dispatch) => {
         }
         return true;
       }else{
-        dispatch(setCursor(no + 1, 0, true))
-        if(text === undefined)text = ""
-        let t1 = text.slice(0, pos)
-        dispatch(changeLine(no, t1, Render(no, t1)))
-        let t2 = text.slice(pos)
-        dispatch(insertLine(no + 1, t2, Render(no + 1, t2)))
-        return false; // prevent default
+        if(shift){
+          onMagic()
+        }else{
+          dispatch(setCursor(no + 1, 0, true))
+          if(text === undefined)text = ""
+          let t1 = text.slice(0, pos)
+          dispatch(changeLine(no, t1, Render(no, t1)))
+          let t2 = text.slice(pos)
+          dispatch(insertLine(no + 1, t2, Render(no + 1, t2)))
+          return false; // prevent default
+        }
       }
     },
     onTab: (no, text, shift) => {

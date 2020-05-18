@@ -124,8 +124,12 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
               case "img":
                 out.push('<span class="inline-image">{{')
                 out.push('img')
-                out.push('<img src="'+
-                  API_SERVER + '/img/' + remain + '">')
+                if(remain.indexOf("http://")===0 || remain.indexOf("https://")===0){
+                  out.push('<img src="' +remain+ '">')
+                }else{
+                  out.push('<img src="'+
+                    API_SERVER + '/img/' + remain + '">')
+                }
                 out.push('}}</span>')
                 break;
               case "calc":

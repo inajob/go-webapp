@@ -10,7 +10,10 @@ import {mermaidAPI} from 'mermaid'
 import rootReducer from './reducers'
 import App from './App'
 import {insertLine, setReadOnly} from './inline-editor/actions'
-import {insertItem, logined, updateInstantResults} from './actions'
+import {insertItem, logined, updateInstantResults,
+  modalListUpdateProviders,
+  modalListOpen
+} from './actions'
 import './inline-editor/index.css';
 import './index.css';
 import {Render, isBlock} from './inline-editor/utils/render'
@@ -118,6 +121,13 @@ global.user = opts.user // TODO: manage context?
 
 
 getPage(opts.user, opts.id).then(function(resp){
+  store.dispatch(modalListUpdateProviders([
+    {name: "amazon"},
+    {name: "aliexpress"},
+  ]))
+
+  store.dispatch(modalListOpen())
+
   let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
   console.log(resp)
   let instantSearch = () => {

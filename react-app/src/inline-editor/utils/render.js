@@ -46,8 +46,26 @@ export const Render = (no, text) => {
           ret += hljsRender(no, lastPart);
         break;
         case "img":
-          ret += '<img src="'+
-            API_SERVER + '/img/' + lastPart + '">'
+          if(lastPart.indexOf("http://")===0 || lastPart.indexOf("https://")===0){
+            ret += '<img src="' + lastPart + '">'
+          }else{
+            ret += '<img src="'+
+              API_SERVER + '/img/' + lastPart + '">'
+          }
+        break;
+        case "item":
+          ret += '<a href="'+lastPart[0]+'">'
+          ret += '<table>'
+          ret += '<tr>'
+          ret += '<td>'
+          ret += '<img src="' + lastPart[1] + '" />'
+          ret += '</td>'
+          ret += '<td>'
+          ret += lastPart[2]
+          ret += '</td>'
+          ret += '</tr>'
+          ret += '</table>'
+          ret += '</a>'
         break;
         case "table":
           ret += "<table>";
