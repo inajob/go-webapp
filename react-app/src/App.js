@@ -3,6 +3,7 @@ import Lines from './inline-editor/components/Lines'
 import List from './components/List'
 import LoginButton from './components/LoginButton'
 import Search from './components/Search'
+import ModalList from './components/ModalList'
 import Controller from './components/Controller'
 import { connect } from 'react-redux'
 import {insertLine, setReadOnly, setReadWrite} from './inline-editor/actions'
@@ -10,22 +11,9 @@ import {Render} from './inline-editor/utils/render'
 import { updateKeyword, updateResults,
   modalListUpdateList,modalListUp, modalListDown, modalListOpen, modalListClose, modalListUpdateQuery
 } from './actions'
-import Modal from 'react-modal';
 import {jsonp} from './utils/jsonp';
 
 class App extends React.Component{
-  componentDidUpdate(){
-    if(this.props.modalList.phase !== "NONE"){
-      // TODO: below line doesn't work well.
-      if(this.refs["query"]){
-        this.refs["query"].focus()
-      }
-      var target = this.refs["item" + this.props.modalList.index];
-      if(target){
-        target.scrollIntoView()
-      }
-    }
-  }
   render() {
   return (
   <div>
@@ -63,41 +51,12 @@ class App extends React.Component{
         <List items={this.props.items} user={this.props.user} />
       </div>
     </div>
-    <Modal isOpen={this.props.modalList.phase !== "NONE"}>
-       <input type="text"
-         ref="query"
-         onChange={this.props.onModalQueryChange}
-         value={this.props.modalList.query}
-         onKeyDown={this.props.onModalKeyDown(
-         this.props.modalList.query,
-         this.props.modalList.phase,
-         this.props.modalList.providers[this.props.modalList.providerIndex],
-         this.props.modalList.index,
-         this.props.modalList.list[this.props.modalList.index]?this.props.modalList.list[this.props.modalList.index].text:"",
-         this.props.cursor
-       )} />
-
-       <div className="modal-list" style={{display: this.props.modalList.phase === "PROVIDERS"?"block":"none"}}>
-        <h1>ProviderList</h1>
-        <ul className="modal-list-ul">
-          {this.props.modalList.providers.map((item, i) => (
-            <li key={i} className={(i===this.props.modalList.providerIndex)?"active":"deactive"}>
-              <div>{item.name}</div>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="modal-list" style={{display: this.props.modalList.phase === "LIST"?"block":"none"}}>
-        <h1>List</h1>
-        <ul className="modal-list-ul">
-          {this.props.modalList.list.map((item, i) => (
-            <li key={i} ref={"item"+i} className={(i===this.props.modalList.index)?"active":"deactive"}>
-              <div><img src={item.image} alt="" />{item.title}</div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </Modal>
+    <ModalList
+      {...this.props.modalList}
+      cursor={this.props.cursor}
+      onKeyDown={this.props.onModalKeyDown}
+      onModalQueryChange={this.props.onModalQueryChange}
+    />
   </div>
   )
   }}
