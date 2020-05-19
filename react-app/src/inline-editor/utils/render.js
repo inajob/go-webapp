@@ -1,6 +1,8 @@
 import {mermaidRender} from '../render/mermaid'
 import {hljsRender} from '../render/hljs'
 import {parse, htmlEncode}  from '../utils/inlineDecorator'
+import {previewLine} from '../actions'
+import {jsonp}  from './jsonp'
 import {create, all} from 'mathjs'
 
 const API_SERVER=process.env.REACT_APP_API_SERVER
@@ -9,7 +11,7 @@ function escapeHTML(s){
   return htmlEncode(parse(s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")));
 }
 
-export const Render = (no, text) => {
+export const Render = (no, text, dispatch) => {
   // TODO: sanitize!!
   if(isBlock(text)){
     let lines = getLines(text);
@@ -53,6 +55,23 @@ export const Render = (no, text) => {
               API_SERVER + '/img/' + lastPart + '">'
           }
         break;
+        case "oembed":
+          let url = "https://noembed.com/embed";
+          var name = "callback_" + Math.random().toString(36).slice(-8);
+          let body = lastPart[0]
+          if(body){
+            if(body.indexOf("https://twitter.com") != -1){
+              url = "https://api.twitter.com/1/statuses/oembed.json";
+            }
+            url += "?url="+encodeURIComponent(body.replace(/[\r\n]/g,""))+'&callback=' + name;
+            jsonp(name, url, function(data){
+              var body = '<span class="mode">&gt;&gt; oembed</span><br/>' + data.html;
+              dispatch(previewLine(no, body));
+              window.twttr.widgets.load() // TODO: global object?
+            });
+            ret += "oembed..."+body
+          }
+        break
         case "item":
           ret += "<span class='mode'>&gt;&gt; item</span>";
           ret += '<a href="'+lastPart[0]+'">'

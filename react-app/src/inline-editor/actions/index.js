@@ -1,7 +1,7 @@
 
-export const previewLine = (no, html) => ({
+export const previewLine = (no, preview) => ({
   type: 'PREVIEW_LINE',
-  html,
+  preview,
   no,
 })
 

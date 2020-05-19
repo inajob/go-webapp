@@ -27,7 +27,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
 mermaidAPI.initialize({startOnLoad: true, theme: 'forest'});
 
 function loadLine(no, text){
-  store.dispatch(insertLine(no, text, Render(no,text)))
+  store.dispatch(insertLine(no, text, Render(no,text,store.dispatch)))
 }
 
 function getOpts(){

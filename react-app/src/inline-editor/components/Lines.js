@@ -90,7 +90,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     onChange: (no,text) => {
-      dispatch(changeLine(no, text, Render(no, text)))
+      dispatch(changeLine(no, text, Render(no, text, dispatch)))
     },
     onUp: (upText) => (no, col, text) => {
       if(no <= 0){
@@ -140,9 +140,9 @@ const mapDispatchToProps = (dispatch) => {
           dispatch(setCursor(no + 1, 0, true))
           if(text === undefined)text = ""
           let t1 = text.slice(0, pos)
-          dispatch(changeLine(no, t1, Render(no, t1)))
+          dispatch(changeLine(no, t1, Render(no, t1, dispatch)))
           let t2 = text.slice(pos)
-          dispatch(insertLine(no + 1, t2, Render(no + 1, t2)))
+          dispatch(insertLine(no + 1, t2, Render(no + 1, t2, dispatch)))
           return false; // prevent default
         }
       }
@@ -165,7 +165,7 @@ const mapDispatchToProps = (dispatch) => {
           text = "- " + text
         }
       }
-      dispatch(changeLine(no, text, Render(no, text)))
+      dispatch(changeLine(no, text, Render(no, text, dispatch)))
     },
     onLeftUp: (pretext) => (no) =>{
       if(no > 0){
@@ -175,7 +175,7 @@ const mapDispatchToProps = (dispatch) => {
     onBSfunc: (pretext) => (no, text) =>{
       dispatch(setCursor(no - 1, pretext.length, true))
       let t = pretext + text;
-      dispatch(changeLine(no-1, t, Render(no - 1, t)))
+      dispatch(changeLine(no-1, t, Render(no - 1, t, dispatch)))
       dispatch(deleteLine(no))
     },
     onClick: (no) => {

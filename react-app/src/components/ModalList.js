@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { 
   modalListUpdateList,modalListUp, modalListDown, modalListClose, modalListUpdateQuery
 } from '../actions'
-import {jsonp} from '../utils/jsonp';
+import {jsonp} from '../inline-editor/utils/jsonp';
 
 class ModalList extends React.Component{
   //constructor(props) {
