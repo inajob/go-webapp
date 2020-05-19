@@ -54,6 +54,7 @@ export const Render = (no, text) => {
           }
         break;
         case "item":
+          ret += "<span class='mode'>&gt;&gt; item</span>";
           ret += '<a href="'+lastPart[0]+'">'
           ret += '<table>'
           ret += '<tr>'
@@ -68,6 +69,7 @@ export const Render = (no, text) => {
           ret += '</a>'
         break;
         case "table":
+          ret += "<span class='mode'>&gt;&gt; table</span>";
           ret += "<table>";
           lastPart.forEach(function(i){
             ret += "<tr>";
