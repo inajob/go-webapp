@@ -9,10 +9,11 @@ class Controller extends React.Component{
       )
     }else{
       return (
-        <div className="controller">
+        <div className={this.props.isError?"controller error":"controller"}>
           {/*
           <button>New Page</button>
           */}
+          <span>{this.props.message}</span>
           <button onClick={this.props.onNewDiary}>New Diary</button>
           <button onClick={this.props.onNewJunk}>New Junk</button>
           <button onClick={this.props.onDebug}>onDebug</button>

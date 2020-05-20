@@ -1,12 +1,17 @@
 package file
 
 import (
+  "fmt"
+  "errors"
   "os"
   "io"
   "io/ioutil"
   "strings"
+  "strconv"
+  "time"
   "path/filepath"
   "mime/multipart"
+  "github.com/gernest/front"
 )
 
 type SearchResult struct {
@@ -58,25 +63,64 @@ func Search(keyword string) []SearchResult{
   return r
 }
 
-func Save (user string, id string, body string) (err error) {
+func Save (user string, id string, body string, lastUpdate string) (nextLastUpdate string, err error) {
   dirPath := filepath.Join(CONTENTS_DIR, user)
   if _, err := os.Stat(dirPath); err != nil{
     if err := os.Mkdir(dirPath, 0775); err != nil{
-      return err
+      return "", err
     }
   }
-  if err := ioutil.WriteFile(filepath.Join(CONTENTS_DIR, user, id), []byte(body), 0644); err != nil {
-    return err
+  filePath := filepath.Join(CONTENTS_DIR, user, id)
+  if _, err := os.Stat(filePath); err != nil{
+    // file not found
+  }else{
+    // file found
+    meta, _, err := Load(user, id)
+    if err != nil {
+      return "", err
+    }
+    l, ok := meta["lastUpdate"]
+    if ok {
+      if lastUpdate != l {
+        return "", errors.New("lastUpdate mismatch")
+      }
+    }else{
+      fmt.Printf("lastUpdate: not found in document\n")
+    }
   }
-  return nil
+
+  now := time.Now().Unix()
+  n := strconv.FormatInt(now, 10)
+  body = "---\nlastUpdate: \"" + n + "\"\n---\n" + body
+  if err := ioutil.WriteFile(filePath, []byte(body), 0644); err != nil {
+    return "", err
+  }
+  return n, nil
 }
 
-func Load (user string, id string) (body []byte, err error) {
-  var bytes []byte
-  if bytes, err = ioutil.ReadFile(filepath.Join(CONTENTS_DIR, user, id)); err != nil {
-    return nil, err
+func Load (user string, id string) (meta map[string]interface{}, body string, err error) {
+  m := front.NewMatter()
+  m.Handle("---", front.YAMLHandler)
+  fp, err := os.Open(filepath.Join(CONTENTS_DIR, user, id))
+  if err != nil {
+    return nil, "", err
   }
-  return bytes, nil
+  defer fp.Close()
+
+  meta, body, err = m.Parse(fp)
+  if err != nil{
+    if err == front.ErrUnknownDelim {
+      var buf []byte
+      fp.Seek(0, 0)
+      buf, err = ioutil.ReadAll(fp)
+      if err == nil{
+        return nil, string(buf), nil
+      }
+    }
+    return nil, "", err
+  }
+
+  return meta, body, nil
 }
 
 func List (user string) (files []string, err error) {

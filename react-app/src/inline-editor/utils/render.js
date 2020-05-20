@@ -60,7 +60,7 @@ export const Render = (no, text, dispatch) => {
           var name = "callback_" + Math.random().toString(36).slice(-8);
           let body = lastPart[0]
           if(body){
-            if(body.indexOf("https://twitter.com") != -1){
+            if(body.indexOf("https://twitter.com") !== -1){
               url = "https://api.twitter.com/1/statuses/oembed.json";
             }
             url += "?url="+encodeURIComponent(body.replace(/[\r\n]/g,""))+'&callback=' + name;

@@ -10,7 +10,7 @@ import {mermaidAPI} from 'mermaid'
 import rootReducer from './reducers'
 import App from './App'
 import {insertLine, setReadOnly} from './inline-editor/actions'
-import {insertItem, logined, updateInstantResults,
+import {insertItem, logined, updateMessage, error, updateInstantResults,
   modalListUpdateProviders,
   modalListClose
 } from './actions'
@@ -42,9 +42,10 @@ function getOpts(){
   return ret
 }
 
-function postPage(user, id, body){
+function postPage(user, id, body, lastUpdate){
   let f = new FormData()
   f.append('body', body)
+  f.append('lastUpdate', lastUpdate)
   var req = new Request(API_SERVER + "/page/" + user + "/" + id, {
     method: "POST",
     credentials: "include", // for save another domain
@@ -116,6 +117,7 @@ function grepToInstantSearch(grepLines, user, id) {
 }
 
 let opts = getOpts()
+let meta = {}
 console.log("opts", opts)
 global.user = opts.user // TODO: manage context?
 
@@ -148,6 +150,7 @@ getPage(opts.user, opts.id).then(function(resp){
   }else{
     resp.json().then(function(o){
       console.log(o)
+      meta = o.meta
       let inBlock = false
       let blockBody;
       let index = 0;
@@ -221,7 +224,19 @@ function save(){
     }
   }).join("\n")
   console.log(rawLines)
-  postPage(opts.user, opts.id, rawLines)
+  let lastUpdate = ""
+  if(meta && meta.lastUpdate){lastUpdate = meta.lastUpdate}
+  postPage(opts.user, opts.id, rawLines, lastUpdate).then(function(resp){
+    if(resp.ok){
+      store.dispatch(updateMessage("Save OK"))
+      resp.json().then((o) => {
+        meta = o.meta // update meta
+      })
+    }else{
+      store.dispatch(updateMessage("Save Error"))
+      store.dispatch(error())
+    }
+  })
 }
 
 var timerID = null

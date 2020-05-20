@@ -39,6 +39,11 @@
   border:solid black;
   border-width: 0px 0px 1px 0px;
 }
+
+.error{
+  background-color: #f66;
+}
+
 .controller button{
   border: solid 1px;
   padding: 5px;

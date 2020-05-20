@@ -7,6 +7,14 @@ export const logined = (user) => ({
   type: 'LOGINED',
   user: user,
 })
+export const updateMessage = (message) => ({
+  type: 'UPDATE_MESSAGE',
+  message: message,
+})
+export const error = (message) => ({
+  type: 'ERROR',
+})
+
 
 export const updateKeyword = (keyword) => ({
   type: 'SEARCH_UPDATE_KEYWORD',

@@ -40,7 +40,7 @@ func AttachFileServer(r *gin.Engine) {
     if filePath == "/" {
       id := c.Query("id")
       user := c.Query("user")
-      body,_ := file.Load(user, id)
+      _, body, _ := file.Load(user, id)
       rawDescription := []rune(string(body))
       description := ""
       if len(description) > 140 {
