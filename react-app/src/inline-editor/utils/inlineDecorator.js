@@ -133,7 +133,6 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
                 out.push('}}</span>')
                 break;
               case "calc":
-                console.log(cmd, list)
                 out.push("<span style='background-color:#eef;border-radius:1em;'>{{")
                 out.push(tmp);
                 out.push("}}")

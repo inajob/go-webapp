@@ -25,7 +25,7 @@ class ModalList extends React.Component{
 
   render() {
     return (
-    <Modal isOpen={this.props.phase !== "NONE"}>
+    <Modal appElement={document.getElementById('root')} isOpen={this.props.phase !== "NONE"}>
        <input type="text"
          ref="query"
          onChange={this.props.onModalQueryChange}
@@ -121,5 +121,5 @@ const mapDispatchToProps = (dispatch) => {
 
   }
 }
-const ModalListContainer = connect(()=>{}, mapDispatchToProps)(ModalList)
+const ModalListContainer = connect(()=>{return {}}, mapDispatchToProps)(ModalList)
 export default ModalListContainer
