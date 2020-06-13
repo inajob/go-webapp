@@ -11,7 +11,7 @@ import (
   "time"
   "path/filepath"
   "mime/multipart"
-  "github.com/gernest/front"
+  "github.com/inajob/frontmatter"
 )
 
 type SearchResult struct {
@@ -99,24 +99,14 @@ func Save (user string, id string, body string, lastUpdate string) (nextLastUpda
 }
 
 func Load (user string, id string) (meta map[string]interface{}, body string, err error) {
-  m := front.NewMatter()
-  m.Handle("---", front.YAMLHandler)
   fp, err := os.Open(filepath.Join(CONTENTS_DIR, user, id))
   if err != nil {
     return nil, "", err
   }
   defer fp.Close()
 
-  meta, body, err = m.Parse(fp)
+  meta, body, err = frontmatter.ParseFrontMatter(fp)
   if err != nil{
-    if err == front.ErrUnknownDelim {
-      var buf []byte
-      fp.Seek(0, 0)
-      buf, err = ioutil.ReadAll(fp)
-      if err == nil{
-        return nil, string(buf), nil
-      }
-    }
     return nil, "", err
   }
 
