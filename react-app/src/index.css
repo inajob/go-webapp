@@ -76,6 +76,7 @@
   list-style-type: none;
   background-color:white;
   margin-bottom: 2px;
+  word-break: break-all;
 }
 .instant-search {
 }

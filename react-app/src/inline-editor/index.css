@@ -52,9 +52,7 @@ line{
 .h2{
   font-size: large;
   font-weight: bold;
-  border: dashed #aaf;
   background-color: #ddf;
-  border-width: 0px 0px 5px 0px;
   margin-left: 15px;
   margin-top: 1em;
 }
@@ -65,8 +63,6 @@ line{
 .h3{
   font-size: medium;
   font-weight: bold;
-  border: solid #aaf;
-  border-width: 0px 0px 1px 0px;
   margin-left: 19px;
 }
 .h3 textarea{

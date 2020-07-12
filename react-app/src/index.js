@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 
-import 'highlight.js/styles/github.css';  // choose your style!
+import 'highlight.js/styles/dracula.css';  // choose your style!
 import {mermaidAPI} from 'mermaid'
 
 // --- inline editor ---
