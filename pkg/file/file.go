@@ -63,7 +63,7 @@ func Search(keyword string) []SearchResult{
   return r
 }
 
-func Save (user string, id string, body string, lastUpdate string) (nextLastUpdate string, err error) {
+func Save (user string, id string, body string, lastUpdate string, cover string) (nextLastUpdate string, err error) {
   dirPath := filepath.Join(CONTENTS_DIR, user)
   if _, err := os.Stat(dirPath); err != nil{
     if err := os.Mkdir(dirPath, 0775); err != nil{
@@ -91,7 +91,7 @@ func Save (user string, id string, body string, lastUpdate string) (nextLastUpda
 
   now := time.Now().Unix()
   n := strconv.FormatInt(now, 10)
-  body = "---\nlastUpdate: \"" + n + "\"\n---\n" + body
+  body = "---\nlastUpdate: \"" + n + "\"\ncover: \""+ cover +"\"\n---\n" + body
   if err := ioutil.WriteFile(filePath, []byte(body), 0644); err != nil {
     return "", err
   }

@@ -32,6 +32,7 @@ func addHeader() gin.HandlerFunc {
 }
 
 func AttachFileServer(r *gin.Engine) {
+  origin := os.Getenv("ALLOW_ORIGIN")
   fs := http.Dir("web")
   fileServer :=http.StripPrefix("/web/", http.FileServer(fs))
   r.GET("/web/*filepath", func(c *gin.Context){
@@ -40,7 +41,7 @@ func AttachFileServer(r *gin.Engine) {
     if filePath == "/" {
       id := c.Query("id")
       user := c.Query("user")
-      _, body, _ := file.Load(user, id)
+      meta, body, _ := file.Load(user, id)
       rawDescription := []rune(string(body))
       description := ""
       if len(description) > 140 {
@@ -49,11 +50,14 @@ func AttachFileServer(r *gin.Engine) {
         description = string(rawDescription)
       }
       description = strings.Replace(description, "\n", " ", -1)
+      cover, _ := meta["cover"]
+      scover, _ := cover.(string)
 
       c.HTML(http.StatusOK, "index.html", gin.H{
         "title": id,
-        "url": "/web/?user=" + url.QueryEscape(user) + "&id=" + url.QueryEscape(id),
+        "url": origin + "/web/?user=" + url.QueryEscape(user) + "&id=" + url.QueryEscape(id),
         "description": description,
+        "cover": origin + scover,
         "body": string(body),
       })
     }else{

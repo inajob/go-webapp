@@ -16,7 +16,7 @@ import {insertItem, logined, updateMessage, error, updateInstantResults,
 } from './actions'
 import './inline-editor/index.css';
 import './index.css';
-import {Render, isBlock} from './inline-editor/utils/render'
+import {Render, isBlock, parseBlock} from './inline-editor/utils/render'
 import {parse} from './inline-editor/utils/inlineDecorator'
 // -- -- --
 
@@ -42,10 +42,11 @@ function getOpts(){
   return ret
 }
 
-function postPage(user, id, body, lastUpdate){
+function postPage(user, id, body, lastUpdate, image){
   let f = new FormData()
   f.append('body', body)
   f.append('lastUpdate', lastUpdate)
+  f.append('cover', image)
   var req = new Request(API_SERVER + "/page/" + user + "/" + id, {
     method: "POST",
     credentials: "include", // for save another domain
@@ -173,7 +174,8 @@ getPage(opts.user, opts.id).then(function(resp){
           }
         }
       })
-      keywords = keywords.concat(analysis().map((k) => "[" + k +"]"))
+      let result = analysis()
+      keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
       keywords.push(decodeURIComponent(opts.id)) // full search
       instantSearch()
     })
@@ -200,6 +202,7 @@ loginCheck(opts.user).then(function(resp){
 
 function analysis(){
   let keywords = []
+  let images = []
   // TODO: nested wiki link
   store.getState().lines.forEach((item) => {
     if(!isBlock(item.text)){
@@ -211,11 +214,26 @@ function analysis(){
           }
         }
       })
+    }else{
+      //
+      let blockInfo = parseBlock(item.text)
+      if(blockInfo.type === "img"){
+          if(blockInfo.body.indexOf("http://")===0 || blockInfo.body.indexOf("https://")===0){
+            images.push(blockInfo.body)
+          }else{
+            images.push(API_SERVER + '/img/' + blockInfo.body)
+          }
+      }
     }
   })
-  return keywords
+  return {
+    keywords,
+    images,
+  }
 }
 function save(){
+  let result = analysis()
+  let images = result.images;
   let rawLines = store.getState().lines.map((item) => {
     if(isBlock(item.text)){
       return item.text + "\n<<"
@@ -225,8 +243,10 @@ function save(){
   }).join("\n")
   console.log(rawLines)
   let lastUpdate = ""
+  let image = ""
   if(meta && meta.lastUpdate){lastUpdate = meta.lastUpdate}
-  postPage(opts.user, opts.id, rawLines, lastUpdate).then(function(resp){
+  if(images.length > 0){image = images[0]}
+  postPage(opts.user, opts.id, rawLines, lastUpdate, image).then(function(resp){
     if(resp.ok){
       store.dispatch(updateMessage("Save OK"))
       resp.json().then((o) => {

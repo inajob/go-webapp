@@ -11,17 +11,37 @@ function escapeHTML(s){
   return htmlEncode(parse(s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")));
 }
 
-export const Render = (no, text, dispatch) => {
-  // TODO: sanitize!!
+export const parseBlock = (text) => {
   if(isBlock(text)){
     let lines = getLines(text);
     let firstLine = lines[0];
     let lastPart = lines.slice(1);
     let parts = firstLine.split(/\s+/);
+    if(parts[0] === ">>"){
+      return {
+        isTyped: true,
+        type: parts[1],
+        body: lastPart,
+      }
+    }
+    return {
+      isTyped: false,
+      type: null,
+      body: text,
+    }
+  }
+  throw new Error(text + "is not block")
+}
+
+export const Render = (no, text, dispatch) => {
+  // TODO: sanitize!!
+  if(isBlock(text)){
+    let blockInfo = parseBlock(text)
+    let lastPart = blockInfo.body
 
     let ret = "";
-    if(parts[0] === ">>"){
-      switch(parts[1]){
+    if(blockInfo.isTyped){
+      switch(blockInfo.type){
         case "calc":
           const math = create(all, {})
           const scope = {}

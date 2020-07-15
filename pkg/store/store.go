@@ -120,8 +120,9 @@ func AttachUpdate(r *gin.Engine) {
     id := c.Param("id")
     body := c.PostForm("body")
     lastUpdate := c.PostForm("lastUpdate")
+    cover := c.PostForm("cover")
 
-    nextLastUpdate, err := file.Save(user, id, body, lastUpdate)
+    nextLastUpdate, err := file.Save(user, id, body, lastUpdate, cover)
     if err != nil{
       c.JSON(500, gin.H{"error": err.Error()})
       return
@@ -130,7 +131,10 @@ func AttachUpdate(r *gin.Engine) {
         Id: id,
         User: user,
         Body: body,
-        Meta: map[string]interface{} {"lastUpdate": nextLastUpdate},
+        Meta: map[string]interface{} {
+          "lastUpdate": nextLastUpdate,
+          "cover": cover,
+        },
       }
       c.JSON(200, result)
       return
