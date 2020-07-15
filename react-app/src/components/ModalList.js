@@ -101,7 +101,20 @@ const mapDispatchToProps = (dispatch) => {
                 })
                 break
                 case "aliexpress":
-                  throw new Error("not implemented yet")
+                  jsonp("aliexpress", "http://web.inajob.tk/ali-search/api.php?callback=aliexpress&q=" + encodeURIComponent(query), function(data){
+                    let list = []
+                    data.items.forEach((i) => {
+                      let title = i.productTitle.replace(/<[^>]*>/g, "")
+                      let image = i.imageUrl + "_220x220.jpg"
+                      list.push({
+                        title: title,
+                        image: image,
+                        text:  ">> item\n"+i.promotionUrl+ "\n" + image  + "\n" + title,
+                      })
+                    })
+                    dispatch(modalListUpdateList(list))
+                  })
+                  break;
                 default:
                   throw new Error("unknown provider",provider.name)
               }
