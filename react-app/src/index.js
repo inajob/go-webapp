@@ -218,14 +218,17 @@ function analysis(){
       //
       let blockInfo = parseBlock(item.text)
       if(blockInfo.type === "img"){
-          if(blockInfo.body.indexOf("http://")===0 || blockInfo.body.indexOf("https://")===0){
-            images.push(blockInfo.body)
+          if(blockInfo.body[0].indexOf("http://")===0 || blockInfo.body[0].indexOf("https://")===0){
+            images.push(blockInfo.body[0])
           }else{
-            images.push(API_SERVER + '/img/' + blockInfo.body)
+            images.push(API_SERVER + '/img/' + blockInfo.body[0])
           }
+      }else if(blockInfo.type === "item"){
+        images.push(blockInfo.body[1]);
       }
     }
   })
+  console.log("Analysis", images)
   return {
     keywords,
     images,

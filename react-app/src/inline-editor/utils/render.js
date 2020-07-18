@@ -68,11 +68,11 @@ export const Render = (no, text, dispatch) => {
           ret += hljsRender(no, lastPart);
         break;
         case "img":
-          if(lastPart.indexOf("http://")===0 || lastPart.indexOf("https://")===0){
-            ret += '<img src="' + lastPart + '">'
+          if(lastPart[0].indexOf("http://")===0 || lastPart[0].indexOf("https://")===0){
+            ret += '<img src="' + lastPart[0] + '">'
           }else{
             ret += '<img src="'+
-              API_SERVER + '/img/' + lastPart + '">'
+              API_SERVER + '/img/' + lastPart[0] + '">'
           }
         break;
         case "oembed":
