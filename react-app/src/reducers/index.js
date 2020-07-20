@@ -9,6 +9,7 @@ import modalList from './modalList'
 
 export default combineReducers({
   lines,
+  sideLines: lines,
   cursor,
   items,
   loginButton,

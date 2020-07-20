@@ -27,7 +27,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
 mermaidAPI.initialize({startOnLoad: true, theme: 'forest'});
 
 function loadLine(no, text){
-  store.dispatch(insertLine(no, text, Render(no,text,store.dispatch)))
+  store.dispatch(insertLine("main", no, text, Render("main", no, text, store.dispatch)))
 }
 
 function getOpts(){
@@ -191,8 +191,8 @@ try{
 loginCheck(opts.user).then(function(resp){
   resp.json().then(function(o){
     if(!o.editable){
-      setReadOnly()
-      store.dispatch(setReadOnly())
+      setReadOnly("main")
+      store.dispatch(setReadOnly("main"))
     }
     if(o.login){
       store.dispatch(logined(o.user))
@@ -360,7 +360,7 @@ function setupPaste(){
             let no = store.getState().cursor.row;
             let imgId = o.imgId
             let line = ">> img\n" + opts.user + '/'+ opts.id + '/' + imgId
-            store.dispatch(insertLine(no,line , Render(no, line)))
+            store.dispatch(insertLine("main", no,line , Render("main", no, line)))
             save()
           })
         })

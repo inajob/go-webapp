@@ -21,20 +21,24 @@ class Lines extends React.Component{
                 height={numLines(line.text)*24 + "px"}
                 isBlock={isBlock(line.text)}
                 className={calcClassName(line.text)}
-                onChange={this.props.onChange}
+                onChange={this.props.onChange(this.props.name)}
                 onUpdate={this.props.onUpdate}
                 onUp={this.props.onUp(
+                        this.props.name,
                         index===0?"":this.props.lines[index - 1])}
                 onDown={this.props.onDown(
+                        this.props.name,
                         index>=this.props.lines.length - 1?"":this.props.lines[index + 1].text, index >= this.props.lines.length - 1)}
-                onEnter={this.props.onEnter(this.props.onMagic)}
-                onTab={this.props.onTab}
-                onClick={this.props.onClick}
+                onEnter={this.props.onEnter(this.props.name, this.props.onMagic)}
+                onTab={this.props.onTab(this.props.name)}
+                onClick={this.props.onClick(this.props.name)}
                 onLeftUp={this.props.onLeftUp(
+                        this.props.name,
                         index===0?"":this.props.lines[index - 1].text)}
                 onBS={this.props.onBSfunc(
+                        this.props.name,
                         index===0?"":this.props.lines[index - 1].text)}
-                onRefreshed={this.props.onRefreshed}
+                onRefreshed={this.props.onRefreshed(this.props.name)}
                 />
         ))}
       </div>
@@ -42,6 +46,7 @@ class Lines extends React.Component{
   }
 }
 Lines.propTypes = {
+  name: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onUp: PropTypes.func.isRequired,
   onDown: PropTypes.func.isRequired,
@@ -89,10 +94,10 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onChange: (no,text) => {
-      dispatch(changeLine(no, text, Render(no, text, dispatch)))
+    onChange: (name) => (no, text) => {
+      dispatch(changeLine(name, no, text, Render(name, no, text, dispatch)))
     },
-    onUp: (upText) => (no, col, text) => {
+    onUp: (name, upText) => (no, col, text) => {
       if(no <= 0){
         return;
       }
@@ -104,12 +109,12 @@ const mapDispatchToProps = (dispatch) => {
         let lines = getLines(upText.text);
         lines.pop()
         let firstPart = lines.join("\n");
-        dispatch(setCursor(no - 1, firstPart.length + col, true))
+        dispatch(setCursor(name, no - 1, firstPart.length + col, true))
       }else{
-        dispatch(setCursor(no - 1, col, true))
+        dispatch(setCursor(name, no - 1, col, true))
       }
     },
-    onDown: (downText, lastLineFlag) => (no, col, text) => {
+    onDown: (name, downText, lastLineFlag) => (no, col, text) => {
       let num = numLines(text);
       let pos = getCursorPos(col,text);
       if(isBlock(text) && pos[1] < num - 1){
@@ -118,18 +123,18 @@ const mapDispatchToProps = (dispatch) => {
       if(isBlock(downText)){
         let lines = getLines(downText);
         let firstLine = lines[0];
-        dispatch(setCursor(no + 1, Math.min(col, firstLine.length), true))
+        dispatch(setCursor(name, no + 1, Math.min(col, firstLine.length), true))
       }else{
         if(!lastLineFlag){
-          dispatch(setCursor(no + 1, col, true))
+          dispatch(setCursor(name, no + 1, col, true))
         }
       }
     },
-    onEnter: (onMagic) => (no, text, pos, shift) => {
+    onEnter: (name, onMagic) => (no, text, pos, shift) => {
       if(isBlock(text)){
         if(shift){
-          dispatch(insertLine(no + 1, "", ""))
-          dispatch(setCursor(no + 1, 0, true))
+          dispatch(insertLine(name, no + 1, "", ""))
+          dispatch(setCursor(name, no + 1, 0, true))
           return false;
         }
         return true;
@@ -137,17 +142,17 @@ const mapDispatchToProps = (dispatch) => {
         if(shift){
           onMagic()
         }else{
-          dispatch(setCursor(no + 1, 0, true))
+          dispatch(setCursor(name, no + 1, 0, true))
           if(text === undefined)text = ""
           let t1 = text.slice(0, pos)
-          dispatch(changeLine(no, t1, Render(no, t1, dispatch)))
+          dispatch(changeLine(name, no, t1, Render(name, no, t1, dispatch)))
           let t2 = text.slice(pos)
-          dispatch(insertLine(no + 1, t2, Render(no + 1, t2, dispatch)))
+          dispatch(insertLine(name, no + 1, t2, Render(name, no + 1, t2, dispatch)))
           return false; // prevent default
         }
       }
     },
-    onTab: (no, text, shift) => {
+    onTab: (name) => (no, text, shift) => {
       if(shift){
         if(text.search(/-+ /) === 0){ // already list
           if(text.indexOf("- ") === 0){
@@ -165,24 +170,24 @@ const mapDispatchToProps = (dispatch) => {
           text = "- " + text
         }
       }
-      dispatch(changeLine(no, text, Render(no, text, dispatch)))
+      dispatch(changeLine(name, no, text, Render(name, no, text, dispatch)))
     },
-    onLeftUp: (pretext) => (no) =>{
+    onLeftUp: (name, pretext) => (no) =>{
       if(no > 0){
-        dispatch(setCursor(no - 1, pretext.length, true))
+        dispatch(setCursor(name, no - 1, pretext.length, true))
       }
     },
-    onBSfunc: (pretext) => (no, text) =>{
-      dispatch(setCursor(no - 1, pretext.length, true))
+    onBSfunc: (name, pretext) => (no, text) =>{
+      dispatch(setCursor(name, no - 1, pretext.length, true))
       let t = pretext + text;
-      dispatch(changeLine(no-1, t, Render(no - 1, t, dispatch)))
-      dispatch(deleteLine(no))
+      dispatch(changeLine(name, no-1, t, Render(name, no - 1, t, dispatch)))
+      dispatch(deleteLine(name, no))
     },
-    onClick: (no) => {
-      dispatch(setCursor(no, 0, false))
+    onClick: (name) => (no) => {
+      dispatch(setCursor(name, no, 0, false))
     },
-    onRefreshed: (no) => {
-      dispatch(setCursor(no, 0, false))
+    onRefreshed: (name) => (no) => {
+      dispatch(setCursor(name, no, 0, false))
     }
   }
 }
