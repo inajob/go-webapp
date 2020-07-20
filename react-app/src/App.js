@@ -45,7 +45,7 @@ class App extends React.Component{
 
       </div>
       <div className="side">
-    {/*<Lines lines={this.props.sideLines} cursor={this.props.cursor} onMagic={this.props.onMagic} onUpdate={this.props.onUpdate} />*/}
+      <Lines name="side" lines={this.props.sideLines} cursor={this.props.sideCursor} />
         <List items={this.props.items} user={this.props.user} />
       </div>
     </div>
@@ -62,6 +62,7 @@ const mapStateToProps = (state, ownProps) => {
     lines: state.lines,
     sideLines: state.sideLines,
     cursor: state.cursor,
+    sideCursor: state.sideCursor,
     items: state.items,
     loginButton: state.loginButton,
     search: state.search,

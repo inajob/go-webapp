@@ -26,8 +26,8 @@ const store = createStore(rootReducer)
 const API_SERVER=process.env.REACT_APP_API_SERVER
 mermaidAPI.initialize({startOnLoad: true, theme: 'forest'});
 
-function loadLine(no, text){
-  store.dispatch(insertLine("main", no, text, Render("main", no, text, store.dispatch)))
+function loadLine(name, no, text){
+  store.dispatch(insertLine(name, no, text, Render(name, no, text, store.dispatch)))
 }
 
 function getOpts(){
@@ -145,7 +145,7 @@ getPage(opts.user, opts.id).then(function(resp){
     })
   }
   if(resp.ok === false){
-    loadLine(0, "# " + decodeURIComponent(opts.id))
+    loadLine("main", 0, "# " + decodeURIComponent(opts.id))
     keywords.push(decodeURIComponent(opts.id))
     instantSearch()
   }else{
@@ -158,7 +158,7 @@ getPage(opts.user, opts.id).then(function(resp){
       o.body.split(/[\r\n]/).forEach(function(line){
         if(inBlock){
           if(line === "<<"){ // end of block
-            loadLine(index, blockBody)
+            loadLine("main", index, blockBody)
             inBlock = false
             index ++;
           }else{
@@ -169,7 +169,7 @@ getPage(opts.user, opts.id).then(function(resp){
             inBlock = true
             blockBody = line
           }else{ // not block line
-            loadLine(index, line)
+            loadLine("main", index, line)
             index ++;
           }
         }
@@ -191,7 +191,6 @@ try{
 loginCheck(opts.user).then(function(resp){
   resp.json().then(function(o){
     if(!o.editable){
-      setReadOnly("main")
       store.dispatch(setReadOnly("main"))
     }
     if(o.login){
@@ -315,6 +314,14 @@ getList(opts.user).then(function(resp){
   })
 })
 
+loadLine("side", 0, "# menu")
+loadLine("side", 1, "## menu")
+loadLine("side", 2, "### menu")
+loadLine("side", 3, "- test")
+loadLine("side", 4, "- test2")
+loadLine("side", 5, "- [hoge]")
+loadLine("side", 6, "- [test]")
+store.dispatch(setReadOnly("side"))
 /*
 loadLine(0, "# React.jsで作ったインラインマークダウンエディタ")
 loadLine(1, "インラインで編集ができる書式付きエディタです。")

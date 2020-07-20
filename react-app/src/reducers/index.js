@@ -7,10 +7,19 @@ import search from './search'
 import instantSearch from './instantSearch'
 import modalList from './modalList'
 
+function createFilteredReducer(reducerFunction, reducerPredicate){
+  return (state, action) => {
+    const isInitializationCall = state === undefined;
+    const shouldRunWrappedReducer = reducerPredicate(action) || isInitializationCall
+    return shouldRunWrappedReducer ? reducerFunction(state, action): state;
+  }
+}
+
 export default combineReducers({
-  lines,
-  sideLines: lines,
-  cursor,
+  lines: createFilteredReducer(lines, action => action.name === "main"),
+  sideLines: createFilteredReducer(lines, action => action.name === "side"),
+  cursor: createFilteredReducer(cursor, action => action.name === "main"),
+  sideCursor:  createFilteredReducer(cursor, action => action.name === "side"),
   items,
   loginButton,
   search,

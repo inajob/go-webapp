@@ -18,6 +18,34 @@
   border-width: 0px 1px 0px 0px;
 }
 
+/* === override main style === */
+.side .h1{
+  font-size: large;
+  font-weight: bold;
+  border: solid #aaf;
+  background-color: #ddf;
+  border-width: 0px 0px 1px 0px;
+  padding:0.2em;
+  margin:0em;
+}
+.side .h2{
+  font-size: medium;
+  font-weight: bold;
+  background-color: #ddf;
+  margin-left: 0px;
+  margin-top: 1em;
+}
+.side .h3{
+  font-size: small;
+  font-weight: bold;
+  margin-left: 0px;
+}
+.side .normal{
+  margin-left: 5px;
+}
+
+/* === === */
+
 }
 
 .main{
