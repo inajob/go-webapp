@@ -19,6 +19,9 @@
 }
 
 /* === override main style === */
+.side {
+  font-size: 0.7em;
+}
 .side .h1{
   font-size: large;
   font-weight: bold;
@@ -42,6 +45,11 @@
 }
 .side .normal{
   margin-left: 5px;
+}
+.side .block{
+  border: none;
+  padding: 0em;
+  margin: 0em;
 }
 
 /* === === */
