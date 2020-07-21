@@ -121,65 +121,78 @@ let opts = getOpts()
 let meta = {}
 console.log("opts", opts)
 global.user = opts.user // TODO: manage context?
+global.list = [] // TODO: manage context?
 
+getList(opts.user).then(function(resp){
+  resp.json().then(function(o){
+    console.log("getList", o.pages)
+    if(o.pages){
+      global.list = o.pages
+      o.pages.forEach(function(item){
+        store.dispatch(insertItem(item))
+      })
+    }
+  })
+}).then(function(){
+  // Page require List
+  getPage(opts.user, opts.id).then(function(resp){
+    store.dispatch(modalListUpdateProviders([
+      {name: "amazon"},
+      {name: "aliexpress"},
+    ]))
 
-getPage(opts.user, opts.id).then(function(resp){
-  store.dispatch(modalListUpdateProviders([
-    {name: "amazon"},
-    {name: "aliexpress"},
-  ]))
+    store.dispatch(modalListClose())
 
-  store.dispatch(modalListClose())
-
-  let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
-  console.log(resp)
-  let instantSearch = () => {
-    keywords.forEach((k) => {
-      sendSearch(k).then((resp) => {
-        resp.json().then((o) => {
-          let lines = o.lines
-          let is = grepToInstantSearch(lines, opts.user, opts.id)
-          store.dispatch(updateInstantResults(k, is))
+    let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
+    console.log(resp)
+    let instantSearch = () => {
+      keywords.forEach((k) => {
+        sendSearch(k).then((resp) => {
+          resp.json().then((o) => {
+            let lines = o.lines
+            let is = grepToInstantSearch(lines, opts.user, opts.id)
+            store.dispatch(updateInstantResults(k, is))
+          })
         })
       })
-    })
-  }
-  if(resp.ok === false){
-    loadLine("main", 0, "# " + decodeURIComponent(opts.id))
-    keywords.push(decodeURIComponent(opts.id))
-    instantSearch()
-  }else{
-    resp.json().then(function(o){
-      console.log(o)
-      meta = o.meta
-      let inBlock = false
-      let blockBody;
-      let index = 0;
-      o.body.split(/[\r\n]/).forEach(function(line){
-        if(inBlock){
-          if(line === "<<"){ // end of block
-            loadLine("main", index, blockBody)
-            inBlock = false
-            index ++;
-          }else{
-            blockBody += "\n" + line
-          }
-        }else{
-          if(isBlock(line)){ // start of block
-            inBlock = true
-            blockBody = line
-          }else{ // not block line
-            loadLine("main", index, line)
-            index ++;
-          }
-        }
-      })
-      let result = analysis()
-      keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
-      keywords.push(decodeURIComponent(opts.id)) // full search
+    }
+    if(resp.ok === false){
+      loadLine("main", 0, "# " + decodeURIComponent(opts.id))
+      keywords.push(decodeURIComponent(opts.id))
       instantSearch()
-    })
-  }
+    }else{
+      resp.json().then(function(o){
+        console.log(o)
+        meta = o.meta
+        let inBlock = false
+        let blockBody;
+        let index = 0;
+        o.body.split(/[\r\n]/).forEach(function(line){
+          if(inBlock){
+            if(line === "<<"){ // end of block
+              loadLine("main", index, blockBody)
+              inBlock = false
+              index ++;
+            }else{
+              blockBody += "\n" + line
+            }
+          }else{
+            if(isBlock(line)){ // start of block
+              inBlock = true
+              blockBody = line
+            }else{ // not block line
+              loadLine("main", index, line)
+              index ++;
+            }
+          }
+        })
+        let result = analysis()
+        keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
+        keywords.push(decodeURIComponent(opts.id)) // full search
+        instantSearch()
+      })
+    }
+  })
 })
 
 try{
@@ -303,17 +316,7 @@ function uploadFile(file){
   return fetch(req)
 }
 
-getList(opts.user).then(function(resp){
-  resp.json().then(function(o){
-    console.log("getList", o.pages)
-    if(o.pages){
-      o.pages.forEach(function(item){
-        store.dispatch(insertItem(item))
-      })
-    }
-  })
-})
-
+// TODO: test menu
 loadLine("side", 0, "# menu")
 loadLine("side", 1, "## menu")
 loadLine("side", 2, "### menu")

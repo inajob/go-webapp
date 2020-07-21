@@ -75,6 +75,10 @@ export const Render = (name, no, text, dispatch) => {
               API_SERVER + '/img/' + lastPart[0] + '">'
           }
         break;
+        case "list":
+            ret += "<span class='mode'>&gt;&gt; list</span>";
+            ret += global.list.filter((s) => s.indexOf(lastPart[0]) == 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s) + "'>" + escapeHTML(s) + "</a></li>").join("")
+          break;
         case "oembed":
           let url = "https://noembed.com/embed";
           var fname = "callback_" + Math.random().toString(36).slice(-8);
