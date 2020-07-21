@@ -123,6 +123,12 @@ console.log("opts", opts)
 global.user = opts.user // TODO: manage context?
 global.list = [] // TODO: manage context?
 
+store.dispatch(modalListUpdateProviders([
+  {name: "amazon"},
+  {name: "aliexpress"},
+]))
+store.dispatch(modalListClose())
+
 getList(opts.user).then(function(resp){
   resp.json().then(function(o){
     console.log("getList", o.pages)
@@ -135,64 +141,65 @@ getList(opts.user).then(function(resp){
   })
 }).then(function(){
   // Page require List
-  getPage(opts.user, opts.id).then(function(resp){
-    store.dispatch(modalListUpdateProviders([
-      {name: "amazon"},
-      {name: "aliexpress"},
-    ]))
-
-    store.dispatch(modalListClose())
-
-    let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
-    console.log(resp)
-    let instantSearch = () => {
-      keywords.forEach((k) => {
-        sendSearch(k).then((resp) => {
-          resp.json().then((o) => {
-            let lines = o.lines
-            let is = grepToInstantSearch(lines, opts.user, opts.id)
-            store.dispatch(updateInstantResults(k, is))
+  function loadPage(name, user, id){
+    getPage(user, id).then(function(resp){
+      let keywords = ["[" + decodeURIComponent(id) + "]"] // link search
+      console.log(resp)
+      let instantSearch = () => {
+        keywords.forEach((k) => {
+          sendSearch(k).then((resp) => {
+            resp.json().then((o) => {
+              let lines = o.lines
+              let is = grepToInstantSearch(lines, user, id)
+              store.dispatch(updateInstantResults(k, is))
+            })
           })
         })
-      })
-    }
-    if(resp.ok === false){
-      loadLine("main", 0, "# " + decodeURIComponent(opts.id))
-      keywords.push(decodeURIComponent(opts.id))
-      instantSearch()
-    }else{
-      resp.json().then(function(o){
-        console.log(o)
-        meta = o.meta
-        let inBlock = false
-        let blockBody;
-        let index = 0;
-        o.body.split(/[\r\n]/).forEach(function(line){
-          if(inBlock){
-            if(line === "<<"){ // end of block
-              loadLine("main", index, blockBody)
-              inBlock = false
-              index ++;
-            }else{
-              blockBody += "\n" + line
-            }
-          }else{
-            if(isBlock(line)){ // start of block
-              inBlock = true
-              blockBody = line
-            }else{ // not block line
-              loadLine("main", index, line)
-              index ++;
-            }
-          }
-        })
-        let result = analysis()
-        keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
-        keywords.push(decodeURIComponent(opts.id)) // full search
+      }
+      if(resp.ok === false){
+        loadLine(name, 0, "# " + decodeURIComponent(id))
+        keywords.push(decodeURIComponent(id))
         instantSearch()
-      })
-    }
-  })
+      }else{
+        resp.json().then(function(o){
+          console.log(o)
+          meta = o.meta
+          let inBlock = false
+          let blockBody;
+          let index = 0;
+          o.body.split(/[\r\n]/).forEach(function(line){
+            if(inBlock){
+              if(line === "<<"){ // end of block
+                loadLine(name, index, blockBody)
+                inBlock = false
+                index ++;
+              }else{
+                blockBody += "\n" + line
+              }
+            }else{
+              if(isBlock(line)){ // start of block
+                inBlock = true
+                blockBody = line
+              }else{ // not block line
+                loadLine(name, index, line)
+                index ++;
+              }
+            }
+          })
+          let result = analysis()
+          keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
+          keywords.push(decodeURIComponent(id)) // full search
+          instantSearch()
+        })
+      }
+    })
+  }
+  // load side page
+  loadPage("side", opts.user, "menu")
+
+  // load main page
+  loadPage("main", opts.user, opts.id)
+
 })
 
 try{
@@ -316,14 +323,6 @@ function uploadFile(file){
   return fetch(req)
 }
 
-// TODO: test menu
-loadLine("side", 0, "# menu")
-loadLine("side", 1, "## menu")
-loadLine("side", 2, "### menu")
-loadLine("side", 3, "- test")
-loadLine("side", 4, "- test2")
-loadLine("side", 5, "- [hoge]")
-loadLine("side", 6, "- [test]")
 store.dispatch(setReadOnly("side"))
 /*
 loadLine(0, "# React.jsで作ったインラインマークダウンエディタ")
