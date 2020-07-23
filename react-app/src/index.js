@@ -26,8 +26,8 @@ const store = createStore(rootReducer)
 const API_SERVER=process.env.REACT_APP_API_SERVER
 mermaidAPI.initialize({startOnLoad: true, theme: 'forest'});
 
-function loadLine(no, text){
-  store.dispatch(insertLine(no, text, Render(no,text,store.dispatch)))
+function loadLine(name, no, text){
+  store.dispatch(insertLine(name, no, text, Render(name, no, text, store.dispatch)))
 }
 
 function getOpts(){
@@ -121,65 +121,87 @@ let opts = getOpts()
 let meta = {}
 console.log("opts", opts)
 global.user = opts.user // TODO: manage context?
+global.list = [] // TODO: manage context?
 
+store.dispatch(modalListUpdateProviders([
+  {name: "amazon"},
+  {name: "aliexpress"},
+]))
+store.dispatch(modalListClose())
 
-getPage(opts.user, opts.id).then(function(resp){
-  store.dispatch(modalListUpdateProviders([
-    {name: "amazon"},
-    {name: "aliexpress"},
-  ]))
-
-  store.dispatch(modalListClose())
-
-  let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
-  console.log(resp)
-  let instantSearch = () => {
-    keywords.forEach((k) => {
-      sendSearch(k).then((resp) => {
-        resp.json().then((o) => {
-          let lines = o.lines
-          let is = grepToInstantSearch(lines, opts.user, opts.id)
-          store.dispatch(updateInstantResults(k, is))
+getList(opts.user).then(function(resp){
+  resp.json().then(function(o){
+    console.log("getList", o.pages)
+    if(o.pages){
+      global.list = o.pages
+      o.pages.forEach(function(item){
+        store.dispatch(insertItem(item))
+      })
+    }
+  })
+}).then(function(){
+  // Page require List
+  function loadPage(name, isMain, user, id){
+    getPage(user, id).then(function(resp){
+      let keywords = ["[" + decodeURIComponent(id) + "]"] // link search
+      console.log(resp)
+      let instantSearch = () => {
+        keywords.forEach((k) => {
+          sendSearch(k).then((resp) => {
+            resp.json().then((o) => {
+              let lines = o.lines
+              let is = grepToInstantSearch(lines, user, id)
+              store.dispatch(updateInstantResults(k, is))
+            })
+          })
         })
-      })
+      }
+      if(resp.ok === false){
+        loadLine(name, 0, "# " + decodeURIComponent(id))
+        keywords.push(decodeURIComponent(id))
+        instantSearch()
+      }else{
+        resp.json().then(function(o){
+          console.log(o)
+          meta = o.meta
+          let inBlock = false
+          let blockBody;
+          let index = 0;
+          o.body.split(/[\r\n]/).forEach(function(line){
+            if(inBlock){
+              if(line === "<<"){ // end of block
+                loadLine(name, index, blockBody)
+                inBlock = false
+                index ++;
+              }else{
+                blockBody += "\n" + line
+              }
+            }else{
+              if(isBlock(line)){ // start of block
+                inBlock = true
+                blockBody = line
+              }else{ // not block line
+                loadLine(name, index, line)
+                index ++;
+              }
+            }
+          })
+          if(isMain){
+            let result = analysis()
+            keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
+            keywords.push(decodeURIComponent(id)) // full search
+            instantSearch()
+          }
+        })
+      }
     })
   }
-  if(resp.ok === false){
-    loadLine(0, "# " + decodeURIComponent(opts.id))
-    keywords.push(decodeURIComponent(opts.id))
-    instantSearch()
-  }else{
-    resp.json().then(function(o){
-      console.log(o)
-      meta = o.meta
-      let inBlock = false
-      let blockBody;
-      let index = 0;
-      o.body.split(/[\r\n]/).forEach(function(line){
-        if(inBlock){
-          if(line === "<<"){ // end of block
-            loadLine(index, blockBody)
-            inBlock = false
-            index ++;
-          }else{
-            blockBody += "\n" + line
-          }
-        }else{
-          if(isBlock(line)){ // start of block
-            inBlock = true
-            blockBody = line
-          }else{ // not block line
-            loadLine(index, line)
-            index ++;
-          }
-        }
-      })
-      let result = analysis()
-      keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
-      keywords.push(decodeURIComponent(opts.id)) // full search
-      instantSearch()
-    })
-  }
+  // load side page
+  loadPage("side", false, opts.user, "menu")
+
+  // load main page
+  loadPage("main", true, opts.user, opts.id)
+
 })
 
 try{
@@ -191,8 +213,7 @@ try{
 loginCheck(opts.user).then(function(resp){
   resp.json().then(function(o){
     if(!o.editable){
-      setReadOnly()
-      store.dispatch(setReadOnly())
+      store.dispatch(setReadOnly("main"))
     }
     if(o.login){
       store.dispatch(logined(o.user))
@@ -218,14 +239,17 @@ function analysis(){
       //
       let blockInfo = parseBlock(item.text)
       if(blockInfo.type === "img"){
-          if(blockInfo.body.indexOf("http://")===0 || blockInfo.body.indexOf("https://")===0){
-            images.push(blockInfo.body)
+          if(blockInfo.body[0].indexOf("http://")===0 || blockInfo.body[0].indexOf("https://")===0){
+            images.push(blockInfo.body[0])
           }else{
-            images.push(API_SERVER + '/img/' + blockInfo.body)
+            images.push(API_SERVER + '/img/' + blockInfo.body[0])
           }
+      }else if(blockInfo.type === "item"){
+        images.push(blockInfo.body[1]);
       }
     }
   })
+  console.log("Analysis", images)
   return {
     keywords,
     images,
@@ -301,17 +325,7 @@ function uploadFile(file){
   return fetch(req)
 }
 
-getList(opts.user).then(function(resp){
-  resp.json().then(function(o){
-    console.log("getList", o.pages)
-    if(o.pages){
-      o.pages.forEach(function(item){
-        store.dispatch(insertItem(item))
-      })
-    }
-  })
-})
-
+store.dispatch(setReadOnly("side"))
 /*
 loadLine(0, "# React.jsで作ったインラインマークダウンエディタ")
 loadLine(1, "インラインで編集ができる書式付きエディタです。")
@@ -357,7 +371,7 @@ function setupPaste(){
             let no = store.getState().cursor.row;
             let imgId = o.imgId
             let line = ">> img\n" + opts.user + '/'+ opts.id + '/' + imgId
-            store.dispatch(insertLine(no,line , Render(no, line)))
+            store.dispatch(insertLine("main", no,line , Render("main", no, line)))
             save()
           })
         })

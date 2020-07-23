@@ -33,7 +33,7 @@ export const parseBlock = (text) => {
   throw new Error(text + "is not block")
 }
 
-export const Render = (no, text, dispatch) => {
+export const Render = (name, no, text, dispatch) => {
   // TODO: sanitize!!
   if(isBlock(text)){
     let blockInfo = parseBlock(text)
@@ -68,25 +68,29 @@ export const Render = (no, text, dispatch) => {
           ret += hljsRender(no, lastPart);
         break;
         case "img":
-          if(lastPart.indexOf("http://")===0 || lastPart.indexOf("https://")===0){
-            ret += '<img src="' + lastPart + '">'
+          if(lastPart[0].indexOf("http://")===0 || lastPart[0].indexOf("https://")===0){
+            ret += '<img src="' + lastPart[0] + '">'
           }else{
             ret += '<img src="'+
-              API_SERVER + '/img/' + lastPart + '">'
+              API_SERVER + '/img/' + lastPart[0] + '">'
           }
         break;
+        case "list":
+            ret += "<span class='mode'>&gt;&gt; list</span>";
+            ret += global.list.filter((s) => s.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s) + "'>" + escapeHTML(s) + "</a></li>").join("")
+          break;
         case "oembed":
           let url = "https://noembed.com/embed";
-          var name = "callback_" + Math.random().toString(36).slice(-8);
+          var fname = "callback_" + Math.random().toString(36).slice(-8);
           let body = lastPart[0]
           if(body){
             if(body.indexOf("https://twitter.com") !== -1){
               url = "https://api.twitter.com/1/statuses/oembed.json";
             }
-            url += "?url="+encodeURIComponent(body.replace(/[\r\n]/g,""))+'&callback=' + name;
-            jsonp(name, url, function(data){
+            url += "?url="+encodeURIComponent(body.replace(/[\r\n]/g,""))+'&callback=' + fname;
+            jsonp(fname, url, function(data){
               var body = '<span class="mode">&gt;&gt; oembed</span><br/>' + data.html;
-              dispatch(previewLine(no, body));
+              dispatch(previewLine(name, no, body));
               window.twttr.widgets.load() // TODO: global object?
             });
             ret += "oembed..."+body
@@ -95,7 +99,7 @@ export const Render = (no, text, dispatch) => {
         case "item":
           ret += "<span class='mode'>&gt;&gt; item</span>";
           ret += '<a href="'+lastPart[0]+'">'
-          ret += '<table>'
+          ret += '<table class="item">'
           ret += '<tr>'
           ret += '<td>'
           ret += '<img src="' + lastPart[1] + '" />'

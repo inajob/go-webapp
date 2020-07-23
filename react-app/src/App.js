@@ -28,7 +28,7 @@ class App extends React.Component{
       <div className="main">
         <Search onUpdateKeyword={this.props.updateKeyword} onSearch={this.props.onSearch(this.props.sendSearch)} keyword={this.props.search.keyword} results={this.props.search.results} />
 
-        <Lines lines={this.props.lines} cursor={this.props.cursor} onMagic={this.props.onMagic} onUpdate={this.props.onUpdate} />
+        <Lines name="main" lines={this.props.lines} cursor={this.props.cursor} onMagic={this.props.onMagic} onUpdate={this.props.onUpdate} />
 
         <div className="instant-search">
           {Object.keys(this.props.instantSearch.results).map((k, j) => (
@@ -45,6 +45,7 @@ class App extends React.Component{
 
       </div>
       <div className="side">
+      <Lines name="side" lines={this.props.sideLines} cursor={this.props.sideCursor} />
         <List items={this.props.items} user={this.props.user} />
       </div>
     </div>
@@ -59,7 +60,9 @@ class App extends React.Component{
 const mapStateToProps = (state, ownProps) => {
   return {
     lines: state.lines,
+    sideLines: state.sideLines,
     cursor: state.cursor,
+    sideCursor: state.sideCursor,
     items: state.items,
     loginButton: state.loginButton,
     search: state.search,
@@ -81,13 +84,13 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(updateKeyword(keyword))
     },
     onSelectList: (cursor) => (text) => {
-      dispatch(insertLine(cursor.row, text, Render(cursor.row, text)))
+      dispatch(insertLine("main", cursor.row, text, Render("main", cursor.row, text)))
     },
     onModalListClose: () => {
-      dispatch(setReadWrite())
+      dispatch(setReadWrite("main"))
     },
     onMagic: () => {
-      dispatch(setReadOnly())
+      dispatch(setReadOnly("main"))
       dispatch(modalListOpen())
     },
     onDebug: () => {

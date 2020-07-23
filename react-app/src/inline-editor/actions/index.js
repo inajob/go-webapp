@@ -1,42 +1,49 @@
 
-export const previewLine = (no, preview) => ({
+export const previewLine = (name, no, preview) => ({
+  name,
   type: 'PREVIEW_LINE',
   preview,
   no,
 })
 
-export const changeLine = (no, text, preview) => ({
+export const changeLine = (name, no, text, preview) => ({
+  name,
   type: 'CHANGE_LINE',
   text,
   preview,
   no,
 })
 
-export const deleteLine = (no, text) => ({
+export const deleteLine = (name, no, text) => ({
+  name,
   type: 'DELETE_LINE',
   text,
   no,
 })
 
-export const insertLine = (no, text, preview) => ({
+export const insertLine = (name, no, text, preview) => ({
+  name,
   type: 'INSERT_LINE',
   text,
   preview,
   no,
 })
 
-export const setCursor = (row, col, dirty) => ({
+export const setCursor = (name, row, col, dirty) => ({
+  name,
   type: 'SET_CURSOR',
   row,
   col,
   dirty,
 })
 
-export const setReadOnly = () => ({
+export const setReadOnly = (name) => ({
+  name,
   type: 'SET_READONLY',
 })
 
-export const setReadWrite = () => ({
+export const setReadWrite = (name) => ({
+  name,
   type: 'SET_READWRITE',
 })
 

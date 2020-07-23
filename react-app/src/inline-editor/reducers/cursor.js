@@ -1,6 +1,7 @@
 function cursor(state = {col: 0, row: 0, dirty: false, editable: true}, action){
   switch(action.type){
     case 'SET_READONLY':
+      console.log("SET_READONLY", action.name)
       return {
         row: state.row,
         col: state.col,
@@ -8,6 +9,7 @@ function cursor(state = {col: 0, row: 0, dirty: false, editable: true}, action){
         editable: false,
       }
     case 'SET_READWRITE':
+      console.log("SET_READWRITE", action.name)
       return {
         row: state.row,
         col: state.col,

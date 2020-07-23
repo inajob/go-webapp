@@ -52,12 +52,15 @@ func AttachFileServer(r *gin.Engine) {
       description = strings.Replace(description, "\n", " ", -1)
       cover, _ := meta["cover"]
       scover, _ := cover.(string)
+      if !strings.HasPrefix(scover, "http://") && !strings.HasPrefix(scover, "https://") {
+        scover = origin + scover
+      }
 
       c.HTML(http.StatusOK, "index.html", gin.H{
         "title": id,
         "url": origin + "/web/?user=" + url.QueryEscape(user) + "&id=" + url.QueryEscape(id),
         "description": description,
-        "cover": origin + scover,
+        "cover": scover,
         "body": string(body),
       })
     }else{
