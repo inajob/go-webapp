@@ -141,7 +141,7 @@ getList(opts.user).then(function(resp){
   })
 }).then(function(){
   // Page require List
-  function loadPage(name, user, id){
+  function loadPage(name, isMain, user, id){
     getPage(user, id).then(function(resp){
       let keywords = ["[" + decodeURIComponent(id) + "]"] // link search
       console.log(resp)
@@ -186,19 +186,21 @@ getList(opts.user).then(function(resp){
               }
             }
           })
-          let result = analysis()
-          keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
-          keywords.push(decodeURIComponent(id)) // full search
-          instantSearch()
+          if(isMain){
+            let result = analysis()
+            keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
+            keywords.push(decodeURIComponent(id)) // full search
+            instantSearch()
+          }
         })
       }
     })
   }
   // load side page
-  loadPage("side", opts.user, "menu")
+  loadPage("side", false, opts.user, "menu")
 
   // load main page
-  loadPage("main", opts.user, opts.id)
+  loadPage("main", true, opts.user, opts.id)
 
 })
 
