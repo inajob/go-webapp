@@ -16,19 +16,17 @@
   min-height: 100%;
   border:solid black;
   border-width: 0px 1px 0px 0px;
+  font-size: 0.7em;
 }
 
 /* === override main style === */
-.side {
-  font-size: 0.7em;
-}
 .side .h1{
   font-size: large;
   font-weight: bold;
   border: solid #aaf;
   background-color: #ddf;
   border-width: 0px 0px 1px 0px;
-  padding:0.2em;
+  padding:0.1em;
   margin:0em;
 }
 .side .h2{
@@ -36,7 +34,7 @@
   font-weight: bold;
   background-color: #ddf;
   margin-left: 0px;
-  margin-top: 1em;
+  margin-top: 0.5em;
 }
 .side .h3{
   font-size: small;
@@ -47,9 +45,13 @@
   margin-left: 5px;
 }
 .side .block{
-  border: none;
+  border: solid #aaf 2px;
   padding: 0em;
+  padding-left: 0.0em;
   margin: 0em;
+}
+.side .mode {
+  display: none;
 }
 
 /* === === */

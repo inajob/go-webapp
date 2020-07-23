@@ -90,7 +90,7 @@ export const Render = (name, no, text, dispatch) => {
             url += "?url="+encodeURIComponent(body.replace(/[\r\n]/g,""))+'&callback=' + fname;
             jsonp(fname, url, function(data){
               var body = '<span class="mode">&gt;&gt; oembed</span><br/>' + data.html;
-              dispatch(previewLine(fname, no, body));
+              dispatch(previewLine(name, no, body));
               window.twttr.widgets.load() // TODO: global object?
             });
             ret += "oembed..."+body
@@ -99,7 +99,7 @@ export const Render = (name, no, text, dispatch) => {
         case "item":
           ret += "<span class='mode'>&gt;&gt; item</span>";
           ret += '<a href="'+lastPart[0]+'">'
-          ret += '<table>'
+          ret += '<table class="item">'
           ret += '<tr>'
           ret += '<td>'
           ret += '<img src="' + lastPart[1] + '" />'
