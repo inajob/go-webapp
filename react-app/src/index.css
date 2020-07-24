@@ -128,6 +128,9 @@
   display: flex;
   flex-wrap: wrap;
 }
+.instant-search li:before{
+  content: "";
+}
 .instant-search .piece li {
   width: 22%;
   display: block;
@@ -136,6 +139,9 @@
   padding:3px;
   margin: 3px;
   background-color: white;
+}
+.instant-search .piece li img{
+  width: 100%;
 }
 
 .modal-list-ul li{

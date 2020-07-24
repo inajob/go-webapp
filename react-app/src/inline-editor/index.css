@@ -89,6 +89,9 @@ line{
   margin: 0.5em;
   margin-left: 20px;
 }
+.block img{
+  max-width: 80%;
+}
 .mode {
   background-color: #aaa;
   border-radius: 3px;

@@ -5,12 +5,14 @@ import (
   "bufio"
   "strings"
   "path/filepath"
+  "github.com/inajob/frontmatter"
 )
 
 type GrepResult struct {
   Path string `json:"path"`
   LineNo int `json:"lineNo"`
   Text string `json:"text"`
+  Meta map[string]interface{} `json:"meta"`
 }
 
 func grepFile(path string, keyword string) []GrepResult{
@@ -30,6 +32,15 @@ func grepFile(path string, keyword string) []GrepResult{
         Text: scanner.Text(),
       }
       results = append(results, r)
+    }
+  }
+  if len(results) > 0 {
+    file.Seek(0, 0) // TODO: use above body data
+    meta, _, err := frontmatter.ParseFrontMatter(file)
+    if err == nil {
+      for i := 0; i < len(results); i ++ {
+        results[i].Meta = meta
+      }
     }
   }
   return results

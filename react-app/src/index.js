@@ -105,9 +105,9 @@ function getList(user){
 function grepToInstantSearch(grepLines, user, id) {
   let resultMap = {}
   grepLines.forEach((l) => {
-    if(resultMap[l.user + "/" + l.id] || (l.user === user && l.id === id)){
+    if(resultMap[l.user + "/" + l.id] || (l.user === user && encodeURIComponent(l.id) === id)){
     }else{
-      resultMap[l.user + "/" + l.id] = {user: l.user, id: l.id, text: l.text}
+      resultMap[l.user + "/" + l.id] = {user: l.user, id: l.id, text: l.text, cover: l.cover}
     }
   })
   let result = []
@@ -163,7 +163,9 @@ getList(opts.user).then(function(resp){
       }else{
         resp.json().then(function(o){
           console.log(o)
-          meta = o.meta
+          if(isMain){
+            meta = o.meta
+          }
           let inBlock = false
           let blockBody;
           let index = 0;

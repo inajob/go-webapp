@@ -19,6 +19,7 @@ type SearchResult struct {
   Id string `json:"id"`
   LineNo int `json:"lineNo"`
   Text string `json:"text"`
+  Cover string `json:"cover"`
 }
 
 var CONTENTS_DIR = filepath.Join("data/contents") // TODO: only support 1 depth dir
@@ -53,11 +54,14 @@ func Search(keyword string) []SearchResult{
   r := make([]SearchResult, len(gr))
   for i := 0; i < len(gr); i ++ {
     path := strings.Split(gr[i].Path, string(os.PathSeparator))
+    cover, _ := gr[i].Meta["cover"]
+    scover, _ := cover.(string)
     r[i] = SearchResult {
       User: path[len(path) - 2],
       Id: path[len(path) - 1],
       LineNo: gr[i].LineNo,
       Text: gr[i].Text,
+      Cover: scover,
     }
   }
   return r
