@@ -119,7 +119,6 @@ function grepToInstantSearch(grepLines, user, id) {
 
 let opts = getOpts()
 let meta = {}
-console.log("opts", opts)
 global.user = opts.user // TODO: manage context?
 global.list = [] // TODO: manage context?
 
@@ -131,7 +130,6 @@ store.dispatch(modalListClose())
 
 getList(opts.user).then(function(resp){
   resp.json().then(function(o){
-    console.log("getList", o.pages)
     if(o.pages){
       global.list = o.pages
       o.pages.forEach(function(item){
