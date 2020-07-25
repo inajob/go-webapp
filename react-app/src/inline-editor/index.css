@@ -52,31 +52,30 @@ line{
 .h1{
   font-size: x-large;
   font-weight: bold;
-  border: solid #aaf;
   background-color: #ddf;
-  border-width: 0px 0px 1px 20px;
-  padding:0.2em;
-  margin:0.3em;
+  padding-left: 2px;
+  margin-top:0.3em;
 }
 .h1 textarea{
   font-size: x-large;
   font-weight: bold;
+  padding-left: 2px;
 }
 .h2{
   font-size: large;
   font-weight: bold;
-  background-color: #ddf;
-  margin-left: 15px;
+  padding-left: 2px;
   margin-top: 1em;
 }
 .h2 textarea{
   font-size: large;
   font-weight: bold;
+  padding-left: 2px;
 }
 .h3{
   font-size: medium;
   font-weight: bold;
-  margin-left: 19px;
+  margin-left: 15px;
 }
 .h3 textarea{
   font-size: medium;
@@ -84,13 +83,15 @@ line{
 }
 .block {
   border: solid #aaf 2px;
-  border-radius: 1em;
-  padding: 0.5em;
+  border-width: 0px 0px 0px 4px;
+  background-color: #eee;
   margin: 0.5em;
   margin-left: 20px;
 }
 .block img{
   max-width: 80%;
+  border: solid #666 3px;
+  border-radius: 3px;
 }
 .mode {
   background-color: #aaa;
