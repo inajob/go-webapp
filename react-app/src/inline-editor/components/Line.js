@@ -76,7 +76,7 @@ class Line extends React.Component{
     }else{
       // inline
       return (
-        <div className={'line ' + this.props.className} onClick={this.clickHandler}>
+        <div className={'line ' + this.props.className} style={this.props.indent>0?{marginLeft: (this.props.indent * 20)+"px"}:{}} onClick={this.clickHandler}>
           <div style={{display: this.props.isFocus?"block":"none"}}>
             <textarea ref="rawInput" style={{height: this.props.height}} onChange={this.send} onKeyDown={this.keyHandler} value={this.props.text} />
           </div>

@@ -101,14 +101,14 @@
   background-color: #eee;
 }
 
-.list{
+.side .list{
   font-size: small;
 }
-.list li::before{
+.side .list li::before{
   content: "-";
   padding: 0.1em;
 }
-.list li{
+.side .list li{
   list-style-type: none;
   background-color:white;
   margin-bottom: 2px;

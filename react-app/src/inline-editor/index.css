@@ -81,6 +81,13 @@ line{
   font-size: medium;
   font-weight: bold;
 }
+.main .list{
+  margin-left: 20px;
+  border-left: solid;
+}
+.main .list textarea{
+}
+
 .block {
   border: solid #aaf 2px;
   border-width: 0px 0px 0px 4px;

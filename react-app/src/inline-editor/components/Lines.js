@@ -21,6 +21,7 @@ class Lines extends React.Component{
                 height={numLines(line.text)*24 + "px"}
                 isBlock={isBlock(line.text)}
                 className={calcClassName(line.text)}
+                indent={calcIndent(line.text)}
                 onChange={this.props.onChange(this.props.name)}
                 onUpdate={this.props.onUpdate}
                 onUp={this.props.onUp(
@@ -80,11 +81,24 @@ const calcClassName = (text) => {
       className = "h2"
     }else if(text.indexOf("#") === 0){
       className = "h1"
+    }else if(text.indexOf("-") === 0){
+      className = "list"
     }else if(text.length === 0){
       className = "empty"
     }
   }
   return className;
+}
+const calcIndent = (text) => {
+  let count = 0;
+  if(!isBlock(text)){
+    if(text.indexOf("-") === 0){
+      while(text.indexOf("-", count) === count){
+        count ++;
+      }
+    }
+  }
+  return count;
 }
 
 const mapStateToProps = (state, ownProps) => {

@@ -32,6 +32,14 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
     var pos = 0;
     function inner(level){
       var out = [];
+      let isList = (body.search(/-+ /) === 0);
+      if(pos === 0 && isList){
+        console.log("List", body);
+        while(body.indexOf("-", pos) === pos){
+          pos ++;
+        }
+        out.push(newPiece("list", body.slice(0, pos)));
+      }
       while(true){
         var cap;
         if(level === 0){
@@ -162,6 +170,14 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
         switch(v.kind){
           case "command":
             out.push("" + v.body + "");
+            break;
+          case "list":
+            let indent = v.body.length;
+            let listHead = "";
+            for(let i = 0; i < indent; i ++){
+              listHead += "-";
+            }
+            out.push(listHead);
             break;
           case "text":
             out.push(v.body);
