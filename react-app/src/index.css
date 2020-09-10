@@ -6,6 +6,11 @@
 .main{
   padding-left:120px;
 }
+.main .title{
+  text-align:right;
+  padding-right: 0.5em;
+  background-color: #eee;
+}
 
 .side {
   position: absolute;
@@ -14,8 +19,6 @@
   background-color: #eee;
   width: 120px;
   min-height: 100%;
-  border:solid black;
-  border-width: 0px 1px 0px 0px;
   font-size: 0.7em;
 }
 
@@ -58,9 +61,6 @@
 
 }
 
-.main{
-  padding-top: 0.5em;
-}
 
 .header{
   display:flex;

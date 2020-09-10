@@ -26,8 +26,7 @@ class App extends React.Component{
     </div>
     <div className={this.props.loginButton.isError?"contents error":"contents"}>
       <div className="main">
-        <Search onUpdateKeyword={this.props.updateKeyword} onSearch={this.props.onSearch(this.props.sendSearch)} keyword={this.props.search.keyword} results={this.props.search.results} />
-
+        <h1 className="title">{(this.props.title)}</h1>
         <Lines name="main" lines={this.props.lines} cursor={this.props.cursor} onMagic={this.props.onMagic} onUpdate={this.props.onUpdate} />
 
         <div className="instant-search">
@@ -42,6 +41,7 @@ class App extends React.Component{
             </div>
           ))}
         </div>
+        <Search onUpdateKeyword={this.props.updateKeyword} onSearch={this.props.onSearch(this.props.sendSearch)} keyword={this.props.search.keyword} results={this.props.search.results} />
 
       </div>
       <div className="side">
