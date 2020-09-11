@@ -159,9 +159,11 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
             break;
           case "wikilink":
             tmp = htmlEncode(v.slice(1));
+            out.push("<span class='label'>")
             out.push("[")
             out.push("<a href='?&user=" + global.user + "&id=" + tmp + "'>" + tmp + "</a>");
             out.push("]")
+            out.push("</span>")
             break;
           default:
             throw new Error("unsupported kind: " + v.kind)

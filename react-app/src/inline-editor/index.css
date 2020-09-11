@@ -115,6 +115,10 @@ line{
   font-size: 3px;
   padding: 3px;
 }
+.label{
+  background-color: #ccf;
+  border-radius: 3px;
+}
 
 .inline-image {
   background-color: #666;
