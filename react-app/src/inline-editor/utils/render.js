@@ -75,6 +75,23 @@ export const Render = (name, no, text, dispatch) => {
               API_SERVER + '/img/' + lastPart[0] + '">'
           }
         break;
+        case "grep":
+          ret += "<span class='mode'>&gt;&gt; grep</span>";
+          ret += "<div>"
+          ret += "Query:" + lastPart[0]
+          ret += "</div>"
+          global.sendSearch(lastPart[0]).then((resp) => {
+            resp.json().then((o) => {
+              console.log("grep result", o) // todo: dispatch
+              let body = [];
+              body.push("<span class='mode'>&gt;&gt; grep &quot;" + lastPart[0] + "&quot;</span>")
+              o.lines.forEach((v)=>{
+                body.push("<li>" + v.text + "<span class='tiny'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a></span></li>")
+              })
+              dispatch(previewLine(name, no, body.join("\n")));
+            })
+          })
+        break;
         case "list":
             ret += "<span class='mode'>&gt;&gt; list</span>";
             ret += global.list.filter((s) => s.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s) + "'>" + escapeHTML(s) + "</a></li>").join("")

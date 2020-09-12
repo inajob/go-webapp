@@ -88,6 +88,8 @@ function sendSearch(keyword){
   return fetch(req)
 }
 
+global.sendSearch = sendSearch;
+
 
 function getPage(user, id){
   var req = new Request(API_SERVER + "/page/" + user + "/" + id, {
