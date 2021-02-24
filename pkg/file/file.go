@@ -22,6 +22,15 @@ type SearchResult struct {
   Cover string `json:"cover"`
 }
 
+type SearchScheduleResult struct {
+  User string `json:"user"`
+  Id string `json:"id"`
+  LineNo int `json:"lineNo"`
+  Text string `json:"text"`
+  Cover string `json:"cover"`
+  Schedule time.Time `json:"schedule"`
+}
+
 var CONTENTS_DIR = filepath.Join("data/contents") // TODO: only support 1 depth dir
 var IMG_DIR = filepath.Join("data/imgs")
 
@@ -57,6 +66,24 @@ func Search(keyword string) []SearchResult{
     cover, _ := gr[i].Meta["cover"]
     scover, _ := cover.(string)
     r[i] = SearchResult {
+      User: path[len(path) - 2],
+      Id: path[len(path) - 1],
+      LineNo: gr[i].LineNo,
+      Text: gr[i].Text,
+      Cover: scover,
+    }
+  }
+  return r
+}
+
+func SearchSchedule() []SearchScheduleResult{
+  gr := ParseSchedule(CONTENTS_DIR)
+  r := make([]SearchScheduleResult, len(gr))
+  for i := 0; i < len(gr); i ++ {
+    path := strings.Split(gr[i].Path, string(os.PathSeparator))
+    cover, _ := gr[i].Meta["cover"]
+    scover, _ := cover.(string)
+    r[i] = SearchScheduleResult {
       User: path[len(path) - 2],
       Id: path[len(path) - 1],
       LineNo: gr[i].LineNo,

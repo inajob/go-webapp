@@ -28,6 +28,10 @@ type CheckResponse struct {
 type SearchResponse struct {
   Lines []file.SearchResult `json:"lines"`
 }
+type SearchScheduleResponse struct {
+  Lines []file.SearchScheduleResult `json:"lines"`
+}
+
 
 func AttachSearch(r *gin.Engine) {
   r.OPTIONS("/search", func(c *gin.Context){
@@ -37,6 +41,20 @@ func AttachSearch(r *gin.Engine) {
     keyword := c.PostForm("keyword")
     lines := file.Search(keyword)
     result := SearchResponse {
+      Lines: lines,
+    }
+    c.JSON(200, result)
+    return
+  })
+}
+
+func AttachSearchSchedule(r *gin.Engine) {
+  r.OPTIONS("/search-schedule", func(c *gin.Context){
+    c.String(200, "OK")
+  })
+  r.POST("/search-schedule", func(c *gin.Context){
+    lines := file.SearchSchedule()
+    result := SearchScheduleResponse {
       Lines: lines,
     }
     c.JSON(200, result)

@@ -119,6 +119,14 @@ line{
   background-color: #ccf;
   border-radius: 3px;
 }
+.schedule-label {
+  border-radius: 3px;
+  border: solid 1px;
+  font-size: 11px;
+  padding-right: 3px;
+  padding-left: 3px;
+  margin-right: 2em;
+}
 
 .inline-image {
   background-color: #666;

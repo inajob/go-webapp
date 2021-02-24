@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux'
-import { Provider } from 'react-redux'
+import { Provider, batch } from 'react-redux'
 
 import 'highlight.js/styles/dracula.css';  // choose your style!
 import {mermaidAPI} from 'mermaid'
@@ -90,6 +90,20 @@ function sendSearch(keyword){
 
 global.sendSearch = sendSearch;
 
+// TODO: cache
+function sendSearchSchedule(){
+  var req = new Request(API_SERVER + "/search-schedule", {
+    method: "POST",
+    credentials: "include", // for save another domain
+    headers: {
+      'Accept': 'applicatoin/json',
+    },
+  })
+  return fetch(req)
+}
+global.sendSearchSchedule = sendSearchSchedule;
+
+
 
 function getPage(user, id){
   var req = new Request(API_SERVER + "/page/" + user + "/" + id, {
@@ -169,6 +183,7 @@ getList(opts.user).then(function(resp){
           let inBlock = false
           let blockBody;
           let index = 0;
+          batch(() => {
           o.body.split(/[\r\n]/).forEach(function(line){
             if(inBlock){
               if(line === "<<"){ // end of block
@@ -194,6 +209,7 @@ getList(opts.user).then(function(resp){
             keywords.push(decodeURIComponent(id)) // full search
             instantSearch()
           }
+          })
         })
       }
     })

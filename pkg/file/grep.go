@@ -24,6 +24,7 @@ func grepFile(path string, keyword string) []GrepResult{
   }
   defer file.Close()
   scanner := bufio.NewScanner(file)
+  // TODO: this requires memory
   for i := 1; scanner.Scan(); i++ {
     if strings.Contains(scanner.Text(), keyword) {
       r := GrepResult {
@@ -36,7 +37,7 @@ func grepFile(path string, keyword string) []GrepResult{
   }
   if len(results) > 0 {
     file.Seek(0, 0) // TODO: use above body data
-    meta, _, err := frontmatter.ParseFrontMatter(file)
+    meta, _, err := frontmatter.ParseFrontMatter(file) // TODO: slow
     if err == nil {
       for i := 0; i < len(results); i ++ {
         results[i].Meta = meta

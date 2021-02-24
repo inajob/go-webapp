@@ -3,6 +3,7 @@ module go-webapp
 go 1.13
 
 require (
+	4d63.com/tz v1.2.0
 	github.com/Ladicle/tcardgen v0.0.0-20200626133112-a0bd335e0861 // indirect
 	github.com/gin-gonic/gin v1.4.0
 	github.com/google/uuid v1.1.1

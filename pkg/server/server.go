@@ -101,6 +101,7 @@ func Serve() {
   AttachFileServer(r);
   store.AttachLoginCheck(r);
   store.AttachSearch(r);
+  store.AttachSearchSchedule(r);
   store.AttachImgUpdate(r);
   store.AttachImgGet(r);
   store.AttachUpdate(r);

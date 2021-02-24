@@ -8,19 +8,19 @@ buildweb:
 	cd react-app &&  REACT_APP_API_SERVER="" yarn run build
 
 build-backend: buildweb
-	docker build -t kinadu/go-webapp-backend .
+	docker build -t inajob1/go-webapp-backend .
 
 push-backend: build-backend
-	docker push kinadu/go-webapp-backend
+	docker push inajob1/go-webapp-backend
 
 deploy: push-backend
 	kubectl rollout restart -n inline-editor deployment go-webapp-backend
 
 build-frontend:
-	docker build -t kinadu/go-webapp-frontend ./react-app
+	docker build -t inajob1/go-webapp-frontend ./react-app
 
 push-frontend: build-frontend
-	docker push kinadu/go-webapp-frontend
+	docker push inajob1/go-webapp-frontend
 
 test:
 	go test pkg/server
