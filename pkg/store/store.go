@@ -12,9 +12,6 @@ type Page struct {
   Body string `json:"body"`
   Meta map[string]interface{} `json:"meta"`
 }
-type PageList struct {
-  Pages []string `json:"pages"`
-}
 type ImgId struct {
   ImgId string `json:"imgId"`
   User string `json:"user"`
@@ -140,7 +137,7 @@ func AttachUpdate(r *gin.Engine) {
     lastUpdate := c.PostForm("lastUpdate")
     cover := c.PostForm("cover")
 
-    nextLastUpdate, err := file.Save(user, id, body, lastUpdate, cover)
+    nextLastUpdate, isNewFile, err := file.Save(user, id, body, lastUpdate, cover)
     if err != nil{
       c.JSON(500, gin.H{"error": err.Error()})
       return
@@ -155,6 +152,10 @@ func AttachUpdate(r *gin.Engine) {
         },
       }
       c.JSON(200, result)
+
+      if isNewFile {
+        file.SaveList(user);
+      }
       return
     }
   })
@@ -183,16 +184,9 @@ func AttachList(r *gin.Engine) {
   r.GET("/page/:user", func(c *gin.Context){
     user := c.Param("user")
 
-    fs, err := file.List(user)
-    if err != nil {
-      c.JSON(500, gin.H{"error": err.Error()})
-      return
-    }
+    fname := file.GetListFileName(user)
 
-    result := PageList {
-      Pages: fs,
-    }
-    c.JSON(200, result)
+    c.File(fname);
     return
   })
 }

@@ -1,6 +1,7 @@
 package file
 
 import (
+  "encoding/json"
   "fmt"
   "errors"
   "os"
@@ -30,6 +31,10 @@ type SearchScheduleResult struct {
   Cover string `json:"cover"`
   Schedule time.Time `json:"schedule"`
 }
+type PageList struct {
+  Pages []string `json:"pages"`
+}
+
 
 var CONTENTS_DIR = filepath.Join("data/contents") // TODO: only support 1 depth dir
 var IMG_DIR = filepath.Join("data/imgs")
@@ -94,26 +99,28 @@ func SearchSchedule() []SearchScheduleResult{
   return r
 }
 
-func Save (user string, id string, body string, lastUpdate string, cover string) (nextLastUpdate string, err error) {
+func Save (user string, id string, body string, lastUpdate string, cover string) (nextLastUpdate string, isNewFile bool, err error) {
   dirPath := filepath.Join(CONTENTS_DIR, user)
   if _, err := os.Stat(dirPath); err != nil{
     if err := os.Mkdir(dirPath, 0775); err != nil{
-      return "", err
+      return "", false, err
     }
   }
+  isNewFile = false;
   filePath := filepath.Join(CONTENTS_DIR, user, id)
   if _, err := os.Stat(filePath); err != nil{
     // file not found
+    isNewFile = true;
   }else{
     // file found
     meta, _, err := Load(user, id)
     if err != nil {
-      return "", err
+      return "", false, err
     }
     l, ok := meta["lastUpdate"]
     if ok {
       if lastUpdate != l {
-        return "", errors.New("lastUpdate mismatch")
+        return "", false, errors.New("lastUpdate mismatch")
       }
     }else{
       fmt.Printf("lastUpdate: not found in document\n")
@@ -124,9 +131,9 @@ func Save (user string, id string, body string, lastUpdate string, cover string)
   n := strconv.FormatInt(now, 10)
   body = "---\nlastUpdate: \"" + n + "\"\ncover: \""+ cover +"\"\n---\n" + body
   if err := ioutil.WriteFile(filePath, []byte(body), 0644); err != nil {
-    return "", err
+    return "", false, err
   }
-  return n, nil
+  return n, isNewFile, nil
 }
 
 func Load (user string, id string) (meta map[string]interface{}, body string, err error) {
@@ -142,6 +149,27 @@ func Load (user string, id string) (meta map[string]interface{}, body string, er
   }
 
   return meta, body, nil
+}
+
+func GetListFileName(user string) (string){
+  return filepath.Join(CONTENTS_DIR, user + "-files.json")
+}
+
+func SaveList(user string) (err error){
+  fname := GetListFileName(user);
+  fs, err := List(user)
+  if err != nil {
+    return err
+  }
+  result := PageList {
+    Pages: fs,
+  }
+  data, err := json.Marshal(result)
+  if err != nil {
+    return err
+  }
+
+  return ioutil.WriteFile(fname, data, 0644)
 }
 
 func List (user string) (files []string, err error) {
