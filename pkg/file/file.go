@@ -37,6 +37,7 @@ type PageList struct {
 
 
 var CONTENTS_DIR = filepath.Join("data/contents") // TODO: only support 1 depth dir
+var CACHE_DIR = filepath.Join("data/cache")
 var IMG_DIR = filepath.Join("data/imgs")
 
 func SaveImg(user string, id string, imgId string, image multipart.File) (err error){
@@ -152,11 +153,19 @@ func Load (user string, id string) (meta map[string]interface{}, body string, er
 }
 
 func GetListFileName(user string) (string){
-  return filepath.Join(CONTENTS_DIR, user + "-files.json")
+  return filepath.Join(CACHE_DIR, user, "files.json")
 }
 
 func SaveList(user string) (err error){
   fname := GetListFileName(user);
+
+  dirPath := filepath.Dir(fname)
+  if _, err := os.Stat(dirPath); err != nil{
+    if err := os.MkdirAll(dirPath, 0775); err != nil{
+      return err
+    }
+  }
+
   fs, err := List(user)
   if err != nil {
     return err
