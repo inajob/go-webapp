@@ -1,4 +1,5 @@
-import {mermaidAPI} from 'mermaid'
+import pkg from 'mermaid'
+const {mermaidAPI} = pkg
 
 export const mermaidRender = (no, text) => {
   let render = "";

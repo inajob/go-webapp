@@ -1,9 +1,10 @@
-import {mermaidRender} from '../render/mermaid'
-import {hljsRender} from '../render/hljs'
-import {parse, htmlEncode}  from '../utils/inlineDecorator'
-import {previewLine} from '../actions'
-import {jsonp}  from './jsonp'
-import {create, all} from 'mathjs'
+import {mermaidRender} from '../render/mermaid.mjs'
+import {hljsRender} from '../render/hljs.mjs'
+import {parse, htmlEncode}  from '../utils/inlineDecorator.mjs'
+import {previewLine} from '../actions/index.mjs'
+import {jsonp}  from './jsonp.mjs'
+import pkg from 'mathjs'
+const {create, all} = pkg
 
 const API_SERVER=process.env.REACT_APP_API_SERVER
 

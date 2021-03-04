@@ -1,4 +1,5 @@
-import {create, all} from 'mathjs'
+import pkg from 'mathjs'
+const {create,all} = pkg
 
 const API_SERVER=process.env.REACT_APP_API_SERVER
 
