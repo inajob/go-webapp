@@ -289,6 +289,8 @@ export const Render = (name, no, text, global, dispatch) => {
       return "<h2>" + escapeHTML(text, global.user) + "</h2>"
     }else if(text.indexOf("#") === 0){
       return "<h1>" + escapeHTML(text, global.user) + "</h1>"
+    }else if(text.indexOf("-") === 0){
+      return "<li>" + escapeHTML(text, global.user) + "</li>"
     }
     return "<div>"+htmlEncode(parse(text), global.user)+"</div>"
   }

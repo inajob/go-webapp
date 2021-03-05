@@ -25,6 +25,9 @@
 .line h1,h2,h3{
   font-size: inherit;
 }
+.line li::before{
+  content: "";
+}
 
 /* === override main style === */
 .side .h1{
