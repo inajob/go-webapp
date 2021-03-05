@@ -17,6 +17,7 @@ import {insertItem, logined, updateMessage, error, updateInstantResults,
 import './inline-editor/index.css';
 import './index.css';
 import {Render, isBlock, parseBlock} from './inline-editor/utils/render'
+import {mermaidRender} from './inline-editor/render/mermaid.mjs'
 import {parse} from './inline-editor/utils/inlineDecorator'
 // -- -- --
 
@@ -24,10 +25,12 @@ const store = createStore(rootReducer)
 //const unsubscribe = store.subscribe(() => console.log("state",store.getState()))
 
 const API_SERVER=process.env.REACT_APP_API_SERVER
+
+global.mermaidRender = mermaidRender
 mermaidAPI.initialize({startOnLoad: true, theme: 'forest'});
 
 function loadLine(name, no, text){
-  store.dispatch(insertLine(name, no, text, Render(name, no, text, store.dispatch)))
+  store.dispatch(insertLine(name, no, text, Render(name, no, text, global, store.dispatch)))
 }
 
 function getOpts(){
@@ -364,7 +367,7 @@ loadLine(13, "https://github.com/inajob/inline-editor")
 ReactDOM.render(
   <Provider store={store}>
     <div>
-      <App title={decodeURIComponent(opts.id)} user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} onNewDiary={onNewDiary} onNewJunk={onNewJunk} sendSearch={sendSearch} />
+      <App title={decodeURIComponent(opts.id)} user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} onNewDiary={onNewDiary} onNewJunk={onNewJunk} sendSearch={sendSearch} sendSearchSchedule={sendSearchSchedule} list={global.list} />
     </div>
   </Provider>,
   document.getElementById('root')
@@ -389,7 +392,7 @@ function setupPaste(){
             let no = store.getState().cursor.row;
             let imgId = o.imgId
             let line = ">> img\n" + opts.user + '/'+ opts.id + '/' + imgId
-            store.dispatch(insertLine("main", no,line , Render("main", no, line)))
+            store.dispatch(insertLine("main", no,line , Render("main", no, line, global)))
             save()
           })
         })

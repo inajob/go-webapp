@@ -27,7 +27,7 @@ class App extends React.Component{
     <div className={this.props.loginButton.isError?"contents error":"contents"}>
       <div className="main">
         <h1 className="title">{(this.props.title)}</h1>
-        <Lines name="main" lines={this.props.lines} cursor={this.props.cursor} onMagic={this.props.onMagic} onUpdate={this.props.onUpdate} />
+        <Lines name="main" lines={this.props.lines} cursor={this.props.cursor} onMagic={this.props.onMagic} user={this.props.user} onUpdate={this.props.onUpdate} sendSearch={this.props.sendSearch} sendSearchSchedule={this.props.sendSearchSchedule} list={this.props.list} mermaidRender={this.props.mermaidRender} />
 
         <div className="instant-search">
           {Object.keys(this.props.instantSearch.results).map((k, j) => (

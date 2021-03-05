@@ -7,7 +7,6 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
   {{link url}}
   {{img img}}
   */
-
   function newPiece(kind, s){
     return {kind: kind, body: s};
   }
@@ -92,7 +91,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
     return inner(0);
   }
 
-  export function htmlEncode(body){
+  export function htmlEncode(body, user){
     var out = [];
     var tmp;
     var list;
@@ -102,7 +101,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
       if(Array.isArray(v)){
         switch(v[0]){
           case "command":
-            tmp = htmlEncode(v.slice(1));
+            tmp = htmlEncode(v.slice(1), user);
             list = tmp.split(/\s+/, 2); //  cmd, remain...
 
             var m = tmp.match(/\s+/);
@@ -159,10 +158,10 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
             }
             break;
           case "wikilink":
-            tmp = htmlEncode(v.slice(1));
+            tmp = htmlEncode(v.slice(1), user);
             out.push("<span class='label'>")
             out.push("[")
-            out.push("<a href='?&user=" + global.user + "&id=" + tmp + "'>" + tmp + "</a>");
+            out.push("<a href='?&user=" + user + "&id=" + tmp + "'>" + tmp + "</a>");
             out.push("]")
             out.push("</span>")
             break;

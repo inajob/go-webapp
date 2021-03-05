@@ -1,4 +1,3 @@
-import {mermaidRender} from '../render/mermaid.mjs'
 import {hljsRender} from '../render/hljs.mjs'
 import {parse, htmlEncode}  from '../utils/inlineDecorator.mjs'
 import {previewLine} from '../actions/index.mjs'
@@ -8,8 +7,8 @@ const {create, all} = pkg
 
 const API_SERVER=process.env.REACT_APP_API_SERVER
 
-function escapeHTML(s){
-  return htmlEncode(parse(s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")));
+function escapeHTML(s, user){
+  return htmlEncode(parse(s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")), user);
 }
 
 export const parseBlock = (text) => {
@@ -34,7 +33,7 @@ export const parseBlock = (text) => {
   throw new Error(text + "is not block")
 }
 
-export const Render = (name, no, text, dispatch) => {
+export const Render = (name, no, text, global, dispatch) => {
   // TODO: sanitize!!
   if(isBlock(text)){
     let blockInfo = parseBlock(text)
@@ -61,7 +60,7 @@ export const Render = (name, no, text, dispatch) => {
         break;
         case "mermaid":
           ret += "<span class='mode'>&gt;&gt; mermaid</span>";
-          ret += mermaidRender(no, lastPart);
+          ret += global.mermaidRender(no, lastPart);
         break;
         case "code":
           ret += "<span class='mode'>&gt;&gt; code</span>";
@@ -218,7 +217,7 @@ export const Render = (name, no, text, dispatch) => {
                   return "255,255,255";
                 }
                 if(v.show){
-                  body.push("<li><span style='background-color:rgb(" + calcColor(v.priority) + ");'>" + "<span class='schedule-label'>"  + v.label + "</span>" + v.text + "</span><span class='tiny'>" +v.priority + " <a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a></span></li>")
+                  body.push("<li><span style='background-color:rgb(" + calcColor(v.priority) + ");'><span class='schedule-label'>"  + v.label + "</span>" + v.text + "</span><span class='tiny'>" +v.priority + " <a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a></span></li>")
                 }
               })
               dispatch(previewLine(name, no, body.join("\n")));
@@ -228,7 +227,7 @@ export const Render = (name, no, text, dispatch) => {
 
         case "list":
             ret += "<span class='mode'>&gt;&gt; list</span>";
-            ret += global.list.filter((s) => s.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s) + "'>" + escapeHTML(s) + "</a></li>").join("")
+            ret += global.list.filter((s) => s.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s) + "'>" + escapeHTML(s, global.user) + "</a></li>").join("")
           break;
         case "oembed":
           let url = "https://noembed.com/embed";
@@ -269,7 +268,7 @@ export const Render = (name, no, text, dispatch) => {
             ret += "<tr>";
             i.split(",").forEach(function(j){
               ret += "<td>";
-              ret += escapeHTML(j);
+              ret += escapeHTML(j, global.user);
               ret += "</td>";
             });
             ret += "</tr>";
@@ -285,13 +284,13 @@ export const Render = (name, no, text, dispatch) => {
     return ret;
   }else{
     if(text.indexOf("###") === 0){
-      return "<div>" + escapeHTML(text) + "<div>"
+      return "<div>" + escapeHTML(text, global.user) + "<div>"
     }else if(text.indexOf("##") === 0){
-      return "<div>" + escapeHTML(text) + "<div>"
+      return "<div>" + escapeHTML(text, global.user) + "<div>"
     }else if(text.indexOf("#") === 0){
-      return "<div>" + escapeHTML(text) + "<div>"
+      return "<div>" + escapeHTML(text, global.user) + "<div>"
     }
-    return "<div>"+htmlEncode(parse(text))+"</div>"
+    return "<div>"+htmlEncode(parse(text), global.user)+"</div>"
   }
 }
 

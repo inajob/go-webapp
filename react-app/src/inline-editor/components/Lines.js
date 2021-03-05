@@ -105,11 +105,15 @@ const mapStateToProps = (state, ownProps) => {
   return {}
 }
 
+function makeGlobal(ownProps){
+  return {sendSearch: ownProps.sendSearch, sendSearchSchedule: ownProps.sendSearchSchedule, list: ownProps.list, user: ownProps.user, mermaidRender: ownProps.mermaidRender};
+}
 
-const mapDispatchToProps = (dispatch) => {
+
+const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     onChange: (name) => (no, text) => {
-      dispatch(changeLine(name, no, text, Render(name, no, text, dispatch)))
+      dispatch(changeLine(name, no, text, Render(name, no, text, makeGlobal(ownProps), dispatch)))
     },
     onUp: (name, upText) => (no, col, text) => {
       if(no <= 0){
@@ -159,9 +163,9 @@ const mapDispatchToProps = (dispatch) => {
           dispatch(setCursor(name, no + 1, 0, true))
           if(text === undefined)text = ""
           let t1 = text.slice(0, pos)
-          dispatch(changeLine(name, no, t1, Render(name, no, t1, dispatch)))
+          dispatch(changeLine(name, no, t1, Render(name, no, t1, makeGlobal(ownProps), dispatch)))
           let t2 = text.slice(pos)
-          dispatch(insertLine(name, no + 1, t2, Render(name, no + 1, t2, dispatch)))
+          dispatch(insertLine(name, no + 1, t2, Render(name, no + 1, t2, makeGlobal(ownProps), dispatch)))
           return false; // prevent default
         }
       }
@@ -184,7 +188,7 @@ const mapDispatchToProps = (dispatch) => {
           text = "- " + text
         }
       }
-      dispatch(changeLine(name, no, text, Render(name, no, text, dispatch)))
+      dispatch(changeLine(name, no, text, Render(name, no, text, makeGlobal(ownProps), dispatch)))
     },
     onLeftUp: (name, pretext) => (no) =>{
       if(no > 0){
@@ -194,7 +198,7 @@ const mapDispatchToProps = (dispatch) => {
     onBSfunc: (name, pretext) => (no, text) =>{
       dispatch(setCursor(name, no - 1, pretext.length, true))
       let t = pretext + text;
-      dispatch(changeLine(name, no-1, t, Render(name, no - 1, t, dispatch)))
+      dispatch(changeLine(name, no-1, t, Render(name, no - 1, t, makeGlobal(ownProps), dispatch)))
       dispatch(deleteLine(name, no))
     },
     onClick: (name) => (no) => {
