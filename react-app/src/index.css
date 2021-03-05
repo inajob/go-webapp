@@ -22,6 +22,10 @@
   font-size: 0.7em;
 }
 
+.line h1,h2,h3{
+  font-size: inherit;
+}
+
 /* === override main style === */
 .side .h1{
   font-size: large;

@@ -284,11 +284,11 @@ export const Render = (name, no, text, global, dispatch) => {
     return ret;
   }else{
     if(text.indexOf("###") === 0){
-      return "<div>" + escapeHTML(text, global.user) + "</div>"
+      return "<h3>" + escapeHTML(text, global.user) + "</h3>"
     }else if(text.indexOf("##") === 0){
-      return "<div>" + escapeHTML(text, global.user) + "</div>"
+      return "<h2>" + escapeHTML(text, global.user) + "</h2>"
     }else if(text.indexOf("#") === 0){
-      return "<div>" + escapeHTML(text, global.user) + "</div>"
+      return "<h1>" + escapeHTML(text, global.user) + "</h1>"
     }
     return "<div>"+htmlEncode(parse(text), global.user)+"</div>"
   }
