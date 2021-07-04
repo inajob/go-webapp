@@ -73,6 +73,7 @@ export const Render = (name, no, text, global, dispatch) => {
           {
             let url = lastPart[0]
             try{
+            let hilights = (lastPart[1]||"").split(",").map((n) => {return parseInt(n)})
             let target = new URL(url)
             const lineSplit = target.hash.split("-");
             const startLine = (target.hash !== "" && parseInt(lineSplit[0].replace("#L", ""))) || -1;
@@ -85,9 +86,9 @@ export const Render = (name, no, text, global, dispatch) => {
             const file = pathSplit.slice(5, pathSplit.length).join("/");
 
             const rawFileURL = `https://raw.githubusercontent.com/${user}/${repository}/${branch}/${file}`;
+            const escapeUrl = (""+ target).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
 
-            ret += lastPart[0] + "<br>";
-            ret += rawFileURL;
+            ret += escapeUrl;
 
             const fetchFile = fetch(rawFileURL).then((response) => {
               if (response.ok) {
@@ -101,16 +102,25 @@ export const Render = (name, no, text, global, dispatch) => {
               let snippet = result.split(/[\r\n]/).slice(startLine - 1, endLine);
               console.log(snippet)
               let out = "";
-              let escapeUrl = (""+ target).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
               out += "<span class='mode'>&gt;&gt; github</span>";
               out +='<a target="_blank" href="' + escapeUrl + '">' + escapeUrl + '</a>'
               out += "<pre class='hljs'>"
-              out += hljsRender(no, snippet).replace(/<(\/|)pre[^>]*>/g,"").split(/[\r\n]/).map((s, n) => {return '<span style="user-select:none;">' +(n + startLine) + '</span>' + s}).join("\n")
+              const lines = hljsRender(no, snippet).replace(/<(\/|)pre[^>]*>/g,"").split(/[\r\n]/)
+              let outLines = [];
+              lines.forEach((l, n) => {
+                const numberedLine = '<span style="user-select:none;">' +(n + startLine) + '</span>' + l
+                if(hilights.includes(n + startLine)){
+                  outLines.push('<span style="background-color: #663">' + numberedLine + '</span>');
+                }else{
+                  outLines.push(numberedLine);
+                }
+              })
+              out += outLines.join("\n")
               out += "</pre>"
               dispatch(previewLine(name, no, out));
             });
             }catch(e){
-              ret += "error";
+              ret += "error " + e;
             }
           }
         break;
