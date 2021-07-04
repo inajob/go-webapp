@@ -34,7 +34,6 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
       var out = [];
       let isList = (body.search(/-+ /) === 0);
       if(pos === 0 && isList){
-        console.log("List", body);
         while(body.indexOf("-", pos) === pos){
           pos ++;
         }

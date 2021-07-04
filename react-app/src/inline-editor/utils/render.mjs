@@ -1,4 +1,6 @@
 import {hljsRender} from '../render/hljs.mjs'
+// below incompatible to console mode
+import {mermaidRender} from '../render/mermaid.mjs'
 import {parse, htmlEncode}  from '../utils/inlineDecorator.mjs'
 import {previewLine} from '../actions/index.mjs'
 import {jsonp}  from './jsonp.mjs'
@@ -59,8 +61,58 @@ export const Render = (name, no, text, global, dispatch) => {
           ret += "<pre>" + lastPart.join("\n") + "</pre>";
         break;
         case "mermaid":
-          ret += "<span class='mode'>&gt;&gt; mermaid</span>";
-          ret += global.mermaidRender(no, lastPart);
+          if(global.mode === "console"){
+            ret += "NOT IMPLEMENT mermaid render";
+          }else{
+            ret += "<span class='mode'>&gt;&gt; mermaid</span>";
+            ret += mermaidRender(no, lastPart);
+          }
+        break;
+        case "github":
+          ret += "<span class='mode'>&gt;&gt; github</span>";
+          {
+            let url = lastPart[0]
+            try{
+            let target = new URL(url)
+            const lineSplit = target.hash.split("-");
+            const startLine = (target.hash !== "" && parseInt(lineSplit[0].replace("#L", ""))) || -1;
+            const endLine = (target.hash !== "" && lineSplit.length > 1 && parseInt(lineSplit[1].replace("L", ""))) || startLine;
+
+            const pathSplit = target.pathname.split("/");
+            const user = pathSplit[1];
+            const repository = pathSplit[2];
+            const branch = pathSplit[4];
+            const file = pathSplit.slice(5, pathSplit.length).join("/");
+
+            const rawFileURL = `https://raw.githubusercontent.com/${user}/${repository}/${branch}/${file}`;
+
+            ret += lastPart[0] + "<br>";
+            ret += rawFileURL;
+
+            const fetchFile = fetch(rawFileURL).then((response) => {
+              if (response.ok) {
+                return response.text();
+              } else {
+                return Promise.reject(`${response.status} ${response.statusText}`);
+              }
+            });
+
+            fetchFile.then((result) => {
+              let snippet = result.split(/[\r\n]/).slice(startLine - 1, endLine);
+              console.log(snippet)
+              let out = "";
+              let escapeUrl = (""+ target).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+              out += "<span class='mode'>&gt;&gt; github</span>";
+              out +='<a target="_blank" href="' + escapeUrl + '">' + escapeUrl + '</a>'
+              out += "<pre class='hljs'>"
+              out += hljsRender(no, snippet).replace(/<(\/|)pre[^>]*>/g,"").split(/[\r\n]/).map((s, n) => {return '<span style="user-select:none;">' +(n + startLine) + '</span>' + s}).join("\n")
+              out += "</pre>"
+              dispatch(previewLine(name, no, out));
+            });
+            }catch(e){
+              ret += "error";
+            }
+          }
         break;
         case "code":
           ret += "<span class='mode'>&gt;&gt; code</span>";
@@ -230,20 +282,24 @@ export const Render = (name, no, text, global, dispatch) => {
             ret += global.list.filter((s) => s.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s) + "'>" + escapeHTML(s, global.user) + "</a></li>").join("")
           break;
         case "oembed":
-          let url = "https://noembed.com/embed";
-          var fname = "callback_" + Math.random().toString(36).slice(-8);
-          let body = lastPart[0]
-          if(body){
-            if(body.indexOf("https://twitter.com") !== -1){
-              url = "https://api.twitter.com/1/statuses/oembed.json";
+          if(global.mode === "console"){
+            ret += "NOT IMPLEMENT oembed render";
+          }else{
+            let url = "https://noembed.com/embed";
+            var fname = "callback_" + Math.random().toString(36).slice(-8);
+            let body = lastPart[0]
+            if(body){
+              if(body.indexOf("https://twitter.com") !== -1){
+                url = "https://api.twitter.com/1/statuses/oembed.json";
+              }
+              url += "?url="+encodeURIComponent(body.replace(/[\r\n]/g,""))+'&callback=' + fname;
+              jsonp(fname, url, function(data){
+                var body = '<span class="mode">&gt;&gt; oembed</span><br/>' + data.html;
+                dispatch(previewLine(name, no, body));
+                window.twttr.widgets.load() // TODO: global object?
+              });
+              ret += "oembed..."+body
             }
-            url += "?url="+encodeURIComponent(body.replace(/[\r\n]/g,""))+'&callback=' + fname;
-            jsonp(fname, url, function(data){
-              var body = '<span class="mode">&gt;&gt; oembed</span><br/>' + data.html;
-              dispatch(previewLine(name, no, body));
-              window.twttr.widgets.load() // TODO: global object?
-            });
-            ret += "oembed..."+body
           }
         break
         case "item":
