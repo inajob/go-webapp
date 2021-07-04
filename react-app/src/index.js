@@ -276,7 +276,10 @@ function analysis(){
     images,
   }
 }
+let saving = false;
+let waiting = false;
 function save(){
+  saving = true;
   let result = analysis()
   let images = result.images;
   let rawLines = store.getState().lines.map((item) => {
@@ -296,6 +299,7 @@ function save(){
       store.dispatch(updateMessage("Save OK"))
       resp.json().then((o) => {
         meta = o.meta // update meta
+        saving = false;
       })
     }else{
       store.dispatch(updateMessage("Save Error"))
@@ -310,7 +314,21 @@ function onUpdate(o){
     clearTimeout(timerID)
     timerID = null
   }
-  timerID = setTimeout(save, 1000)
+  if(waiting){return} // waiting queue length == 1
+
+  let waitAndSave = () => {
+    if(saving == false){
+      waiting = false;
+      timerID = setTimeout(save, 1000)
+    }else{
+      // now in saving
+      waiting = true
+      setTimeout(() => {
+        waitAndSave()
+      }, 1000);
+    }
+  }
+  waitAndSave();
 }
 
 function onLoginClick(){
