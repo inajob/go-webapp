@@ -103,7 +103,7 @@ func SearchSchedule() []SearchScheduleResult{
 func Save (user string, id string, body string, lastUpdate string, cover string) (nextLastUpdate string, isNewFile bool, err error) {
   dirPath := filepath.Join(CONTENTS_DIR, user)
   if _, err := os.Stat(dirPath); err != nil{
-    if err := os.Mkdir(dirPath, 0775); err != nil{
+    if err := os.MkdirAll(dirPath, 0775); err != nil{
       return "", false, err
     }
   }
