@@ -153,12 +153,13 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         if(shift){
           dispatch(insertLine(name, no + 1, "", ""))
           dispatch(setCursor(name, no + 1, 0, true))
-          return false;
+          return {preventDefault: true, update: true};
         }
-        return true;
+        return {preventDefault: false, update: true};
       }else{
         if(shift){
           onMagic()
+          return {preventDefault: false, update: false};
         }else{
           dispatch(setCursor(name, no + 1, 0, true))
           if(text === undefined)text = ""
@@ -166,7 +167,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
           dispatch(changeLine(name, no, t1, Render(name, no, t1, makeGlobal(ownProps), dispatch)))
           let t2 = text.slice(pos)
           dispatch(insertLine(name, no + 1, t2, Render(name, no + 1, t2, makeGlobal(ownProps), dispatch)))
-          return false; // prevent default
+          return {preventDefault: true, update: true}; // prevent default
         }
       }
     },

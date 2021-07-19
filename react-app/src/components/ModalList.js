@@ -7,14 +7,16 @@ import {
 import {jsonp} from '../inline-editor/utils/jsonp';
 
 class ModalList extends React.Component{
-  //constructor(props) {
-  //  super(props)
-  //}
+  constructor(props) {
+    super(props)
+    this.queryRef = React.createRef();
+  }
   componentDidUpdate(){
     if(this.props.phase !== "NONE"){
-      // TODO: below line doesn't work well.
-      if(this.refs["query"]){
-        this.refs["query"].focus()
+      // TODO: below line doesn't work well. sometimes queryRef is null.
+      // if call update, this works well but takes some freeze.
+      if(this.queryRef.current){
+        this.queryRef.current.focus()
       }
       var target = this.refs["item" + this.props.index];
       if(target){
@@ -27,7 +29,7 @@ class ModalList extends React.Component{
     return (
     <Modal appElement={document.getElementById('root')} isOpen={this.props.phase !== "NONE"}>
        <input type="text"
-         ref="query"
+         ref={this.queryRef}
          onChange={this.props.onModalQueryChange(this.props.phase, this.props.providers[this.props.providerIndex])}
          value={this.props.query}
          onKeyDown={this.props.onKeyDown(

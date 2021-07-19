@@ -41,10 +41,13 @@ class Line extends React.Component{
       }
       break;
       case 13: //enter
-      if(!this.props.onEnter(this.props.no, this.props.text, e.target.selectionStart, e.shiftKey)){
+      let ret = this.props.onEnter(this.props.no, this.props.text, e.target.selectionStart, e.shiftKey)
+      if(ret.preventDefault){
         e.preventDefault()
       }
-      this.props.onUpdate()
+      if(ret.update){
+        this.props.onUpdate()
+      }
       break;
       case 8: //BS
       // when cursor is head
