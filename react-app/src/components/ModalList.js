@@ -87,6 +87,18 @@ const mapDispatchToProps = (dispatch) => {
           switch(phase){
             case "PROVIDERS":
               switch(provider.name){
+                case "page":
+                  let list = []
+                  global.list.forEach((i)  => {
+                    if(i.indexOf(query) != -1){
+                      list.push({
+                        title: i,
+                        text: "[" + i + "]",
+                      })
+                    }
+                  })
+                  dispatch(modalListUpdateList(list))
+                break;
                 case "amazon":
                 jsonp("amazon", "http://web.inajob.tk/ad/amz.php?callback=amazon&q=" + encodeURIComponent(query), function(data){
                   let list = []

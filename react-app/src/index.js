@@ -142,6 +142,7 @@ global.user = opts.user // TODO: manage context?
 global.list = [] // TODO: manage context?
 
 store.dispatch(modalListUpdateProviders([
+  {name: "page"},
   {name: "amazon"},
   {name: "aliexpress"},
 ]))
@@ -317,7 +318,7 @@ function onUpdate(o){
   if(waiting){return} // waiting queue length == 1
 
   let waitAndSave = () => {
-    if(saving == false){
+    if(saving === false){
       waiting = false;
       timerID = setTimeout(save, 1000)
     }else{

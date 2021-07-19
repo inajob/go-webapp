@@ -84,7 +84,7 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(updateKeyword(keyword))
     },
     onSelectList: (cursor) => (text) => {
-      dispatch(insertLine("main", cursor.row, text, Render("main", cursor.row, text)))
+      dispatch(insertLine("main", cursor.row, text, Render("main", cursor.row, text, global))) // TODO: global is deprecate
     },
     onModalListClose: () => {
       dispatch(setReadWrite("main"))
