@@ -28,7 +28,7 @@ class ModalList extends React.Component{
     <Modal appElement={document.getElementById('root')} isOpen={this.props.phase !== "NONE"}>
        <input type="text"
          ref="query"
-         onChange={this.props.onModalQueryChange}
+         onChange={this.props.onModalQueryChange(this.props.phase, this.props.providers[this.props.providerIndex])}
          value={this.props.query}
          onKeyDown={this.props.onKeyDown(
          this.props.query,
@@ -68,7 +68,22 @@ class ModalList extends React.Component{
 const mapDispatchToProps = (dispatch) => {
 
   return {
-    onModalQueryChange: (e) =>{
+    onModalQueryChange: (phase, provider) => (e) =>{
+      // TODO: this implementation is ad-hoc
+      if(phase === "LIST" && provider.name === "page"){
+        let list = []
+        global.list.forEach((i)  => {
+          if(i.indexOf(e.target.value) !== -1){
+            list.push({
+              title: i,
+              text: "[" + i + "]",
+            })
+          }
+        })
+        dispatch(modalListUpdateQuery(e.target.value))
+        dispatch(modalListUpdateList(list))
+        return
+      }
       dispatch(modalListUpdateQuery(e.target.value))
     },
     onKeyDown: (query, phase, provider, index, text, onSelectList, onClose) => (e) => {
@@ -90,7 +105,7 @@ const mapDispatchToProps = (dispatch) => {
                 case "page":
                   let list = []
                   global.list.forEach((i)  => {
-                    if(i.indexOf(query) != -1){
+                    if(i.indexOf(query) !== -1){
                       list.push({
                         title: i,
                         text: "[" + i + "]",
