@@ -149,9 +149,10 @@ const mapDispatchToProps = (dispatch) => {
               }
               break;
             case "LIST":
-              onSelectList(text)
+              onSelectList(text, (provider.name === "page")?true:false)
               dispatch(modalListClose())
               onClose()
+              e.preventDefault();
               break;
             default:
               throw new Error("unknown phase", phase)

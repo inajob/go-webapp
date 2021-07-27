@@ -6,7 +6,7 @@ import Search from './components/Search'
 import ModalList from './components/ModalList'
 import Controller from './components/Controller'
 import { connect } from 'react-redux'
-import {insertLine, setReadOnly, setReadWrite} from './inline-editor/actions'
+import {changeLine, insertLine, setCursor, setReadOnly, setReadWrite} from './inline-editor/actions'
 import {Render} from './inline-editor/utils/render'
 import { updateKeyword, updateResults, modalListOpen} from './actions'
 
@@ -51,7 +51,7 @@ class App extends React.Component{
     </div>
     <ModalList
       {...this.props.modalList}
-      onSelectList={this.props.onSelectList(this.props.cursor)}
+      onSelectList={this.props.onSelectList(this.props.cursor, this.props.modalList.targetLine)}
       onClose={this.props.onModalListClose}
     />
   </div>
@@ -83,15 +83,23 @@ const mapDispatchToProps = (dispatch) => {
     updateKeyword: (keyword) => {
       dispatch(updateKeyword(keyword))
     },
-    onSelectList: (cursor) => (text) => {
-      dispatch(insertLine("main", cursor.row, text, Render("main", cursor.row, text, global))) // TODO: global is deprecate
+    onSelectList: (cursor, targetLine) => (text, inline) => {
+      if(inline){
+        let t1 = targetLine.text.slice(0, targetLine.pos)
+        let t2 = targetLine.text.slice(targetLine.pos)
+        let nextText = t1 + text + t2
+        dispatch(changeLine("main", cursor.row, nextText, Render("main", cursor.row, nextText, global))) // TODO: global is deprecate
+        dispatch(setCursor("main", cursor.row, cursor.col + text.length, true))
+      }else{
+        dispatch(insertLine("main", cursor.row, text, Render("main", cursor.row, text, global))) // TODO: global is deprecate
+      }
     },
     onModalListClose: () => {
       dispatch(setReadWrite("main"))
     },
-    onMagic: () => {
+    onMagic: (no, pos, text) => {
       dispatch(setReadOnly("main"))
-      dispatch(modalListOpen())
+      dispatch(modalListOpen(no, pos, text))
     },
     onDebug: () => {
       dispatch(modalListOpen())

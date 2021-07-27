@@ -158,7 +158,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         return {preventDefault: false, update: true};
       }else{
         if(shift){
-          onMagic()
+          dispatch(setCursor(name, no, pos, true))
+          onMagic(no, pos, text)
           return {preventDefault: false, update: false};
         }else{
           dispatch(setCursor(name, no + 1, 0, true))

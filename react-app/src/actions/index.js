@@ -48,8 +48,11 @@ export const modalListUpdateQuery = (query) => ({
   type: 'MODAL_LIST_UPDATE_QUERY',
   query: query
 })
-export const modalListOpen = () => ({
+export const modalListOpen = (no, pos, text) => ({
   type: 'MODAL_LIST_OPEN',
+  no: no,
+  pos: pos,
+  text: text,
 })
 export const modalListClose = () => ({
   type: 'MODAL_LIST_CLOSE',
