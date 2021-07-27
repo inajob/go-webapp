@@ -23,6 +23,10 @@ type SearchResult struct {
   Cover string `json:"cover"`
 }
 
+type SearchResponse struct {
+  Lines []SearchResult `json:"lines"`
+}
+
 type SearchScheduleResult struct {
   User string `json:"user"`
   Id string `json:"id"`
@@ -64,8 +68,8 @@ func GetImgPath(user string, id string, imgId string) (path string){
   return filepath.Join(IMG_DIR, user, id, imgId)
 }
 
-func Search(keyword string) []SearchResult{
-  gr := Grep(CONTENTS_DIR, keyword)
+func Search(keyword string, user string) (SearchResponse, error){
+  gr := Grep(filepath.Join(CONTENTS_DIR, user), keyword)
   r := make([]SearchResult, len(gr))
   for i := 0; i < len(gr); i ++ {
     path := strings.Split(gr[i].Path, string(os.PathSeparator))
@@ -79,7 +83,33 @@ func Search(keyword string) []SearchResult{
       Cover: scover,
     }
   }
-  return r
+
+  result := SearchResponse {
+    Lines: r,
+  }
+
+  // save search result when bracket keyword
+  if(strings.HasPrefix(keyword, "[") && strings.HasSuffix(keyword, "]")){
+    fname := GetSearchFileName(user, keyword);
+    dirPath := filepath.Dir(fname)
+
+    if _, err := os.Stat(dirPath); err != nil{
+      if err := os.MkdirAll(dirPath, 0775); err != nil{
+        return result, err
+      }
+    }
+
+    data, err := json.Marshal(result)
+    if err != nil{
+      return result, err
+    }
+
+    if err := ioutil.WriteFile(fname, data, 0644); err != nil{
+      return result, err
+    }
+  }
+
+  return result, nil
 }
 
 func SearchSchedule() []SearchScheduleResult{
@@ -150,6 +180,10 @@ func Load (user string, id string) (meta map[string]interface{}, body string, er
   }
 
   return meta, body, nil
+}
+
+func GetSearchFileName(user string, query string) (string){
+  return filepath.Join(CACHE_DIR, user, "search", query + ".json")
 }
 
 func GetListFileName(user string) (string){

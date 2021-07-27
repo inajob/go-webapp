@@ -77,9 +77,11 @@ function loginCheck(user){
   return fetch(req)
 }
 
-function sendSearch(keyword){
+function sendSearch(keyword, noCache){
   let f = new FormData()
   f.append('keyword', keyword)
+  f.append('user', global.user)
+  f.append('noCache', noCache?"1":"0")
   var req = new Request(API_SERVER + "/search", {
     method: "POST",
     credentials: "include", // for save another domain
@@ -165,7 +167,7 @@ getList(opts.user).then(function(resp){
       console.log(resp)
       let instantSearch = () => {
         keywords.forEach((k) => {
-          sendSearch(k).then((resp) => {
+          sendSearch(k, false).then((resp) => {
             resp.json().then((o) => {
               let lines = o.lines
               let is = grepToInstantSearch(lines, user, id)
@@ -297,11 +299,32 @@ function save(){
   if(images.length > 0){image = images[0]}
   postPage(opts.user, opts.id, rawLines, lastUpdate, image).then(function(resp){
     if(resp.ok){
-      store.dispatch(updateMessage("Save OK"))
-      resp.json().then((o) => {
+      store.dispatch(updateMessage("Save OK, update Cache"))
+      resp.json().then(async (o) => {
         meta = o.meta // update meta
-        saving = false;
+
+        // update Search cache
+        let result = analysis()
+        let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
+        keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
+        let instantSearch = async () => {
+          await Promise.all(
+          keywords.map(async k => {
+            await sendSearch(k, true).then((resp) => {
+              resp.json().then((o) => {
+                let lines = o.lines
+                let is = grepToInstantSearch(lines, opts.user, opts.id)
+                store.dispatch(updateInstantResults(k, is))
+              })
+            })
+          })
+          )
+        }
+        saving = false; // TODO: this cause server overload, but fast user interaction
+        await instantSearch();
+        store.dispatch(updateMessage("Update Cache OK"))
       })
+
     }else{
       store.dispatch(updateMessage("Save Error"))
       store.dispatch(error())

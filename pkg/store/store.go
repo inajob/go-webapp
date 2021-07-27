@@ -1,6 +1,8 @@
 package store
 
 import (
+  "os"
+  "log"
   "github.com/gin-gonic/gin"
   "github.com/google/uuid"
   "go-webapp/pkg/file"
@@ -22,9 +24,6 @@ type CheckResponse struct {
   User string `json:"user"`
 }
 
-type SearchResponse struct {
-  Lines []file.SearchResult `json:"lines"`
-}
 type SearchScheduleResponse struct {
   Lines []file.SearchScheduleResult `json:"lines"`
 }
@@ -36,9 +35,22 @@ func AttachSearch(r *gin.Engine) {
   })
   r.POST("/search", func(c *gin.Context){
     keyword := c.PostForm("keyword")
-    lines := file.Search(keyword)
-    result := SearchResponse {
-      Lines: lines,
+    user := c.PostForm("user")
+    noCache := c.PostForm("noCache")
+
+    if(noCache != "1"){
+      // check chache
+      fname := file.GetSearchFileName(user, keyword)
+      if _, err := os.Stat(fname); err == nil{
+        // cache hit
+        c.File(fname);
+        return
+      }
+    }
+    result, err := file.Search(keyword, user)
+    if err != nil {
+      //c.JSON(500, gin.H{"error": err.Error()})
+      log.Printf("Search Save Error: %v", err)
     }
     c.JSON(200, result)
     return
