@@ -1,6 +1,6 @@
-export const insertItem = (text) => ({
+export const insertItem = (item) => ({
   type: 'INSERT_ITEM',
-  text,
+  item,
 })
 
 export const logined = (user) => ({

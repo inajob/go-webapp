@@ -153,8 +153,10 @@ store.dispatch(modalListClose())
 getList(opts.user).then(function(resp){
   resp.json().then(function(o){
     if(o.pages){
-      global.list = o.pages
-      o.pages.forEach(function(item){
+      let nameList = o.pages;
+      global.list = nameList
+      nameList.forEach(function(item){
+        item.modTime = new Date(item.modTime);
         store.dispatch(insertItem(item))
       })
     }

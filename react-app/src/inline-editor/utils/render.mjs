@@ -289,7 +289,7 @@ export const Render = (name, no, text, global, dispatch) => {
 
         case "list":
             ret += "<span class='mode'>&gt;&gt; list</span>";
-            ret += global.list.filter((s) => s.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s) + "'>" + escapeHTML(s, global.user) + "</a></li>").join("")
+            ret += global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "'>" + escapeHTML(s.name, global.user) + "</a></li>").join("")
           break;
         case "oembed":
           if(global.mode === "console"){

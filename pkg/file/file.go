@@ -35,10 +35,13 @@ type SearchScheduleResult struct {
   Cover string `json:"cover"`
   Schedule time.Time `json:"schedule"`
 }
-type PageList struct {
-  Pages []string `json:"pages"`
+type PageInfo struct {
+  Name string `json:"name"`
+  ModTime time.Time `json:"modTime"`
 }
-
+type PageList struct {
+  Pages []PageInfo `json:"pages"`
+}
 
 var CONTENTS_DIR = filepath.Join("data/contents") // TODO: only support 1 depth dir
 var CACHE_DIR = filepath.Join("data/cache")
@@ -186,8 +189,11 @@ func GetSearchFileName(user string, query string) (string){
   return filepath.Join(CACHE_DIR, user, "search", query + ".json")
 }
 
+func GetListFileName2(user string) (string){
+  return filepath.Join(CACHE_DIR, user, "files2.json")
+}
 func GetListFileName(user string) (string){
-  return filepath.Join(CACHE_DIR, user, "files.json")
+  return filepath.Join(CACHE_DIR, user, "files2.json")
 }
 
 func SaveList(user string) (err error){
@@ -211,20 +217,23 @@ func SaveList(user string) (err error){
   if err != nil {
     return err
   }
-
+  ioutil.WriteFile(GetListFileName2(user), data, 0644)
   return ioutil.WriteFile(fname, data, 0644)
 }
 
-func List (user string) (files []string, err error) {
+func List (user string) (files []PageInfo, err error) {
   dirPath := filepath.Join(CONTENTS_DIR, user)
   fs, err := ioutil.ReadDir(dirPath)
   if err != nil {
     return nil, err
   }
-  var l []string
+  var l []PageInfo
 
   for _, f := range fs {
-    l = append(l, f.Name());
+    l = append(l, PageInfo {
+      Name: f.Name(),
+      ModTime: f.ModTime(),
+    });
   }
   return l, nil
 }

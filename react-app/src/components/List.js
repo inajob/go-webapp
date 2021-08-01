@@ -5,8 +5,8 @@ class List extends React.Component{
     return (
       <div className="list">
         <ul>
-          {this.props.items.map((item, index) => (
-            <li key={index}><a href={"?user="+ this.props.user +"&id="+item.text}>{item.text}</a></li>
+          {this.props.items.sort((a, b) => b.modTime - a.modTime).map((item, index) => (
+            <li key={index}><a href={"?user="+ this.props.user +"&id="+item.name}>{item.name}</a></li>
           ))}
         </ul>
       </div>

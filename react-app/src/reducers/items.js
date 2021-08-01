@@ -3,7 +3,7 @@ function items(state = [], action){
   switch(action.type){
     case 'INSERT_ITEM':
       newState = state.slice()
-      newState.push({text: action.text})
+      newState.push(action.item)
       return newState
     default:
       return state

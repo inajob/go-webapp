@@ -35,7 +35,12 @@ class App extends React.Component{
               <div>Search result of '{k}'</div>
               <div className="pages">
               {this.props.instantSearch.results[k].map((r, i) => (
-                <li key={i}><div><a href={"?user=" + r.user + "&id=" + r.id}>{r.id}</a></div><div><img src={r.cover} alt="cover" />{r.text}</div></li>
+                <li key={i}><div><a href={"?user=" + r.user + "&id=" + r.id}>{r.id}</a></div>
+                  <div>
+                    {(() => {if(r.cover) return <img src={r.cover} alt="cover" />})()}
+                    {r.text}
+                  </div>
+                </li>
               ))}
               </div>
             </div>
