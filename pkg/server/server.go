@@ -1,6 +1,7 @@
 package server
 
 import (
+  "context"
   "os"
   "strings"
   "log"
@@ -96,11 +97,15 @@ func Serve() {
     c.JSON(200, result)
   })
 
+  ctx, cancel := context.WithCancel(context.Background())
+  defer cancel()
+  go store.StartSearch(ctx)
 
   // register entrypoint
   AttachFileServer(r);
   store.AttachLoginCheck(r);
   store.AttachSearch(r);
+  store.AttachSearchCache(r);
   store.AttachSearchSchedule(r);
   store.AttachImgUpdate(r);
   store.AttachImgGet(r);

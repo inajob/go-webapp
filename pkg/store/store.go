@@ -1,7 +1,10 @@
 package store
 
 import (
+  "context"
   "os"
+  "sync"
+  "time"
   "log"
   "github.com/gin-gonic/gin"
   "github.com/google/uuid"
@@ -28,6 +31,84 @@ type SearchScheduleResponse struct {
   Lines []file.SearchScheduleResult `json:"lines"`
 }
 
+type SearchRequest struct {
+  Keyword string
+  User string
+  RequestTime time.Time
+}
+
+var searchRequests []SearchRequest
+var mu sync.Mutex
+
+func StartSearch(ctx context.Context) {
+  mu = sync.Mutex{}
+
+  ticker := time.NewTicker(30 * time.Second)
+  defer ticker.Stop()
+
+  go func() {
+    for{
+      select {
+        case <- ticker.C:
+          log.Printf("tick")
+          CheckSearchRequest()
+      }
+    }
+  }()
+
+  for{
+    select {
+      case <- ctx.Done():
+        return
+    }
+  }
+}
+func AddSearchRequest(sr SearchRequest) int{
+  mu.Lock()
+  defer mu.Unlock()
+  hit := false
+  for i, _ := range searchRequests{
+    if searchRequests[i].Keyword == sr.Keyword && searchRequests[i].User == sr.User {
+      searchRequests[i].RequestTime = sr.RequestTime
+      hit = true
+      log.Printf("already exists searchRequests, update RequestTime %v", searchRequests[i].RequestTime)
+    }
+  }
+  if !hit {
+    searchRequests = append(searchRequests, sr)
+  }
+  return len(searchRequests)
+}
+func CheckSearchRequest() {
+  var targetSearchRequests []SearchRequest
+  {
+    mu.Lock()
+    defer mu.Unlock()
+    now := time.Now()
+    var newSearchRequests []SearchRequest
+
+    for _, v := range searchRequests{
+      if(now.Sub(v.RequestTime) > time.Minute*3){
+        // v is time to search
+        targetSearchRequests = append(targetSearchRequests, v)
+        log.Printf("%v is time to search", v)
+      }else{
+        newSearchRequests = append(newSearchRequests, v)
+        log.Printf("%v is wait for search", v)
+      }
+    }
+    searchRequests = newSearchRequests
+  }
+
+  for _, sr := range targetSearchRequests{
+    _, err := file.Search(sr.Keyword, sr.User)
+    if err != nil {
+      log.Printf("Search Save Error: %v", err)
+    }else{
+      log.Printf("Search Save OK: %v", sr)
+    }
+  }
+}
 
 func AttachSearch(r *gin.Engine) {
   r.OPTIONS("/search", func(c *gin.Context){
@@ -53,6 +134,23 @@ func AttachSearch(r *gin.Engine) {
       log.Printf("Search Save Error: %v", err)
     }
     c.JSON(200, result)
+    return
+  })
+}
+
+func AttachSearchCache(r *gin.Engine) {
+  r.OPTIONS("/search-cache", func(c *gin.Context){
+    c.String(200, "OK")
+  })
+  r.POST("/search-cache", func(c *gin.Context){
+    keyword := c.PostForm("keyword")
+    user := c.PostForm("user")
+    n := AddSearchRequest(SearchRequest{
+      Keyword: keyword,
+      User: user,
+      RequestTime: time.Now(),
+    })
+    c.String(200, "OK %d", n)
     return
   })
 }

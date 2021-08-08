@@ -92,6 +92,20 @@ function sendSearch(keyword, noCache){
   })
   return fetch(req)
 }
+function sendSearchCache(keyword, noCache){
+  let f = new FormData()
+  f.append('keyword', keyword)
+  f.append('user', global.user)
+  var req = new Request(API_SERVER + "/search-cache", {
+    method: "POST",
+    credentials: "include", // for save another domain
+    headers: {
+      'Accept': 'applicatoin/json',
+    },
+    body: f,
+  })
+  return fetch(req)
+}
 
 global.sendSearch = sendSearch;
 
@@ -312,11 +326,9 @@ function save(){
         let instantSearch = async () => {
           await Promise.all(
           keywords.map(async k => {
-            await sendSearch(k, true).then((resp) => {
-              resp.json().then((o) => {
-                let lines = o.lines
-                let is = grepToInstantSearch(lines, opts.user, opts.id)
-                store.dispatch(updateInstantResults(k, is))
+            await sendSearchCache(k, true).then((resp) => {
+              resp.text().then((o) => {
+                console.log("search cache queue length",o)
               })
             })
           })
