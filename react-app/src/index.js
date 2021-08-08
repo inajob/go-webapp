@@ -125,13 +125,15 @@ global.sendSearchSchedule = sendSearchSchedule;
 
 
 function getPage(user, id){
-  var req = new Request(API_SERVER + "/page/" + user + "/" + id, {
+  let r = Math.floor(Math.random()*1000)
+  var req = new Request(API_SERVER + "/page/" + user + "/" + id + "?r=" + r, {
     method: "GET"
   })
   return fetch(req)
 }
 function getList(user){
-  var req = new Request(API_SERVER + "/page/" + user, {
+  let r = Math.floor(Math.random()*1000)
+  var req = new Request(API_SERVER + "/page/" + user + "?r=" + r, {
     method: "GET"
   })
   return fetch(req)
