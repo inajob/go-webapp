@@ -224,7 +224,7 @@ getList(opts.user).then(function(resp){
                 inBlock = true
                 blockBody = line
               }else{ // not block line
-                if(!(i == lines.length - 1 && line.length == 0)){ // skip tail
+                if(!(i === lines.length - 1 && line.length === 0)){ // skip tail
                   loadLine(name, index, line)
                   index ++;
                 }
