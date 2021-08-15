@@ -209,7 +209,8 @@ getList(opts.user).then(function(resp){
           let blockBody;
           let index = 0;
           batch(() => {
-          o.body.split(/[\r\n]/).forEach(function(line){
+          let lines = o.body.split(/[\r\n]/)
+          lines.forEach(function(line, i){
             if(inBlock){
               if(line === "<<"){ // end of block
                 loadLine(name, index, blockBody)
@@ -223,8 +224,10 @@ getList(opts.user).then(function(resp){
                 inBlock = true
                 blockBody = line
               }else{ // not block line
-                loadLine(name, index, line)
-                index ++;
+                if(!(i == lines.length - 1 && line.length == 0)){ // skip tail
+                  loadLine(name, index, line)
+                  index ++;
+                }
               }
             }
           })
