@@ -79,6 +79,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     onSearch: (sendSearch) => (keyword) => {
       console.log("search", keyword)
+      dispatch(updateResults([{text:"loading..."}]))
       sendSearch(keyword).then((resp) => {
         resp.json().then((o) => {
           dispatch(updateResults(o.lines))

@@ -201,6 +201,7 @@ export const Render = (name, no, text, global, dispatch) => {
                       v.priority = Math.floor((today.getTime() - date.getTime())/oneday);
                     }else{
                       v.priority = -9999;
+                      v.show = false;
                     }
                     break;
                   case "!": // deadline
@@ -219,6 +220,7 @@ export const Render = (name, no, text, global, dispatch) => {
                   case ".": // done
                     v.label = "完了";
                     v.priority = -9999;
+                    v.show = false;
                     break;
                   case "-": // note
                     v.label = "覚書";

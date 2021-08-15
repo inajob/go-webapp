@@ -186,6 +186,7 @@ getList(opts.user).then(function(resp){
       let instantSearch = () => {
         keywords.forEach((k) => {
           sendSearch(k, false).then((resp) => {
+            store.dispatch(updateInstantResults(k, [{text:"loading..."}]))
             resp.json().then((o) => {
               let lines = o.lines
               let is = grepToInstantSearch(lines, user, id)
