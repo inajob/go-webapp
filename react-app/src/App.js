@@ -56,6 +56,7 @@ class App extends React.Component{
     </div>
     <ModalList
       {...this.props.modalList}
+      items={this.props.items}
       onSelectList={this.props.onSelectList(this.props.cursor, this.props.modalList.targetLine)}
       onClose={this.props.onModalListClose}
     />

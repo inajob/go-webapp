@@ -30,11 +30,12 @@ class ModalList extends React.Component{
     <Modal appElement={document.getElementById('root')} isOpen={this.props.phase !== "NONE"}>
        <input type="text"
          ref={this.queryRef}
-         onChange={this.props.onModalQueryChange(this.props.phase, this.props.providers[this.props.providerIndex])}
+         onChange={this.props.onModalQueryChange(this.props.phase, this.props.providers[this.props.providerIndex], this.props.items)}
          value={this.props.query}
          onKeyDown={this.props.onKeyDown(
          this.props.query,
          this.props.phase,
+         this.props.items,
          this.props.providers[this.props.providerIndex],
          this.props.index,
          this.props.list[this.props.index]?this.props.list[this.props.index].text:"",
@@ -70,25 +71,25 @@ class ModalList extends React.Component{
 const mapDispatchToProps = (dispatch) => {
 
   return {
-    onModalQueryChange: (phase, provider) => (e) =>{
+    onModalQueryChange: (phase, provider, items) => (e) =>{
       // TODO: this implementation is ad-hoc
       if(phase === "LIST" && provider.name === "page"){
-        let list = []
-        global.list.forEach((i)  => {
-          if(i.indexOf(e.target.value) !== -1){
-            list.push({
-              title: i,
-              text: "[" + i + "]",
+        let viewList = []
+        items.forEach((i)  => {
+          if(i.name.indexOf(e.target.value) !== -1){
+            viewList.push({
+              title: i.name,
+              text: "[" + i.name + "]",
             })
           }
         })
         dispatch(modalListUpdateQuery(e.target.value))
-        dispatch(modalListUpdateList(list))
+        dispatch(modalListUpdateList(viewList))
         return
       }
       dispatch(modalListUpdateQuery(e.target.value))
     },
-    onKeyDown: (query, phase, provider, index, text, onSelectList, onClose) => (e) => {
+    onKeyDown: (query, phase, items, provider, index, text, onSelectList, onClose) => (e) => {
       switch(e.keyCode){
         case 27: // esc
         dispatch(modalListClose())
@@ -105,16 +106,17 @@ const mapDispatchToProps = (dispatch) => {
             case "PROVIDERS":
               switch(provider.name){
                 case "page":
-                  let list = []
-                  global.list.forEach((i)  => {
-                    if(i.indexOf(query) !== -1){
-                      list.push({
-                        title: i,
-                        text: "[" + i + "]",
+                  let viewList = []
+                  console.log(items)
+                  items.forEach((i)  => {
+                    if(i.name.indexOf(query) !== -1){
+                      viewList.push({
+                        title: i.name,
+                        text: "[" + i.name + "]",
                       })
                     }
                   })
-                  dispatch(modalListUpdateList(list))
+                  dispatch(modalListUpdateList(viewList))
                 break;
                 case "amazon":
                 jsonp("amazon", "http://web.inajob.tk/ad/amz.php?callback=amazon&q=" + encodeURIComponent(query), function(data){
