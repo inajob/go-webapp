@@ -1,6 +1,7 @@
 import {hljsRender} from '../render/hljs.mjs'
 // below incompatible to console mode
 import {mermaidRender} from '../render/mermaid.mjs'
+import {mceRender} from '../render/mce.js' // this is not module
 import {parse, htmlEncode}  from '../utils/inlineDecorator.mjs'
 import {previewLine} from '../actions/index.mjs'
 import {jsonp}  from './jsonp.mjs'
@@ -68,6 +69,22 @@ export const Render = (name, no, text, global, dispatch) => {
             ret += mermaidRender(no, lastPart);
           }
         break;
+        case "mce":
+          if(global.mode === "console"){
+            ret += "NOT IMPLEMENT mce render";
+          }else{
+            ret += "<span class='mode'>&gt;&gt; MCE</span>";
+            if(lastPart){
+              try{
+                // TODO: slow
+                mceRender(lastPart.join("\n"), (svg) => {
+                  ret += "<div>" + svg + "</div>"
+                });
+              }catch(e){console.log(e); ret += e}
+            }
+          }
+        break;
+
         case "github":
           ret += "<span class='mode'>&gt;&gt; github</span>";
           {
