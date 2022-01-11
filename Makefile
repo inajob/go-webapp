@@ -14,7 +14,8 @@ build-backend: buildweb
 	docker build -t inajob1/go-webapp-backend .
 
 push-backend: build-backend
-	docker push inajob1/go-webapp-backend
+	#docker push inajob1/go-webapp-backend
+	docker buildx build --platform linux/amd64,linux/arm64 -t inajob1/go-webapp-backend --push .
 
 deploy: push-backend
 	kubectl rollout restart -n inline-editor deployment go-webapp-backend

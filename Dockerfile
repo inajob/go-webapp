@@ -8,8 +8,8 @@ COPY go.sum ./
 COPY Makefile ./
 
 ENV CGO_ENABLED=0
-ENV GOOS=linux
-ENV GOARCH=amd64
+#ENV GOOS=linux
+#ENV GOARCH=amd64
 
 RUN make build
 
