@@ -112,6 +112,7 @@ func Serve() {
   store.AttachUpdate(r);
   store.AttachGet(r);
   store.AttachList(r);
+  store.AttachRename(r);
 
   r.Run(":8088");
 }

@@ -37,6 +37,11 @@ type SearchRequest struct {
   RequestTime time.Time
 }
 
+type RenameResponse struct {
+  Success bool `json:"success"`
+  Message string `json:"message"`
+}
+
 var searchRequests []SearchRequest
 var mu sync.Mutex
 
@@ -184,6 +189,28 @@ func AttachLoginCheck(r *gin.Engine) {
     }
     c.JSON(200, result)
     return
+  })
+}
+
+func AttachRename(r *gin.Engine) {
+  r.OPTIONS("/rename", func(c *gin.Context){
+    c.String(200, "OK")
+  })
+  r.POST("/rename", func(c *gin.Context){
+    from := c.PostForm("from")
+    to := c.PostForm("to")
+    user := c.PostForm("user")
+
+    err := file.Rename(user, from, to)
+    if err == nil{
+      result := RenameResponse {
+        Success: true,
+        Message: "ok",
+      }
+      c.JSON(200, result)
+      return
+    }
+    c.JSON(500, gin.H{"error": err.Error()})
   })
 }
 

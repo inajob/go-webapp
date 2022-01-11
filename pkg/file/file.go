@@ -133,6 +133,39 @@ func SearchSchedule() []SearchScheduleResult{
   return r
 }
 
+func Rename(user string, from string, to string) error{
+  fromPath := filepath.Join(CONTENTS_DIR, user, from)
+  toPath := filepath.Join(CONTENTS_DIR, user, to)
+  _, err := os.Stat(toPath);
+  if err == nil{
+    // file exists
+    return fmt.Errorf("%s exists", toPath)
+  }
+  if !os.IsNotExist(err){
+    return fmt.Errorf("Stat error: %v", err)
+  }
+
+  err = os.Rename(fromPath, toPath)
+  if err != nil {
+    return fmt.Errorf("Rename error: %v", err)
+  }
+
+  fromImgDir := filepath.Join(IMG_DIR, user, from)
+  toImgDir := filepath.Join(IMG_DIR, user, to)
+  _, err = os.Stat(fromImgDir);
+  if err == nil{
+    err := os.Rename(fromImgDir, toImgDir)
+    if err != nil {
+      return fmt.Errorf("Img Dir Rename error: %v", err)
+    }
+  }else{
+    if !os.IsNotExist(err){
+      return fmt.Errorf("Stat error: %v", err)
+    }
+  }
+  return nil
+}
+
 func Save (user string, id string, body string, lastUpdate string, cover string) (nextLastUpdate string, isNewFile bool, err error) {
   dirPath := filepath.Join(CONTENTS_DIR, user)
   if _, err := os.Stat(dirPath); err != nil{

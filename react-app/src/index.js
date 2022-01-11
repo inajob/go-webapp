@@ -160,6 +160,7 @@ global.user = opts.user // TODO: manage context?
 global.list = [] // TODO: manage context?
 
 store.dispatch(modalListUpdateProviders([
+  {name: "rename"},
   {name: "page"},
   {name: "amazon"},
   {name: "aliexpress"},
