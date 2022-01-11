@@ -59,6 +59,7 @@ class App extends React.Component{
       items={this.props.items}
       title={this.props.title}
       onSelectList={this.props.onSelectList(this.props.cursor, this.props.modalList.targetLine)}
+      onRename={this.props.onRename(this.props.sendRename, this.props.user)}
       onClose={this.props.onModalListClose}
     />
   </div>
@@ -85,6 +86,15 @@ const mapDispatchToProps = (dispatch) => {
       sendSearch(keyword).then((resp) => {
         resp.json().then((o) => {
           dispatch(updateResults(o.lines))
+        })
+      })
+    },
+    onRename: (sendRename, user) => (from, to) => {
+      sendRename(from, to).then((resp) => {
+        resp.json().then((o) => {
+          // jump to new page
+          console.log(o)
+          document.location.href = '?user=' + user + '&id=' + to
         })
       })
     },

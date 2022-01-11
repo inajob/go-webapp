@@ -208,6 +208,7 @@ func AttachRename(r *gin.Engine) {
         Message: "ok",
       }
       c.JSON(200, result)
+      file.SaveList(user);
       return
     }
     c.JSON(500, gin.H{"error": err.Error()})

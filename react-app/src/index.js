@@ -77,6 +77,23 @@ function loginCheck(user){
   return fetch(req)
 }
 
+function sendRename(from, to){
+  // TODO: change img tag
+  let f = new FormData()
+  f.append('from', from)
+  f.append('to', to)
+  f.append('user', global.user)
+  var req = new Request(API_SERVER + "/rename", {
+    method: "POST",
+    credentials: "include", // for save another domain
+    headers: {
+      'Accept': 'applicatoin/json',
+    },
+    body: f,
+  })
+  return fetch(req)
+}
+
 function sendSearch(keyword, noCache){
   let f = new FormData()
   f.append('keyword', keyword)
@@ -197,7 +214,6 @@ getList(opts.user).then(function(resp){
         })
       }
       if(resp.ok === false){
-        loadLine(name, 0, "# " + decodeURIComponent(id))
         keywords.push(decodeURIComponent(id))
         instantSearch()
       }else{
@@ -430,7 +446,7 @@ loadLine(13, "https://github.com/inajob/inline-editor")
 ReactDOM.render(
   <Provider store={store}>
     <div>
-      <App title={decodeURIComponent(opts.id)} user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} onNewDiary={onNewDiary} onNewJunk={onNewJunk} sendSearch={sendSearch} sendSearchSchedule={sendSearchSchedule} list={global.list} />
+      <App title={decodeURIComponent(opts.id)} user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} onNewDiary={onNewDiary} onNewJunk={onNewJunk} sendSearch={sendSearch} sendSearchSchedule={sendSearchSchedule} sendRename={sendRename} list={global.list} />
     </div>
   </Provider>,
   document.getElementById('root')

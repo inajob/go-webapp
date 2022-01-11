@@ -41,6 +41,7 @@ class ModalList extends React.Component{
          this.props.index,
          this.props.list[this.props.index]?this.props.list[this.props.index].text:"",
          this.props.onSelectList,
+         this.props.onRename,
          this.props.onClose,
        )} />
 
@@ -90,7 +91,7 @@ const mapDispatchToProps = (dispatch) => {
       }
       dispatch(modalListUpdateQuery(e.target.value))
     },
-    onKeyDown: (query, phase, items, title, provider, index, text, onSelectList, onClose) => (e) => {
+    onKeyDown: (query, phase, items, title, provider, index, text, onSelectList, onRename, onClose) => (e) => {
       switch(e.keyCode){
         case 27: // esc
         dispatch(modalListClose())
@@ -107,7 +108,7 @@ const mapDispatchToProps = (dispatch) => {
             case "PROVIDERS":
               switch(provider.name){
                 case "rename":
-                  alert("RENAME:" + title + "->"  + query);
+                  onRename(title, query)
                 break;
                 case "page":
                   let viewList = []
