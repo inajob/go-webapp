@@ -166,6 +166,26 @@ func Rename(user string, from string, to string) error{
   return nil
 }
 
+func Delete(user string, id string) error{
+  filePath := filepath.Join(CONTENTS_DIR, user, id)
+  imgDirPath := filepath.Join(IMG_DIR, user, id)
+  _, err := os.Stat(filePath);
+  if err == nil {
+    err = os.Remove(filePath)
+    if err != nil{
+      return fmt.Errorf("remove %s error: %v", filePath, err)
+    }
+  }
+  _, err = os.Stat(imgDirPath);
+  if err == nil {
+    err = os.RemoveAll(imgDirPath)
+    if err != nil{
+      return fmt.Errorf("remove %s error: %v", imgDirPath, err)
+    }
+  }
+  return nil
+}
+
 func Save (user string, id string, body string, lastUpdate string, cover string) (nextLastUpdate string, isNewFile bool, err error) {
   dirPath := filepath.Join(CONTENTS_DIR, user)
   if _, err := os.Stat(dirPath); err != nil{

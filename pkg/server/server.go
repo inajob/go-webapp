@@ -113,6 +113,7 @@ func Serve() {
   store.AttachGet(r);
   store.AttachList(r);
   store.AttachRename(r);
+  store.AttachDelete(r);
 
   r.Run(":8088");
 }

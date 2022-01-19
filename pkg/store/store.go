@@ -192,6 +192,34 @@ func AttachLoginCheck(r *gin.Engine) {
   })
 }
 
+func AttachDelete(r *gin.Engine) {
+  r.OPTIONS("/delete", func(c *gin.Context){
+    c.String(200, "OK")
+  })
+  r.POST("/delete", func(c *gin.Context){
+    id := c.PostForm("id")
+    user := c.PostForm("user")
+
+    login := c.GetHeader("User") // TODO: not enough
+    if(login != user){
+      c.JSON(401, gin.H{"error": "login user is not page author"})
+      return
+    }
+
+    err := file.Delete(user, id)
+    if err == nil{
+      result := RenameResponse {
+        Success: true,
+        Message: "ok",
+      }
+      c.JSON(200, result)
+      file.SaveList(user);
+      return
+    }
+    c.JSON(500, gin.H{"error": err.Error()})
+  })
+}
+
 func AttachRename(r *gin.Engine) {
   r.OPTIONS("/rename", func(c *gin.Context){
     c.String(200, "OK")
@@ -200,6 +228,12 @@ func AttachRename(r *gin.Engine) {
     from := c.PostForm("from")
     to := c.PostForm("to")
     user := c.PostForm("user")
+
+    login := c.GetHeader("User") // TODO: not enough
+    if(login != user){
+      c.JSON(401, gin.H{"error": "login user is not page author"})
+      return
+    }
 
     err := file.Rename(user, from, to)
     if err == nil{

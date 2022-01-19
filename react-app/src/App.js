@@ -22,7 +22,7 @@ class App extends React.Component{
       <LoginButton logined={this.props.loginButton.login} user={this.props.loginButton.user} onLoginClick={this.props.onLoginClick} onLogoutClick={this.props.onLogoutClick} />
     </div>
     <div>
-      <Controller logined={this.props.loginButton.login} message={this.props.loginButton.message} isError={this.props.loginButton.isError} onNewDiary={this.props.onNewDiary} onNewJunk={this.props.onNewJunk} onDebug={this.props.onDebug} />
+      <Controller logined={this.props.loginButton.login} message={this.props.loginButton.message} isError={this.props.loginButton.isError} onNewDiary={this.props.onNewDiary} onDelete={this.props.onDelete} onNewJunk={this.props.onNewJunk} onDebug={this.props.onDebug} />
     </div>
     <div className={this.props.loginButton.isError?"contents error":"contents"}>
       <div className="main">

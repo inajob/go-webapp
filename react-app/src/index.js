@@ -77,21 +77,43 @@ function loginCheck(user){
   return fetch(req)
 }
 
-function sendRename(from, to){
-  // TODO: change img tag
+function sendDelete(user, id){
   let f = new FormData()
-  f.append('from', from)
-  f.append('to', to)
-  f.append('user', global.user)
-  var req = new Request(API_SERVER + "/rename", {
+  f.append('user', user)
+  f.append('id', id)
+  let req = new Request(API_SERVER + "/delete", {
     method: "POST",
     credentials: "include", // for save another domain
     headers: {
       'Accept': 'applicatoin/json',
+      'User': user, // this header is deleted by login-proxy but useful for debug
     },
     body: f,
   })
   return fetch(req)
+}
+
+function sendRename(from, to){
+  let imgPathChange = (lines) => {
+    // TODO: replace img tag
+  }
+  return savePromise().then(() => {
+    let f = new FormData()
+    f.append('from', from)
+    f.append('to', to)
+    f.append('user', global.user) // TODO: global.user
+    let req = new Request(API_SERVER + "/rename", {
+      method: "POST",
+      credentials: "include", // for save another domain
+      headers: {
+        'Accept': 'applicatoin/json',
+        // TODO: global.user
+        'User': global.user, // this header is deleted by login-proxy but useful for debug
+      },
+      body: f,
+    })
+    return fetch(req)
+  })
 }
 
 function sendSearch(keyword, noCache){
@@ -318,13 +340,15 @@ function analysis(){
     images,
   }
 }
-let saving = false;
-let waiting = false;
-function save(){
-  saving = true;
+
+function savePromise(filter){
   let result = analysis()
   let images = result.images;
-  let rawLines = store.getState().lines.map((item) => {
+  let lines = store.getState().lines
+  if(filter){
+    lines = filter(lines);
+  }
+  let rawLines = lines.map((item) => {
     if(isBlock(item.text)){
       return item.text + "\n<<"
     }else{
@@ -336,36 +360,42 @@ function save(){
   let image = ""
   if(meta && meta.lastUpdate){lastUpdate = meta.lastUpdate}
   if(images.length > 0){image = images[0]}
-  postPage(opts.user, opts.id, rawLines, lastUpdate, image).then(function(resp){
+  return postPage(opts.user, opts.id, rawLines, lastUpdate, image).then(function(resp){
     if(resp.ok){
       store.dispatch(updateMessage("Save OK, update Cache"))
-      resp.json().then(async (o) => {
-        meta = o.meta // update meta
-
-        // update Search cache
-        let result = analysis()
-        let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
-        keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
-        let instantSearch = async () => {
-          await Promise.all(
-          keywords.map(async k => {
-            await sendSearchCache(k, true).then((resp) => {
-              resp.text().then((o) => {
-                console.log("search cache queue length",o)
-              })
-            })
-          })
-          )
-        }
-        saving = false; // TODO: this cause server overload, but fast user interaction
-        await instantSearch();
-        store.dispatch(updateMessage("Update Cache OK"))
-      })
-
+      return resp.json()
     }else{
       store.dispatch(updateMessage("Save Error"))
       store.dispatch(error())
     }
+  })
+}
+
+let saving = false;
+let waiting = false;
+function save(){
+  saving = true;
+  savePromise().then(async (o) => {
+    meta = o.meta // update meta
+
+    // update Search cache
+    let result = analysis()
+    let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
+    keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
+    let instantSearch = async () => {
+      await Promise.all(
+      keywords.map(async k => {
+        await sendSearchCache(k, true).then((resp) => {
+          resp.text().then((o) => {
+            console.log("search cache queue length",o)
+          })
+        })
+      })
+      )
+    }
+    saving = false; // TODO: this cause server overload, but fast user interaction
+    await instantSearch();
+    store.dispatch(updateMessage("Update Cache OK"))
   })
 }
 
@@ -409,6 +439,16 @@ function onNewJunk(){
   let id = "" + d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) +  ("0" + d.getMinutes()).slice(-2) + ("0" + d.getSeconds()).slice(-2)
   document.location.href = "?user=" + opts.user + "&id=" + id
 }
+function onDelete(user, id){
+  return () => {
+    sendDelete(user, id)
+      .then(resp => resp.json())
+      .then((o) => {
+      console.log(o)
+      document.location = "?user=" + user + "&id=FrontPage"
+    })
+  }
+}
 
 function uploadFile(file){
   let f = new FormData()
@@ -446,7 +486,7 @@ loadLine(13, "https://github.com/inajob/inline-editor")
 ReactDOM.render(
   <Provider store={store}>
     <div>
-      <App title={decodeURIComponent(opts.id)} user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} onNewDiary={onNewDiary} onNewJunk={onNewJunk} sendSearch={sendSearch} sendSearchSchedule={sendSearchSchedule} sendRename={sendRename} list={global.list} />
+      <App title={decodeURIComponent(opts.id)} user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} onNewDiary={onNewDiary} onNewJunk={onNewJunk} onDelete={onDelete(opts.user,opts.id)} sendSearch={sendSearch} sendSearchSchedule={sendSearchSchedule} sendRename={sendRename} list={global.list} />
     </div>
   </Provider>,
   document.getElementById('root')
