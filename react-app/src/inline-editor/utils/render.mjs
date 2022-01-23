@@ -170,6 +170,12 @@ export const Render = (name, no, text, global, dispatch) => {
             })
           })
         break;
+        case "pages":
+          ret += "<span class='mode'>&gt;&gt; pages</span>";
+          ret += "<div>"
+          ret += global.list.join("<br>")
+          ret += "</div>"
+        break;
         case "schedule":
           ret += "<span class='mode'>&gt;&gt; schedule</span>";
           global.sendSearchSchedule().then((resp) => {
@@ -305,11 +311,31 @@ export const Render = (name, no, text, global, dispatch) => {
             })
           })
         break;
-
         case "list":
             ret += "<span class='mode'>&gt;&gt; list</span>";
-            ret += global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "'>" + escapeHTML(s.name, global.user) + "</a></li>").join("")
+            ret += "<div>loading list..</div>"
+            let showList = () => {
+              if(global.list.length == 0){
+                setTimeout(showList, 500)
+              }
+              let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "'>" + escapeHTML(s.name, global.user) + "</a></li>").join("")
+              dispatch(previewLine(name, no, lineStr));
+            }
+            setTimeout(showList, 100)
           break;
+        case "boxlist":
+            ret += "<span class='mode'>&gt;&gt; boxlist</span>";
+            ret += "<div>loading list..</div>"
+            let showBoxList = () => {
+              if(global.list.length == 0){
+                setTimeout(showBoxList, 500)
+              }
+              let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "'>" + escapeHTML(s.name, global.user) + "</a></li>").join("")
+              dispatch(previewLine(name, no, "<div class='boxlist'>" + lineStr + "</div>"));
+            }
+            setTimeout(showBoxList, 100)
+          break;
+
         case "oembed":
           if(global.mode === "console"){
             ret += "NOT IMPLEMENT oembed render";

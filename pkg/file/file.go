@@ -244,9 +244,6 @@ func GetSearchFileName(user string, query string) (string){
   return filepath.Join(CACHE_DIR, user, "search", query + ".json")
 }
 
-func GetListFileName2(user string) (string){
-  return filepath.Join(CACHE_DIR, user, "files2.json")
-}
 func GetListFileName(user string) (string){
   return filepath.Join(CACHE_DIR, user, "files2.json")
 }
@@ -272,7 +269,7 @@ func SaveList(user string) (err error){
   if err != nil {
     return err
   }
-  ioutil.WriteFile(GetListFileName2(user), data, 0644)
+  ioutil.WriteFile(GetListFileName(user), data, 0644)
   return ioutil.WriteFile(fname, data, 0644)
 }
 

@@ -22,6 +22,22 @@
   font-size: 0.7em;
 }
 
+.boxlist {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.boxlist li{
+  width: 104px;
+  display: block;
+  border:solid 1px;
+  border-radius: 5px;
+  padding:3px;
+  margin: 3px;
+  background-color: white;
+  word-break: break-all;
+}
+
 
 /* === override main style === */
 .side .h1{
