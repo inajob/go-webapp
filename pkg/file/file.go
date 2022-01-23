@@ -175,6 +175,8 @@ func Delete(user string, id string) error{
     if err != nil{
       return fmt.Errorf("remove %s error: %v", filePath, err)
     }
+  }else{
+    return fmt.Errorf("%s is not found", filePath);
   }
   _, err = os.Stat(imgDirPath);
   if err == nil {
