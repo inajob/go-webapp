@@ -38,6 +38,8 @@ type SearchScheduleResult struct {
 type PageInfo struct {
   Name string `json:"name"`
   ModTime time.Time `json:"modTime"`
+  Description string `json:"description"`
+  Cover string `json:"cover"`
 }
 type PageList struct {
   Pages []PageInfo `json:"pages"`
@@ -248,7 +250,7 @@ func GetListFileName(user string) (string){
   return filepath.Join(CACHE_DIR, user, "files2.json")
 }
 
-func SaveList(user string) (err error){
+func SaveList(user string, id string) (err error){
   fname := GetListFileName(user);
 
   dirPath := filepath.Dir(fname)
@@ -258,14 +260,45 @@ func SaveList(user string) (err error){
     }
   }
 
-  fs, err := List(user)
-  if err != nil {
-    return err
+  var pl *PageList
+  _, err = os.Stat(fname);
+
+  if len(id) == 0 || os.IsNotExist(err){
+    // create all pages
+    pl, err = ListAll(user)
+    if err != nil {
+      return err
+    }
+  }else{
+    // insert 1 page
+    b, err := ioutil.ReadFile(fname)
+    if err != nil {
+      return err
+    }
+    pl = &PageList{}
+    if err := json.Unmarshal(b, pl); err != nil {
+      return err
+    }
+    filePath := filepath.Join(CONTENTS_DIR, user, id)
+    info, err := os.Stat(filePath)
+    if err != nil{
+      return err
+    }
+    pi, err := GetPageInfo(user, id, info.ModTime())
+    if err != nil {
+      return err
+    }
+    newPageList := PageList{}
+    for _, v := range pl.Pages{
+      if(id != v.Name){
+        newPageList.Pages = append(newPageList.Pages, v)
+      }
+    }
+    newPageList.Pages = append(newPageList.Pages, *pi)
+    pl = &newPageList
   }
-  result := PageList {
-    Pages: fs,
-  }
-  data, err := json.Marshal(result)
+
+  data, err := json.Marshal(*pl)
   if err != nil {
     return err
   }
@@ -273,7 +306,30 @@ func SaveList(user string) (err error){
   return ioutil.WriteFile(fname, data, 0644)
 }
 
-func List (user string) (files []PageInfo, err error) {
+func GetPageInfo(user string, id string, modTime time.Time) (*PageInfo, error) {
+  meta, body, err := Load(user, id)
+  if err != nil {
+    return nil, err
+  }
+  rawDescription := []rune(string(body))
+  description := ""
+  if len(description) > 140 {
+    description = string(rawDescription[:140]) + "..."
+  }else{
+    description = string(rawDescription)
+  }
+
+  cover, _ := meta["cover"]
+  scover,_ := cover.(string)
+  pi := PageInfo {
+    Name: id,
+    ModTime: modTime,
+    Cover: scover,
+    Description: description,
+  }
+  return &pi, nil
+}
+func ListAll (user string) (files *PageList, err error) {
   dirPath := filepath.Join(CONTENTS_DIR, user)
   fs, err := ioutil.ReadDir(dirPath)
   if err != nil {
@@ -282,10 +338,15 @@ func List (user string) (files []PageInfo, err error) {
   var l []PageInfo
 
   for _, f := range fs {
-    l = append(l, PageInfo {
-      Name: f.Name(),
-      ModTime: f.ModTime(),
-    });
+    pi, err := GetPageInfo(user, f.Name(), f.ModTime())
+
+    if err != nil {
+      return nil, err
+    }
+    l = append(l, *pi);
   }
-  return l, nil
+  pl := PageList{
+    Pages: l,
+  }
+  return &pl, nil
 }

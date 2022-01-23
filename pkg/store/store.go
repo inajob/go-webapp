@@ -213,7 +213,7 @@ func AttachDelete(r *gin.Engine) {
         Message: "ok",
       }
       c.JSON(200, result)
-      file.SaveList(user);
+      file.SaveList(user, ""); // TODO: delete from list
       return
     }
     c.JSON(500, gin.H{"error": err.Error()})
@@ -242,7 +242,8 @@ func AttachRename(r *gin.Engine) {
         Message: "ok",
       }
       c.JSON(200, result)
-      file.SaveList(user);
+      file.SaveList(user, ""); // TODO: delete from list
+
       return
     }
     c.JSON(500, gin.H{"error": err.Error()})
@@ -325,8 +326,11 @@ func AttachUpdate(r *gin.Engine) {
       }
       c.JSON(200, result)
 
-      file.SaveList(user);
-      return
+      err = file.SaveList(user, id);
+      if err != nil{
+        log.Printf("error SaveList: %v", err)
+        return
+      }
     }
   })
 }

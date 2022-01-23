@@ -330,7 +330,13 @@ export const Render = (name, no, text, global, dispatch) => {
               if(global.list.length == 0){
                 setTimeout(showBoxList, 500)
               }
-              let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "'>" + escapeHTML(s.name, global.user) + "</a></li>").join("")
+              let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).sort((a,b) => b.modTime.getTime() - a.modTime.getTime()).map((s) => {
+                let content = s.description.slice(0,50) + '...'
+                if(s.cover != ""){
+                  content = '<img src="' + s.cover + '">'
+                }
+                return "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "'>" + escapeHTML(s.name, global.user) + "</a>"+content+"</li>"
+              }).join("")
               dispatch(previewLine(name, no, "<div class='boxlist'>" + lineStr + "</div>"));
             }
             setTimeout(showBoxList, 100)
