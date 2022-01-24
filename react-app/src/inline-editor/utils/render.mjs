@@ -342,6 +342,10 @@ export const Render = (name, no, text, global, dispatch) => {
             setTimeout(showBoxList, 100)
           break;
 
+        case "url":
+            ret += "<span class='mode'>&gt;&gt; url</span>";
+            ret +='<div><iframe src="https://hatenablog.com/embed?url=' + encodeURIComponent(lastPart[0]) + '"></iframe></div>'
+          break;
         case "oembed":
           if(global.mode === "console"){
             ret += "NOT IMPLEMENT oembed render";
