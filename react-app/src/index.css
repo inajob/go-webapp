@@ -36,8 +36,12 @@
   margin: 3px;
   background-color: white;
   word-break: break-all;
+  font-size: x-small;
 }
 
+.boxlist li div.boxlist-title{
+  font-size: small;
+}
 
 /* === override main style === */
 .side .h1{
