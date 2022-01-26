@@ -18,8 +18,10 @@ function createFilteredReducer(reducerFunction, reducerPredicate){
 export default combineReducers({
   lines: createFilteredReducer(lines, action => action.name === "main"),
   sideLines: createFilteredReducer(lines, action => action.name === "side"),
+  rightLines: createFilteredReducer(lines, action => action.name === "right"),
   cursor: createFilteredReducer(cursor, action => action.name === "main"),
   sideCursor:  createFilteredReducer(cursor, action => action.name === "side"),
+  rightCursor:  createFilteredReducer(cursor, action => action.name === "right"),
   items,
   loginButton,
   search,

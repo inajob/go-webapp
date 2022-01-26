@@ -318,7 +318,7 @@ export const Render = (name, no, text, global, dispatch) => {
               if(global.list.length == 0){
                 setTimeout(showList, 500)
               }
-              let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "'>" + escapeHTML(s.name, global.user) + "</a></li>").join("")
+              let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "'>" + escapeHTML(s.name, global.user) + "</a><a data-id=" + s.name + ">*</a></li>").join("")
               dispatch(previewLine(name, no, "<span class='mode'>&gt;&gt; list</span><div>" + lineStr + "</div>"));
             }
             setTimeout(showList, 100)
@@ -335,7 +335,7 @@ export const Render = (name, no, text, global, dispatch) => {
                 if(s.cover != ""){
                   content = '<img src="' + s.cover + '">'
                 }
-                return "<li><div class='boxlist-title'><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "'>" + escapeHTML(s.name, global.user) + "</a></div>"+content+"</li>"
+                return "<li><div class='boxlist-title'><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "'>" + escapeHTML(s.name, global.user) + "</a><a data-id=" + s.name + ">*</a></div>"+content+"</li>"
               }).join("")
               dispatch(previewLine(name, no, "<span class='mode'>&gt;&gt; boxlist</span><div class='boxlist'>" + lineStr + "</div>"));
             }

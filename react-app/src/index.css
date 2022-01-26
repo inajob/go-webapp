@@ -1,10 +1,25 @@
 @media screen and (min-width:480px) {
 
+html, body{
+  height: 100%;
+}
+#root{
+  height: 100%;
+}
+#root>div{
+  height: 100%;
+}
+.wrap{
+  height: 100%;
+}
+
 .contents{
   position:relative;
+  height: calc(100% - 6em - 10px); /* TODO: 10px? */
 }
 .main{
   padding-left:120px;
+  height: 100%;
 }
 .main .title{
   text-align:right;
@@ -20,27 +35,8 @@
   width: 120px;
   min-height: 100%;
   font-size: 0.7em;
-}
-
-.boxlist {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.boxlist li{
-  width: 104px;
-  display: block;
-  border:solid 1px;
-  border-radius: 5px;
-  padding:3px;
-  margin: 3px;
-  background-color: white;
-  word-break: break-all;
-  font-size: x-small;
-}
-
-.boxlist li div.boxlist-title{
-  font-size: small;
+  height: 100%;
+  overflow-y: scroll;
 }
 
 /* === override main style === */
@@ -78,9 +74,46 @@
   display: none;
 }
 
+.editor-container{
+  display: flex;
+}
+.left-editor{
+  flex:2;
+}
+.right-editor{
+  flex:1;
+}
+
+.header{
+  height: 4.5em;
+}
+
+.controller{
+  height: 1.5em;
+}
+
+.editor-container, .left-editor, .right-editor{
+  height: 100%;
+}
+.left-editor, .right-editor{
+  height: 100%;
+  overflow-y: scroll;
+}
+
 /* === === */
 
 }
+
+::-webkit-scrollbar {
+  width: 4px;
+  background: #ddd;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #aaa;
+}
+
 
 .line h1,h2,h3{
   font-size: inherit;
@@ -179,3 +212,25 @@
 .modal-list-ul li.active{
   background-color: #ddf;
 }
+
+.boxlist {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.boxlist li{
+  width: 104px;
+  display: block;
+  border:solid 1px;
+  border-radius: 5px;
+  padding:3px;
+  margin: 3px;
+  background-color: white;
+  word-break: break-all;
+  font-size: x-small;
+}
+
+.boxlist li div.boxlist-title{
+  font-size: small;
+}
+

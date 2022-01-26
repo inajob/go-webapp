@@ -284,9 +284,22 @@ getList(opts.user).then(function(resp){
   // load side page
   loadPage("side", false, opts.user, "menu")
 
+  // load right page
+  loadPage("right", false, opts.user, "menu")
+
+
   // load main page
   loadPage("main", true, opts.user, opts.id)
 
+  // TODO: set event more elegant way
+  document.getElementById('root').addEventListener("click", (e)=> {
+    console.log()
+    let jumpTo = e.srcElement.dataset.id
+    if(jumpTo){
+      console.log(jumpTo)
+      loadPage("right", false, opts.user, jumpTo)
+    }
+  }, false)
 })
 
 try{
@@ -466,6 +479,7 @@ function uploadFile(file){
 }
 
 store.dispatch(setReadOnly("side"))
+store.dispatch(setReadOnly("right"))
 /*
 loadLine(0, "# React.jsで作ったインラインマークダウンエディタ")
 loadLine(1, "インラインで編集ができる書式付きエディタです。")
@@ -523,4 +537,5 @@ function setupPaste(){
   });
 }
 setupPaste();
+
 
