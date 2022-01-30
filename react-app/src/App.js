@@ -28,7 +28,7 @@ class App extends React.Component{
       <div className="main">
         <div className="editor-container">
           <div className="left-editor">
-            <h1 className="title">{(this.props.title)}</h1>
+            <h1 className="title">{(this.props.cursor.title)}</h1>
             <Lines name="main" lines={this.props.lines} cursor={this.props.cursor} onMagic={this.props.onMagic} user={this.props.user} onUpdate={this.props.onUpdate} sendSearch={this.props.sendSearch} sendSearchSchedule={this.props.sendSearchSchedule} list={this.props.list} mermaidRender={this.props.mermaidRender} />
             <div className="instant-search">
               {Object.keys(this.props.instantSearch.results).map((k, j) => (
@@ -36,7 +36,7 @@ class App extends React.Component{
                   <div>Search result of '{k}'</div>
                   <div className="pages">
                   {this.props.instantSearch.results[k].map((r, i) => (
-                    <li key={i}><div><a href={"?user=" + r.user + "&id=" + r.id}>{r.id}</a></div>
+                    <li key={i}><div><a href={"?user=" + r.user + "&id=" + r.id} data-jump={r.id}>{r.id}</a><a href={"?user=" + r.user + "&id=" + r.id} data-id={r.id}>*</a></div>
                       <div>
                         {(() => {if(r.cover) return <img src={r.cover} alt="cover" />})()}
                         {r.text}
@@ -50,6 +50,7 @@ class App extends React.Component{
             <Search onUpdateKeyword={this.props.updateKeyword} onSearch={this.props.onSearch(this.props.sendSearch)} keyword={this.props.search.keyword} results={this.props.search.results} />
           </div>
           <div className="right-editor">
+            <h1 className="title">{(this.props.rightCursor.title)}</h1>
             <Lines name="right" lines={this.props.rightLines} cursor={this.props.rightCursor} />
           </div>
         </div>

@@ -36,6 +36,10 @@ function lines(state = [{text:""}], action){
       newState = state.slice()
       newState.splice(action.no, 1)
       return newState
+    case 'CLEAR_ALL':
+      //console.log("CLEAR_ALL")
+      return [{text:""}]
+
     default:
       // pass
   }

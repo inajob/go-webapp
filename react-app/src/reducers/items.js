@@ -5,6 +5,8 @@ function items(state = [], action){
       newState = state.slice()
       newState.push(action.item)
       return newState
+    case 'CLEAR_ITEM':
+      return []
     default:
       return state
   }

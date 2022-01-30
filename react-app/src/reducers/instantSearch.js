@@ -7,6 +7,8 @@ function instantSearch(state = {results:{}}, action){
       }
       s[action.keyword] = action.results
       return {results: s}
+    case 'INSTANT_SEARCH_CLEAR':
+      return {results: {}}
     default:
       return state
   }

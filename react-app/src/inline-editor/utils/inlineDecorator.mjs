@@ -160,7 +160,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
             tmp = htmlEncode(v.slice(1), user);
             out.push("<span class='label'>")
             out.push("[")
-            out.push("<a href='?&user=" + user + "&id=" + tmp + "'>" + tmp + "</a>");
+            out.push("<a href='?&user=" + user + "&id=" + tmp + "' data-jump='"+ tmp +"'>" + tmp + "</a>");
             out.push("]<a data-id=" + tmp + ">*</a>")
             out.push("</span>")
             break;

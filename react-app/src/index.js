@@ -9,8 +9,9 @@ import {mermaidAPI} from 'mermaid'
 // --- inline editor ---
 import rootReducer from './reducers'
 import App from './App'
-import {insertLine, setReadOnly} from './inline-editor/actions'
-import {insertItem, logined, updateMessage, error, updateInstantResults,
+import {insertLine, setReadOnly, clearAll, setTitle} from './inline-editor/actions'
+import {insertItem, clearItem, logined, updateMessage, error, updateInstantResults,
+  clearInstantResults,
   modalListUpdateProviders,
   modalListClose
 } from './actions'
@@ -193,6 +194,21 @@ function grepToInstantSearch(grepLines, user, id) {
   return result;
 }
 
+function loadList(){
+  return getList(opts.user).then(function(resp){
+    resp.json().then(function(o){
+      if(o.pages){
+        let nameList = o.pages;
+        global.list = nameList
+        nameList.forEach(function(item){
+          item.modTime = new Date(item.modTime);
+          store.dispatch(insertItem(item))
+        })
+      }
+    })
+  })
+}
+
 let opts = getOpts()
 let meta = {}
 global.user = opts.user // TODO: manage context?
@@ -206,23 +222,16 @@ store.dispatch(modalListUpdateProviders([
 ]))
 store.dispatch(modalListClose())
 
-getList(opts.user).then(function(resp){
-  resp.json().then(function(o){
-    if(o.pages){
-      let nameList = o.pages;
-      global.list = nameList
-      nameList.forEach(function(item){
-        item.modTime = new Date(item.modTime);
-        store.dispatch(insertItem(item))
-      })
-    }
-  })
-}).then(function(){
+loadList().then(function(){
   // Page require List
   function loadPage(name, isMain, user, id){
     getPage(user, id).then(function(resp){
       let keywords = ["[" + decodeURIComponent(id) + "]"] // link search
       console.log(resp)
+      if(isMain){
+        store.dispatch(clearInstantResults())
+      }
+      store.dispatch(setTitle(name, decodeURIComponent(id)))
       let instantSearch = () => {
         keywords.forEach((k) => {
           sendSearch(k, false).then((resp) => {
@@ -283,23 +292,45 @@ getList(opts.user).then(function(resp){
   }
   // load side page
   loadPage("side", false, opts.user, "menu")
-
   // load right page
   loadPage("right", false, opts.user, "menu")
-
-
   // load main page
   loadPage("main", true, opts.user, opts.id)
 
-  // TODO: set event more elegant way
+  // for SPA
   document.getElementById('root').addEventListener("click", (e)=> {
-    console.log()
-    let jumpTo = e.srcElement.dataset.id
+    let rightTo = e.srcElement.dataset.id
+    let jumpTo = e.srcElement.dataset.jump
+    if(rightTo){
+      store.dispatch(clearAll("right"))
+      loadPage("right", false, opts.user, rightTo)
+    }
     if(jumpTo){
-      console.log(jumpTo)
-      loadPage("right", false, opts.user, jumpTo)
+      store.dispatch(clearAll("main"))
+      const url = new URL(window.location)
+      url.searchParams.set("id", jumpTo)
+      window.history.pushState({},"", url)
+      document.title = jumpTo
+      opts.id = jumpTo
+      store.dispatch(clearItem())
+      loadList().then(() => {
+        loadPage("main", true, opts.user, jumpTo)
+      })
+      e.preventDefault()
     }
   }, false)
+
+  // for browser back
+  window.onpopstate = function(e){
+    let lopts = getOpts()
+    opts.id = lopts.id
+    store.dispatch(clearAll("main"))
+    document.title = decodeURIComponent(opts.id)
+    store.dispatch(clearItem())
+    loadList().then(function(){
+      loadPage("main", true, opts.user, opts.id)
+    })
+  }
 })
 
 try{
@@ -513,7 +544,7 @@ function setupPaste(){
     console.log("paste");
     var items = (event.clipboardData || event.originalEvent.clipboardData).items;
     console.log(items.length);
-    for(var i = 0; i < items.length; i ++){
+    for(let i = 0; i < items.length; i ++){
       console.log(items[i]);
       if(items[i].type.indexOf("image") !== -1){
         // find image

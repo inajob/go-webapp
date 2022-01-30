@@ -2,6 +2,10 @@ export const insertItem = (item) => ({
   type: 'INSERT_ITEM',
   item,
 })
+export const clearItem = (item) => ({
+  type: 'CLEAR_ITEM',
+  item,
+})
 
 export const logined = (user) => ({
   type: 'LOGINED',
@@ -30,6 +34,10 @@ export const updateInstantResults = (keyword, results) => ({
   keyword: keyword,
   results: results,
 })
+export const clearInstantResults = () => ({
+  type: 'INSTANT_SEARCH_CLEAR',
+})
+
 export const modalListUp = () => ({
   type: 'MODAL_LIST_UP',
 })

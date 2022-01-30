@@ -50,14 +50,14 @@ line{
   background-color: #ffd;
 }
 .h1{
-  font-size: x-large;
+  font-size: large;
   font-weight: bold;
   background-color: #ddf;
   padding-left: 2px;
   margin-top:0.3em;
 }
 .h1 textarea{
-  font-size: x-large;
+  font-size: large;
   font-weight: bold;
   padding-left: 2px;
 }

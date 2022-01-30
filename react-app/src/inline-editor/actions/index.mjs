@@ -29,6 +29,12 @@ export const insertLine = (name, no, text, preview) => ({
   no,
 })
 
+export const clearAll = (name) => ({
+  name,
+  type: 'CLEAR_ALL',
+})
+
+
 export const setCursor = (name, row, col, dirty) => ({
   name,
   type: 'SET_CURSOR',
@@ -45,5 +51,11 @@ export const setReadOnly = (name) => ({
 export const setReadWrite = (name) => ({
   name,
   type: 'SET_READWRITE',
+})
+
+export const setTitle = (name, title) => ({
+  name,
+  type: 'SET_TITLE',
+  title,
 })
 
