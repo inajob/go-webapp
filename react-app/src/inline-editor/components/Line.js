@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types'
+import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
+import "@webscopeio/react-textarea-autocomplete/style.css";
 
 class Line extends React.Component{
   constructor(props) {
@@ -10,7 +12,10 @@ class Line extends React.Component{
   }
   send(e){
     this.props.onChange(this.props.no, e.target.value)
-    this.props.onUpdate() // trigger save or something
+
+    if(this.props.onUpdate){
+      this.props.onUpdate() // trigger save or something
+    }
     return;
   }
   keyHandler(e){
@@ -65,11 +70,30 @@ class Line extends React.Component{
     this.props.onClick(this.props.no);
   }
   render() {
+    let loadingComponent = () => <span>Loading</span>
+    let trigger = {
+      "[": {
+        dataProvider: token => {
+          return this.props.items.filter((v) => v.name.indexOf(token) !== -1).map((v) => {return {"value": "[" + v.name + "]"}});
+        },
+        component: ({ entity: { value } }) => <div>{`${value}`}</div>,
+        output: (item, trigger) => item.value
+      }
+    }
     if(this.props.isBlock){
       return (
         <div className={'line ' + this.props.className} onClick={this.clickHandler}>
           <div style={{display: this.props.isFocus?"block":"none"}}>
-            <textarea ref="rawInput" style={{height: this.props.height}} wrap="off" onChange={this.send} onKeyDown={this.keyHandler} value={this.props.text} />
+            <ReactTextareaAutocomplete
+              ref="rawInput"
+              style={{height: this.props.height, fontSize: "16px"}}
+              wrap="off"
+              onChange={this.send}
+              onKeyDown={this.keyHandler}
+              loadingComponent={loadingComponent}
+              trigger={trigger}
+              value={this.props.text}
+            />
           </div>
           <div>
             <div dangerouslySetInnerHTML={{__html:this.props.preview}} />
@@ -81,7 +105,15 @@ class Line extends React.Component{
       return (
         <div className={'line ' + this.props.className} style={this.props.indent>0?{marginLeft: (this.props.indent * 20)+"px"}:{}} onClick={this.clickHandler}>
           <div style={{display: this.props.isFocus?"block":"none"}}>
-            <textarea ref="rawInput" style={{height: this.props.height}} onChange={this.send} onKeyDown={this.keyHandler} value={this.props.text} />
+            <ReactTextareaAutocomplete
+              ref="rawInput"
+              style={{height: this.props.height, fontSize: "16px"}} //same size as body text
+              onChange={this.send}
+              onKeyDown={this.keyHandler}
+              value={this.props.text}
+              loadingComponent={loadingComponent}
+              trigger={trigger}
+            />
           </div>
           <div style={{display: !this.props.isFocus?"block":"none"}}>
             <div dangerouslySetInnerHTML={{__html:this.props.preview}} />
@@ -92,14 +124,13 @@ class Line extends React.Component{
   }
   updateFocus(){
     if(this.props.isFocus){
-      this.refs.rawInput.focus();
+      this.refs.rawInput.textareaRef.focus();
       if(this.props.dirty){
         var that = this;
         setTimeout(function(){
-          console.log("update cursor");
           // FIXME: remove setTimeout
-          that.refs.rawInput.setSelectionRange(that.props.column, that.props.column);
-          that.props.onRefreshed(that.props.no);
+          that.refs.rawInput.textareaRef.setSelectionRange(that.props.column, that.props.column);
+          that.props.onRefreshed(that.props.no, that.props.column);
         },10);
       }
     }

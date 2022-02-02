@@ -29,7 +29,18 @@ class App extends React.Component{
         <div className="editor-container">
           <div className="left-editor">
             <h1 className="title">{(this.props.cursor.title)}</h1>
-            <Lines name="main" lines={this.props.lines} cursor={this.props.cursor} onMagic={this.props.onMagic} user={this.props.user} onUpdate={this.props.onUpdate} sendSearch={this.props.sendSearch} sendSearchSchedule={this.props.sendSearchSchedule} list={this.props.list} mermaidRender={this.props.mermaidRender} />
+            <Lines
+              name="main"
+              lines={this.props.lines}
+              cursor={this.props.cursor}
+              onMagic={this.props.onMagic}
+              user={this.props.user}
+              onUpdate={this.props.onUpdate}
+              sendSearch={this.props.sendSearch}
+              sendSearchSchedule={this.props.sendSearchSchedule}
+              items={this.props.items}
+              mermaidRender={this.props.mermaidRender}
+            />
             <div className="instant-search">
               {Object.keys(this.props.instantSearch.results).map((k, j) => (
                 <div className="piece" key={j}>

@@ -35,13 +35,15 @@ export const clearAll = (name) => ({
 })
 
 
-export const setCursor = (name, row, col, dirty) => ({
+export const setCursor = function(name, row, col, dirty) {
+  return ({
   name,
   type: 'SET_CURSOR',
   row,
   col,
   dirty,
 })
+}
 
 export const setReadOnly = (name) => ({
   name,

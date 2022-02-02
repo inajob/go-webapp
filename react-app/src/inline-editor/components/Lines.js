@@ -20,6 +20,7 @@ class Lines extends React.Component{
                 no={index}
                 height={numLines(line.text)*24 + "px"}
                 isBlock={isBlock(line.text)}
+                items={this.props.items}
                 className={calcClassName(line.text)}
                 indent={calcIndent(line.text)}
                 onChange={this.props.onChange(this.props.name)}
@@ -206,8 +207,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     onClick: (name) => (no) => {
       dispatch(setCursor(name, no, 0, false))
     },
-    onRefreshed: (name) => (no) => {
-      dispatch(setCursor(name, no, 0, false))
+    onRefreshed: (name) => (no, col) => {
+      dispatch(setCursor(name, no, col, false))
     }
   }
 }

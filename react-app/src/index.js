@@ -308,7 +308,7 @@ loadList().then(function(){
     if(jumpTo){
       store.dispatch(clearAll("main"))
       const url = new URL(window.location)
-      url.searchParams.set("id", jumpTo)
+      url.search = "?user=" + encodeURIComponent(opts.user) + "&id=" + encodeURIComponent(jumpTo)
       window.history.pushState({},"", url)
       document.title = jumpTo
       opts.id = jumpTo
@@ -444,7 +444,12 @@ function save(){
 }
 
 var timerID = null
+var firstOnUpdate = true
 function onUpdate(o){
+  if(firstOnUpdate){ // ReactTextareaAutocomplete trigger first unknown onUpdate
+    firstOnUpdate = false;
+    return
+  }
   if(timerID != null){
     clearTimeout(timerID)
     timerID = null
