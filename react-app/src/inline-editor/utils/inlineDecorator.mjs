@@ -57,9 +57,22 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
             break;
           }
         }else if(cap.target === "["){
+          let capPos = cap.pos;
           out.push(newPiece("text", body.slice(pos, cap.pos)));
           pos = cap.pos + "[".length;
           out.push(["wikilink"].concat(inner(level + 1)));
+          if(capPos == 0){
+            switch(body[pos]){
+              case '!':
+              case '@':
+              case '~':
+              case '-':
+              case '+':
+                out.push(newPiece("schedule-active", body.slice(pos, pos + 1)));
+                pos = pos + ".".length;
+                break;
+            }
+          }
         }else if(cap.target === "]"){
           out.push(newPiece("text", body.slice(pos, cap.pos)));
           pos = cap.pos + "]".length;
@@ -183,6 +196,10 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
           case "text":
             out.push(v.body);
             break;
+          case "schedule-active":
+            out.push('<span class="schedule-active">'+v.body+'</span>');
+            break;
+
           case "url":
             // todo: escape
             out.push("<a href='" +  v.body + "'>" + v.body + "</a><a href='http://b.hatena.ne.jp/entry/"+ v.body+"' target='_blank'><img src='http://b.hatena.ne.jp/entry/image/" + v.body + "' /></a>");

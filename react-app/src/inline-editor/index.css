@@ -127,6 +127,9 @@ line{
   padding-left: 3px;
   margin-right: 2em;
 }
+.schedule-active {
+  background-color: #ff0;
+}
 
 .inline-image {
   background-color: #666;
