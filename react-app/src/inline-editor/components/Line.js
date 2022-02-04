@@ -6,6 +6,7 @@ import "@webscopeio/react-textarea-autocomplete/style.css";
 class Line extends React.Component{
   constructor(props) {
     super(props)
+    this.dirtyByKeyDown = false;
     this.send = this.send.bind(this);
     this.keyHandler = this.keyHandler.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
@@ -13,8 +14,9 @@ class Line extends React.Component{
   send(e){
     this.props.onChange(this.props.no, e.target.value)
 
-    if(this.props.onUpdate){
+    if(this.props.onUpdate && this.dirtyByKeyDown){
       this.props.onUpdate() // trigger save or something
+      this.dirtyByKeyDown = false;
     }
     return;
   }
@@ -64,6 +66,7 @@ class Line extends React.Component{
       break;
       default:
         // pass
+        this.dirtyByKeyDown = true
     }
   }
   clickHandler(e){

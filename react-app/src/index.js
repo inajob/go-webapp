@@ -444,12 +444,7 @@ function save(){
 }
 
 var timerID = null
-var firstOnUpdate = true
 function onUpdate(o){
-  if(firstOnUpdate){ // ReactTextareaAutocomplete trigger first unknown onUpdate
-    firstOnUpdate = false;
-    return
-  }
   if(timerID != null){
     clearTimeout(timerID)
     timerID = null
