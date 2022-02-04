@@ -43,9 +43,10 @@ table.item td{
   padding: 0em;
 }
 
-line{
-  width: 100%;
+.line textarea{
+  font-size: 16px;
 }
+
 .focus textarea {
   background-color: #ffd;
 }

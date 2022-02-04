@@ -89,7 +89,7 @@ class Line extends React.Component{
           <div style={{display: this.props.isFocus?"block":"none"}}>
             <ReactTextareaAutocomplete
               ref="rawInput"
-              style={{height: this.props.height, fontSize: "16px"}}
+              style={{height: this.props.height}}
               wrap="off"
               onChange={this.send}
               onKeyDown={this.keyHandler}
@@ -110,7 +110,7 @@ class Line extends React.Component{
           <div style={{display: this.props.isFocus?"block":"none"}}>
             <ReactTextareaAutocomplete
               ref="rawInput"
-              style={{height: this.props.height, fontSize: "16px"}} //same size as body text
+              style={{height: this.props.height}}
               onChange={this.send}
               onKeyDown={this.keyHandler}
               value={this.props.text}
