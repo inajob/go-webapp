@@ -74,7 +74,7 @@ class App extends React.Component{
     <ModalList
       {...this.props.modalList}
       items={this.props.items}
-      title={this.props.title}
+      title={this.props.cursor.title}
       onSelectList={this.props.onSelectList(this.props.cursor, this.props.modalList.targetLine)}
       onRename={this.props.onRename(this.props.sendRename, this.props.user)}
       onClose={this.props.onModalListClose}
@@ -113,7 +113,7 @@ const mapDispatchToProps = (dispatch) => {
         resp.json().then((o) => {
           // jump to new page
           console.log(o)
-          document.location.href = '?user=' + user + '&id=' + to
+          document.location.href = '?user=' + encodeURIComponent(user) + '&id=' + encodeURIComponent(to)
         })
       })
     },

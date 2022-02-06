@@ -132,7 +132,7 @@ function sendSearch(keyword, noCache){
   })
   return fetch(req)
 }
-function sendSearchCache(keyword, noCache){
+function sendSearchCache(keyword){
   let f = new FormData()
   f.append('keyword', keyword)
   f.append('user', global.user)
@@ -200,9 +200,11 @@ function loadList(){
       if(o.pages){
         let nameList = o.pages;
         global.list = nameList
-        nameList.forEach(function(item){
-          item.modTime = new Date(item.modTime);
-          store.dispatch(insertItem(item))
+        batch(() =>{
+          nameList.forEach(function(item){
+            item.modTime = new Date(item.modTime);
+            store.dispatch(insertItem(item))
+          })
         })
       }
     })
@@ -429,7 +431,7 @@ function save(){
     let instantSearch = async () => {
       await Promise.all(
       keywords.map(async k => {
-        await sendSearchCache(k, true).then((resp) => {
+        await sendSearchCache(k).then((resp) => {
           resp.text().then((o) => {
             console.log("search cache queue length",o)
           })
