@@ -62,7 +62,11 @@ class App extends React.Component{
           </div>
           <div className="right-editor">
             <h1 className="title">{(this.props.rightCursor.title)}</h1>
-            <Lines name="right" lines={this.props.rightLines} cursor={this.props.rightCursor} />
+            <Lines name="right"
+              lines={this.props.rightLines}
+              cursor={this.props.rightCursor}
+              sendSearch={this.props.sendSearch}
+            />
           </div>
         </div>
       </div>

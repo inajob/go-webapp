@@ -306,6 +306,7 @@ loadList().then(function(){
     if(rightTo){
       store.dispatch(clearAll("right"))
       loadPage("right", false, opts.user, rightTo)
+      e.preventDefault()
     }
     if(jumpTo){
       store.dispatch(clearAll("main"))
