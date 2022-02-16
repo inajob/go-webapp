@@ -165,7 +165,7 @@ export const Render = (name, no, text, global, dispatch) => {
               body.push("<span class='mode'>&gt;&gt; grep &quot;" + lastPart[0] + "&quot;</span>")
               body.push("<div class='boxlist'>")
               o.lines.forEach((v)=>{
-                body.push("<li><div class='boxlist-title'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + encodeURIComponent(v.id) + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a><a class='non-select' data-id='" + encodeURIComponent(v.id) + "'>*</a></div>" + v.text + "</li>")
+                body.push("<li><div class='boxlist-title'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + encodeURIComponent(v.id) + "'>" + v.id + "</a><a class='non-select' data-id='" + encodeURIComponent(v.id) + "'>*</a></div>" + v.text + "</li>")
               })
               body.push("</div>")
               dispatch(previewLine(name, no, body.join("\n")));
