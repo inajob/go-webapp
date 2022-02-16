@@ -318,7 +318,7 @@ export const Render = (name, no, text, global, dispatch) => {
               if(global.list.length === 0){
                 setTimeout(showList, 500)
               }
-              let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "' data-jump='" + s.name + "'>" + escapeHTML(s.name, global.user) + "</a><a data-id=" + s.name + ">*</a></li>").join("")
+              let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "' data-jump='" + s.name + "'>" + escapeHTML(s.name, global.user) + "</a><a data-id='" + s.name + "'>*</a></li>").join("")
               dispatch(previewLine(name, no, "<span class='mode'>&gt;&gt; list</span><div>" + lineStr + "</div>"));
             }
             setTimeout(showList, 100)
