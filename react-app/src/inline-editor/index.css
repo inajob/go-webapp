@@ -162,3 +162,7 @@ table.item td{
 .non-select{
   user-select: none;
 }
+.non-select:hover{
+  background-color: blue;
+  color: white;
+}
