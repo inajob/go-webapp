@@ -174,7 +174,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
             out.push("<span class='label'>")
             out.push("[")
             out.push("<a href='?&user=" + user + "&id=" + tmp + "' data-jump='"+ tmp +"'>" + tmp + "</a>");
-            out.push("]<a data-id=" + tmp + ">*</a>")
+            out.push("]<a class='non-select' data-id=" + tmp + ">*</a>")
             out.push("</span>")
             break;
           default:

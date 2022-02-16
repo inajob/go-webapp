@@ -165,7 +165,7 @@ export const Render = (name, no, text, global, dispatch) => {
               body.push("<span class='mode'>&gt;&gt; grep &quot;" + lastPart[0] + "&quot;</span>")
               body.push("<div class='boxlist'>")
               o.lines.forEach((v)=>{
-                body.push("<li><div class='boxlist-title'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + encodeURIComponent(v.id) + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a><a data-id='" + encodeURIComponent(v.id) + "'>*</a></div>" + v.text + "</li>")
+                body.push("<li><div class='boxlist-title'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + encodeURIComponent(v.id) + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a><a class='non-select' data-id='" + encodeURIComponent(v.id) + "'>*</a></div>" + v.text + "</li>")
               })
               body.push("</div>")
               dispatch(previewLine(name, no, body.join("\n")));
@@ -306,7 +306,7 @@ export const Render = (name, no, text, global, dispatch) => {
                   return "255,255,255";
                 }
                 if(v.show){
-                  body.push("<li><span style='background-color:rgb(" + calcColor(v.priority) + ");'><span class='schedule-label'>"  + v.label + "</span>" + v.text + "</span><span class='tiny'>" +v.priority + " <a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + encodeURIComponent(v.id) + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a><a data-id='" + encodeURIComponent(v.id) + "'>*</a></span></li>")
+                  body.push("<li><span style='background-color:rgb(" + calcColor(v.priority) + ");'><span class='schedule-label'>"  + v.label + "</span>" + v.text + "</span><span class='tiny'>" +v.priority + " <a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + encodeURIComponent(v.id) + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a><a class='non-select' data-id='" + encodeURIComponent(v.id) + "'>*</a></span></li>")
                 }
               })
               dispatch(previewLine(name, no, body.join("\n")));
@@ -320,7 +320,7 @@ export const Render = (name, no, text, global, dispatch) => {
               if(!global.list || global.list.length === 0){
                 setTimeout(showList, 500)
               }else{
-                let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "' data-jump='" + s.name + "'>" + escapeHTML(s.name, global.user) + "</a><a data-id='" + s.name + "'>*</a></li>").join("")
+                let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "' data-jump='" + s.name + "'>" + escapeHTML(s.name, global.user) + "</a><a class='non-select' data-id='" + s.name + "'>*</a></li>").join("")
                 dispatch(previewLine(name, no, "<span class='mode'>&gt;&gt; list</span><div>" + lineStr + "</div>"));
               }
             }
@@ -338,7 +338,7 @@ export const Render = (name, no, text, global, dispatch) => {
                   if(s.cover !== ""){
                     content = '<img src="' + s.cover + '">'
                   }
-                  return "<li><div class='boxlist-title'><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "' data-jump='" + s.name + "'>" + escapeHTML(s.name, global.user) + "</a><a data-id=" + s.name + ">*</a></div>"+content+"</li>"
+                  return "<li><div class='boxlist-title'><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "' data-jump='" + s.name + "'>" + escapeHTML(s.name, global.user) + "</a><a class='non-select' data-id=" + s.name + ">*</a></div>"+content+"</li>"
                 }).join("")
                 dispatch(previewLine(name, no, "<span class='mode'>&gt;&gt; boxlist</span><div class='boxlist'>" + lineStr + "</div>"));
               }
