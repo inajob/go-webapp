@@ -163,9 +163,11 @@ export const Render = (name, no, text, global, dispatch) => {
             resp.json().then((o) => {
               let body = [];
               body.push("<span class='mode'>&gt;&gt; grep &quot;" + lastPart[0] + "&quot;</span>")
+              body.push("<div class='boxlist'>")
               o.lines.forEach((v)=>{
-                body.push("<li>" + v.text + "<span class='tiny'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + encodeURIComponent(v.id) + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a><a data-id='" + encodeURIComponent(v.id) + "'>*</a></span></li>")
+                body.push("<li><div class='boxlist-title'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + encodeURIComponent(v.id) + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a><a data-id='" + encodeURIComponent(v.id) + "'>*</a></div>" + v.text + "</li>")
               })
+              body.push("</div>")
               dispatch(previewLine(name, no, body.join("\n")));
             })
           })
@@ -315,11 +317,12 @@ export const Render = (name, no, text, global, dispatch) => {
             ret += "<span class='mode'>&gt;&gt; list</span>";
             ret += "<div>loading list..</div>"
             let showList = () => {
-              if(global.list.length === 0){
+              if(!global.list || global.list.length === 0){
                 setTimeout(showList, 500)
+              }else{
+                let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "' data-jump='" + s.name + "'>" + escapeHTML(s.name, global.user) + "</a><a data-id='" + s.name + "'>*</a></li>").join("")
+                dispatch(previewLine(name, no, "<span class='mode'>&gt;&gt; list</span><div>" + lineStr + "</div>"));
               }
-              let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).map((s) => "<li><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "' data-jump='" + s.name + "'>" + escapeHTML(s.name, global.user) + "</a><a data-id='" + s.name + "'>*</a></li>").join("")
-              dispatch(previewLine(name, no, "<span class='mode'>&gt;&gt; list</span><div>" + lineStr + "</div>"));
             }
             setTimeout(showList, 100)
           break;
@@ -329,15 +332,16 @@ export const Render = (name, no, text, global, dispatch) => {
             let showBoxList = () => {
               if(global.list.length === 0){
                 setTimeout(showBoxList, 500)
+              }else{
+                let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).sort((a,b) => b.modTime.getTime() - a.modTime.getTime()).map((s) => {
+                  let content = s.description.slice(0,50) + '...'
+                  if(s.cover !== ""){
+                    content = '<img src="' + s.cover + '">'
+                  }
+                  return "<li><div class='boxlist-title'><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "' data-jump='" + s.name + "'>" + escapeHTML(s.name, global.user) + "</a><a data-id=" + s.name + ">*</a></div>"+content+"</li>"
+                }).join("")
+                dispatch(previewLine(name, no, "<span class='mode'>&gt;&gt; boxlist</span><div class='boxlist'>" + lineStr + "</div>"));
               }
-              let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).sort((a,b) => b.modTime.getTime() - a.modTime.getTime()).map((s) => {
-                let content = s.description.slice(0,50) + '...'
-                if(s.cover !== ""){
-                  content = '<img src="' + s.cover + '">'
-                }
-                return "<li><div class='boxlist-title'><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "' data-jump='" + s.name + "'>" + escapeHTML(s.name, global.user) + "</a><a data-id=" + s.name + ">*</a></div>"+content+"</li>"
-              }).join("")
-              dispatch(previewLine(name, no, "<span class='mode'>&gt;&gt; boxlist</span><div class='boxlist'>" + lineStr + "</div>"));
             }
             setTimeout(showBoxList, 100)
           break;
