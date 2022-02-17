@@ -555,13 +555,19 @@ function setupPaste(){
         var blob = items[i].getAsFile();
 
         uploadFile(blob).then(function(resp){
-          resp.json().then(function(o){
-            let no = store.getState().cursor.row;
-            let imgId = o.imgId
-            let line = ">> img\n" + opts.user + '/'+ opts.id + '/' + imgId
-            store.dispatch(insertLine("main", no,line , Render("main", no, line, global)))
-            save()
-          })
+          if(!resp.ok){
+            alert("Error:" + resp.statusText)
+          }else{
+            resp.json().then(function(o){
+              let no = store.getState().cursor.row;
+              let imgId = o.imgId
+              let line = ">> img\n" + opts.user + '/'+ opts.id + '/' + imgId
+              store.dispatch(insertLine("main", no,line , Render("main", no, line, global)))
+              save()
+            })
+          }
+        }).catch(error => {
+          alert("Catch Error: " + error)
         })
         return false;
       }
