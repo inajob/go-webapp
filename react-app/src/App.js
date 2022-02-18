@@ -66,12 +66,17 @@ class App extends React.Component{
               lines={this.props.rightLines}
               cursor={this.props.rightCursor}
               sendSearch={this.props.sendSearch}
+              items={this.props.items}
             />
           </div>
         </div>
       </div>
       <div className="side">
-      <Lines name="side" lines={this.props.sideLines} cursor={this.props.sideCursor} />
+        <Lines name="side"
+          lines={this.props.sideLines}
+          cursor={this.props.sideCursor}
+          items={this.props.items}
+        />
         <List items={this.props.items} user={this.props.user} />
       </div>
     </div>
