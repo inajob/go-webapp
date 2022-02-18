@@ -31,7 +31,7 @@ let preAnalysisResult = null;
 global.mermaidRender = mermaidRender
 mermaidAPI.initialize({startOnLoad: true, theme: 'forest'});
 
-function loadLine(name, no, text){
+function loadLine(name, no, text, list){
   store.dispatch(insertLine(name, no, text, Render(name, no, text, global, store.dispatch)))
 }
 
@@ -197,7 +197,7 @@ function grepToInstantSearch(grepLines, user, id) {
 
 function loadList(){
   return getList(opts.user).then(function(resp){
-    resp.json().then(function(o){
+    return resp.json().then(function(o){
       if(o.pages){
         let nameList = o.pages;
         global.list = nameList
@@ -207,6 +207,7 @@ function loadList(){
             store.dispatch(insertItem(item))
           })
         })
+        return nameList
       }
     })
   })
@@ -225,7 +226,7 @@ store.dispatch(modalListUpdateProviders([
 ]))
 store.dispatch(modalListClose())
 
-loadList().then(function(){
+loadList().then(function(list){
   // Page require List
   function loadPage(name, isMain, user, id){
     getPage(user, id).then(function(resp){
@@ -264,7 +265,7 @@ loadList().then(function(){
           lines.forEach(function(line, i){
             if(inBlock){
               if(line === "<<"){ // end of block
-                loadLine(name, index, blockBody)
+                loadLine(name, index, blockBody, list)
                 inBlock = false
                 index ++;
               }else{
@@ -276,7 +277,7 @@ loadList().then(function(){
                 blockBody = line
               }else{ // not block line
                 if(!(i === lines.length - 1 && line.length === 0)){ // skip tail
-                  loadLine(name, index, line)
+                  loadLine(name, index, line, list)
                   index ++;
                 }
               }

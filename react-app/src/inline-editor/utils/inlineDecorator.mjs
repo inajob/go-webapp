@@ -103,7 +103,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
     return inner(0);
   }
 
-  export function htmlEncode(body, user, list){
+  export function htmlEncode(body, user, pageList){
     var out = [];
     var tmp;
     var list;
@@ -113,7 +113,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
       if(Array.isArray(v)){
         switch(v[0]){
           case "command":
-            tmp = htmlEncode(v.slice(1), user);
+            tmp = htmlEncode(v.slice(1), user, pageList);
             list = tmp.split(/\s+/, 2); //  cmd, remain...
 
             var m = tmp.match(/\s+/);
@@ -170,9 +170,9 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
             }
             break;
           case "wikilink":
-            tmp = htmlEncode(v.slice(1), user);
+            tmp = htmlEncode(v.slice(1), user, pageList);
             let notFound = false;
-            if(!list.find((s) => s.name == tmp)){
+            if(!pageList.find((s) => s.name == tmp)){
               notFound = true
             }
             out.push("<span class='label'>")
