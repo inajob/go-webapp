@@ -26,6 +26,7 @@ const store = createStore(rootReducer)
 //const unsubscribe = store.subscribe(() => console.log("state",store.getState()))
 
 const API_SERVER=process.env.REACT_APP_API_SERVER
+let preAnalysisResult = null;
 
 global.mermaidRender = mermaidRender
 mermaidAPI.initialize({startOnLoad: true, theme: 'forest'});
@@ -283,6 +284,7 @@ loadList().then(function(){
           })
           if(isMain){
             let result = analysis()
+            preAnalysisResult = result; // save result for check missing keywords
             keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
             keywords.push(decodeURIComponent(id)) // full search
             instantSearch()
@@ -363,7 +365,9 @@ function analysis(){
       parsed.forEach((l) => {
         if(Array.isArray(l)){
           if(l[0] === "wikilink"){
-            keywords.push(l[1].body)
+            if(keywords.indexOf(l[1].body) == -1){
+              keywords.push(l[1].body)
+            }
           }
         }
       })
@@ -428,6 +432,12 @@ function save(){
     // update Search cache
     let result = analysis()
     let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
+    // add missing keywords for cleaning keyword cache
+    preAnalysisResult.keywords.forEach((k) => {
+      if(result.keywords.indexOf(k) == -1){
+        keywords.push("[" + k + "]")
+      }
+    })
     keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
     let instantSearch = async () => {
       await Promise.all(
@@ -440,6 +450,7 @@ function save(){
       })
       )
     }
+    preAnalysisResult = result;
     saving = false; // TODO: this cause server overload, but fast user interaction
     await instantSearch();
     store.dispatch(updateMessage("Update Cache OK"))

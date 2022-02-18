@@ -107,7 +107,7 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 function makeGlobal(ownProps){
-  return {sendSearch: ownProps.sendSearch, sendSearchSchedule: ownProps.sendSearchSchedule, list: ownProps.list, user: ownProps.user, mermaidRender: ownProps.mermaidRender};
+  return {sendSearch: ownProps.sendSearch, sendSearchSchedule: ownProps.sendSearchSchedule, list: ownProps.items, user: ownProps.user, mermaidRender: ownProps.mermaidRender};
 }
 
 
