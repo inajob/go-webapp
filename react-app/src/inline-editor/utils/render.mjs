@@ -10,8 +10,8 @@ const {create, all} = pkg
 
 const API_SERVER=process.env.REACT_APP_API_SERVER
 
-function escapeHTML(s, user){
-  return htmlEncode(parse(s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")), user);
+function escapeHTML(s, user, list){
+  return htmlEncode(parse(s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")), user, list);
 }
 
 export const parseBlock = (text) => {
@@ -393,7 +393,7 @@ export const Render = (name, no, text, global, dispatch) => {
             ret += "<tr>";
             i.split(",").forEach(function(j){
               ret += "<td>";
-              ret += escapeHTML(j, global.user);
+              ret += escapeHTML(j, global.user, global.list);
               ret += "</td>";
             });
             ret += "</tr>";
@@ -409,15 +409,15 @@ export const Render = (name, no, text, global, dispatch) => {
     return ret;
   }else{
     if(text.indexOf("###") === 0){
-      return "<h3>" + escapeHTML(text, global.user) + "</h3>"
+      return "<h3>" + escapeHTML(text, global.user, global.list) + "</h3>"
     }else if(text.indexOf("##") === 0){
-      return "<h2>" + escapeHTML(text, global.user) + "</h2>"
+      return "<h2>" + escapeHTML(text, global.user, global.list) + "</h2>"
     }else if(text.indexOf("#") === 0){
-      return "<h1>" + escapeHTML(text, global.user) + "</h1>"
+      return "<h1>" + escapeHTML(text, global.user, global.list) + "</h1>"
     }else if(text.indexOf("-") === 0){
-      return "<li>" + escapeHTML(text, global.user) + "</li>"
+      return "<li>" + escapeHTML(text, global.user, global.list) + "</li>"
     }
-    return "<div>"+htmlEncode(parse(text), global.user)+"</div>"
+    return "<div>"+htmlEncode(parse(text), global.user, global.list)+"</div>"
   }
 }
 

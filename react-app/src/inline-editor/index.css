@@ -159,6 +159,10 @@ table.item td{
   color: red;
 }
 
+.not-found{
+  color: red;
+}
+
 .non-select{
   user-select: none;
 }
