@@ -434,11 +434,13 @@ function save(){
     let result = analysis()
     let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
     // add missing keywords for cleaning keyword cache
-    preAnalysisResult.keywords.forEach((k) => {
-      if(result.keywords.indexOf(k) == -1){
-        keywords.push("[" + k + "]")
-      }
-    })
+    if(preAnalysisResult){
+      preAnalysisResult.keywords.forEach((k) => {
+        if(result.keywords.indexOf(k) == -1){
+          keywords.push("[" + k + "]")
+        }
+      })
+    }
     keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
     let instantSearch = async () => {
       await Promise.all(
