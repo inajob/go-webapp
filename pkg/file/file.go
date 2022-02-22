@@ -313,7 +313,7 @@ func GetPageInfo(user string, id string, modTime time.Time) (*PageInfo, error) {
   }
   rawDescription := []rune(string(body))
   description := ""
-  if len(description) > 140 {
+  if len(rawDescription) > 140 {
     description = string(rawDescription[:140]) + "..."
   }else{
     description = string(rawDescription)
