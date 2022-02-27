@@ -112,6 +112,7 @@ func Serve() {
   store.AttachUpdate(r);
   store.AttachGet(r);
   store.AttachList(r);
+  store.AttachKeywordsList(r);
   store.AttachRename(r);
   store.AttachDelete(r);
 

@@ -364,3 +364,13 @@ func AttachList(r *gin.Engine) {
     return
   })
 }
+func AttachKeywordsList(r *gin.Engine) {
+  r.GET("/keywords/:user", func(c *gin.Context){
+    user := c.Param("user")
+
+    fname := file.GetKeywordsListFileName(user)
+
+    c.File(fname);
+    return
+  })
+}

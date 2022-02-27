@@ -44,6 +44,10 @@ type PageInfo struct {
 type PageList struct {
   Pages []PageInfo `json:"pages"`
 }
+type KeywordsList struct {
+  Keywords []string `json:"keywords"`
+}
+
 
 var CONTENTS_DIR = filepath.Join("data/contents") // TODO: only support 1 depth dir
 var CACHE_DIR = filepath.Join("data/cache")
@@ -104,16 +108,29 @@ func Search(keyword string, user string) (SearchResponse, error){
       }
     }
 
-    data, err := json.Marshal(result)
-    if err != nil{
-      return result, err
+    if len(gr) == 0 {
+      if _, err := os.Stat(fname); err == nil{
+        err = os.Remove(fname)
+        fmt.Printf("Remove %s\n", fname)
+        if err != nil {
+          return result, err
+        }
+      }
+    }else{
+      data, err := json.Marshal(result)
+      if err != nil{
+        return result, err
+      }
+
+      if err := ioutil.WriteFile(fname, data, 0644); err != nil{
+        return result, err
+      }
     }
 
-    if err := ioutil.WriteFile(fname, data, 0644); err != nil{
+    if err := SaveKeywordsList(user); err != nil{
       return result, err
     }
   }
-
   return result, nil
 }
 
@@ -250,6 +267,30 @@ func GetListFileName(user string) (string){
   return filepath.Join(CACHE_DIR, user, "files2.json")
 }
 
+func GetKeywordsListFileName(user string) (string){
+  return filepath.Join(CACHE_DIR, user, "keywords.json")
+}
+
+func SaveKeywordsList(user string) (err error){
+  dirPath := filepath.Join(CACHE_DIR, user, "search")
+  fs, err := ioutil.ReadDir(dirPath)
+  if err != nil {
+    return nil
+  }
+  kl := KeywordsList{}
+
+  for _, f := range fs {
+    kl.Keywords = append(kl.Keywords, strings.TrimSuffix(strings.TrimPrefix(f.Name(), "["), "].json"))
+  }
+
+  data, err := json.Marshal(kl)
+  if err != nil {
+    return err
+  }
+
+  return ioutil.WriteFile(GetKeywordsListFileName(user), data, 644)
+}
+
 func SaveList(user string, id string) (err error){
   fname := GetListFileName(user);
 
@@ -302,7 +343,6 @@ func SaveList(user string, id string) (err error){
   if err != nil {
     return err
   }
-  ioutil.WriteFile(GetListFileName(user), data, 0644)
   return ioutil.WriteFile(fname, data, 0644)
 }
 
