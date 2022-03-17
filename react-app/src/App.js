@@ -39,6 +39,7 @@ class App extends React.Component{
               sendSearch={this.props.sendSearch}
               sendSearchSchedule={this.props.sendSearchSchedule}
               items={this.props.items}
+              context={this.props.context}
               mermaidRender={this.props.mermaidRender}
             />
             <div className="instant-search">

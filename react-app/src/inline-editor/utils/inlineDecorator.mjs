@@ -61,7 +61,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
           out.push(newPiece("text", body.slice(pos, cap.pos)));
           pos = cap.pos + "[".length;
           out.push(["wikilink"].concat(inner(level + 1)));
-          if(capPos == 0){
+          if(capPos === 0){
             switch(body[pos]){
               case '!':
               case '@':
@@ -70,6 +70,8 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
               case '+':
                 out.push(newPiece("schedule-active", body.slice(pos, pos + 1)));
                 pos = pos + ".".length;
+                break;
+              default:
                 break;
             }
           }
@@ -103,7 +105,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
     return inner(0);
   }
 
-  export function htmlEncode(body, user, pageList){
+  export function htmlEncode(body, user, keywords){
     var out = [];
     var tmp;
     var list;
@@ -113,7 +115,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
       if(Array.isArray(v)){
         switch(v[0]){
           case "command":
-            tmp = htmlEncode(v.slice(1), user, pageList);
+            tmp = htmlEncode(v.slice(1), user, keywords);
             list = tmp.split(/\s+/, 2); //  cmd, remain...
 
             var m = tmp.match(/\s+/);
@@ -170,9 +172,9 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
             }
             break;
           case "wikilink":
-            tmp = htmlEncode(v.slice(1), user, pageList);
+            tmp = htmlEncode(v.slice(1), user, keywords);
             let notFound = false;
-            if(!pageList.find((s) => s.name == tmp)){
+            if(!keywords.find((s) => s === tmp)){
               notFound = true
             }
             out.push("<span class='label'>")

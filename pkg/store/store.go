@@ -357,8 +357,14 @@ func AttachGet(r *gin.Engine) {
 func AttachList(r *gin.Engine) {
   r.GET("/page/:user", func(c *gin.Context){
     user := c.Param("user")
+    detail := c.DefaultQuery("detail", "0")
 
-    fname := file.GetListFileName(user)
+    var fname string
+    if detail == "0" {
+      fname = file.GetSimpleListFileName(user)
+    }else{
+      fname = file.GetListFileName(user)
+    }
 
     c.File(fname);
     return

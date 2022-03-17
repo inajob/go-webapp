@@ -32,7 +32,7 @@ global.mermaidRender = mermaidRender
 mermaidAPI.initialize({startOnLoad: true, theme: 'forest'});
 
 function loadLine(name, no, text, list){
-  store.dispatch(insertLine(name, no, text, Render(name, no, text, global, store.dispatch)))
+  store.dispatch(insertLine(name, no, text, Render(name, no, text, context, store.dispatch)))
 }
 
 function getOpts(){
@@ -179,6 +179,13 @@ function getList(user){
   })
   return fetch(req)
 }
+function getKeywords(user){
+  let r = Math.floor(Math.random()*1000)
+  var req = new Request(API_SERVER + "/keywords/" + user + "?r=" + r, {
+    method: "GET"
+  })
+  return fetch(req)
+}
 
 function grepToInstantSearch(grepLines, user, id) {
   let resultMap = {}
@@ -195,9 +202,34 @@ function grepToInstantSearch(grepLines, user, id) {
   return result;
 }
 
+global.detailList = []
+
+function loadKeywords(){
+  return getKeywords(opts.user).then(function(resp){
+    return resp.json().then(function(o){
+      if(o.keywords){
+        context.keywords = o.keywords
+        return o.keywords
+      }
+    })
+  })
+}
+
 function loadList(){
   return getList(opts.user).then(function(resp){
     return resp.json().then(function(o){
+      if(o.keywords){
+        let nameList = o.keywords.map((k) => {return {name: k}})
+        context.list = nameList
+        batch(() =>{
+          nameList.forEach(function(item){
+            store.dispatch(insertItem(item))
+          })
+        })
+
+        return nameList
+      }
+      /*
       if(o.pages){
         let nameList = o.pages;
         global.list = nameList
@@ -209,6 +241,7 @@ function loadList(){
         })
         return nameList
       }
+      */
     })
   })
 }
@@ -216,7 +249,13 @@ function loadList(){
 let opts = getOpts()
 let meta = {}
 global.user = opts.user // TODO: manage context?
-global.list = [] // TODO: manage context?
+let context = {
+  list: [],
+  keywords: [],
+  detailList: [],
+  sendSearchSchedule,
+  sendSearch,
+}
 
 store.dispatch(modalListUpdateProviders([
   {name: "rename"},
@@ -226,7 +265,10 @@ store.dispatch(modalListUpdateProviders([
 ]))
 store.dispatch(modalListClose())
 
-loadList().then(function(list){
+Promise.all([loadKeywords(), loadList()])
+  .then(function(values){
+  //let keywords = values[0] // no use
+  let list = values[1]
   // Page require List
   function loadPage(name, isMain, user, id){
     getPage(user, id).then(function(resp){
@@ -366,7 +408,7 @@ function analysis(){
       parsed.forEach((l) => {
         if(Array.isArray(l)){
           if(l[0] === "wikilink"){
-            if(keywords.indexOf(l[1].body) == -1){
+            if(keywords.indexOf(l[1].body) === -1){
               keywords.push(l[1].body)
             }
           }
@@ -436,7 +478,7 @@ function save(){
     // add missing keywords for cleaning keyword cache
     if(preAnalysisResult){
       preAnalysisResult.keywords.forEach((k) => {
-        if(result.keywords.indexOf(k) == -1){
+        if(result.keywords.indexOf(k) === -1){
           keywords.push("[" + k + "]")
         }
       })
@@ -548,7 +590,7 @@ loadLine(13, "https://github.com/inajob/inline-editor")
 ReactDOM.render(
   <Provider store={store}>
     <div>
-      <App title={decodeURIComponent(opts.id)} user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} onNewDiary={onNewDiary} onNewJunk={onNewJunk} onDelete={onDelete} sendSearch={sendSearch} sendSearchSchedule={sendSearchSchedule} sendRename={sendRename} list={global.list} />
+      <App title={decodeURIComponent(opts.id)} user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} onNewDiary={onNewDiary} onNewJunk={onNewJunk} onDelete={onDelete} sendSearch={sendSearch} sendSearchSchedule={sendSearchSchedule} sendRename={sendRename} context={context} />
     </div>
   </Provider>,
   document.getElementById('root')

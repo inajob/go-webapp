@@ -77,7 +77,7 @@ class Line extends React.Component{
     let trigger = {
       "[": {
         dataProvider: token => {
-          return this.props.items.filter((v) => v.name.toLowerCase().indexOf(token.toLowerCase()) !== -1).map((v) => {return {"value": "[" + v.name + "]"}});
+          return this.props.context.keywords.filter((v) => v.toLowerCase().indexOf(token.toLowerCase()) !== -1).map((v) => {return {"value": "[" + v + "]"}});
         },
         component: ({ entity: { value } }) => <div>{`${value}`}</div>,
         output: (item, trigger) => item.value

@@ -266,7 +266,9 @@ func GetSearchFileName(user string, query string) (string){
 func GetListFileName(user string) (string){
   return filepath.Join(CACHE_DIR, user, "files2.json")
 }
-
+func GetSimpleListFileName(user string) (string){
+  return filepath.Join(CACHE_DIR, user, "files.json")
+}
 func GetKeywordsListFileName(user string) (string){
   return filepath.Join(CACHE_DIR, user, "keywords.json")
 }
@@ -339,11 +341,24 @@ func SaveList(user string, id string) (err error){
     pl = &newPageList
   }
 
-  data, err := json.Marshal(*pl)
+  kl := KeywordsList{}
+  for _, v := range pl.Pages{
+    kl.Keywords = append(kl.Keywords, v.Name)
+  }
+
+  pageListData, err := json.Marshal(*pl)
   if err != nil {
     return err
   }
-  return ioutil.WriteFile(fname, data, 0644)
+  if ioutil.WriteFile(fname, pageListData, 0644) != nil {
+    return err
+  }
+
+  keywordsData, err := json.Marshal(kl)
+  if err != nil {
+    return err
+  }
+  return ioutil.WriteFile(GetSimpleListFileName(user) , keywordsData, 0644)
 }
 
 func GetPageInfo(user string, id string, modTime time.Time) (*PageInfo, error) {

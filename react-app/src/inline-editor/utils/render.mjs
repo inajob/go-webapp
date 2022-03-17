@@ -330,10 +330,10 @@ export const Render = (name, no, text, global, dispatch) => {
             ret += "<span class='mode'>&gt;&gt; boxlist</span>";
             ret += "<div>loading list..</div>"
             let showBoxList = () => {
-              if(global.list.length === 0){
+              if(global.detailList.length === 0){
                 setTimeout(showBoxList, 500)
               }else{
-                let lineStr = global.list.filter((s) => s.name.indexOf(lastPart[0]) === 0).sort((a,b) => b.modTime.getTime() - a.modTime.getTime()).map((s) => {
+                let lineStr = global.detailList.filter((s) => s.name.indexOf(lastPart[0]) === 0).sort((a,b) => b.modTime.getTime() - a.modTime.getTime()).map((s) => {
                   let content = s.description.slice(0,50) + '...'
                   if(s.cover !== ""){
                     content = '<img src="' + s.cover + '">'
@@ -393,7 +393,7 @@ export const Render = (name, no, text, global, dispatch) => {
             ret += "<tr>";
             i.split(",").forEach(function(j){
               ret += "<td>";
-              ret += escapeHTML(j, global.user, global.list);
+              ret += escapeHTML(j, global.user, global.keywords);
               ret += "</td>";
             });
             ret += "</tr>";
@@ -409,15 +409,15 @@ export const Render = (name, no, text, global, dispatch) => {
     return ret;
   }else{
     if(text.indexOf("###") === 0){
-      return "<h3>" + escapeHTML(text, global.user, global.list) + "</h3>"
+      return "<h3>" + escapeHTML(text, global.user, global.keywords) + "</h3>"
     }else if(text.indexOf("##") === 0){
-      return "<h2>" + escapeHTML(text, global.user, global.list) + "</h2>"
+      return "<h2>" + escapeHTML(text, global.user, global.keywords) + "</h2>"
     }else if(text.indexOf("#") === 0){
-      return "<h1>" + escapeHTML(text, global.user, global.list) + "</h1>"
+      return "<h1>" + escapeHTML(text, global.user, global.keywords) + "</h1>"
     }else if(text.indexOf("-") === 0){
-      return "<li>" + escapeHTML(text, global.user, global.list) + "</li>"
+      return "<li>" + escapeHTML(text, global.user, global.keywords) + "</li>"
     }
-    return "<div>"+htmlEncode(parse(text), global.user, global.list)+"</div>"
+    return "<div>"+htmlEncode(parse(text), global.user, global.keywords)+"</div>"
   }
 }
 

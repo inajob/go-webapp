@@ -21,6 +21,7 @@ class Lines extends React.Component{
                 height={numLines(line.text)*24 + "px"}
                 isBlock={isBlock(line.text)}
                 items={this.props.items}
+                context={this.props.context}
                 className={calcClassName(line.text)}
                 indent={calcIndent(line.text)}
                 onChange={this.props.onChange(this.props.name)}
@@ -107,7 +108,14 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 function makeGlobal(ownProps){
-  return {sendSearch: ownProps.sendSearch, sendSearchSchedule: ownProps.sendSearchSchedule, list: ownProps.items, user: ownProps.user, mermaidRender: ownProps.mermaidRender};
+  return {
+    sendSearch: ownProps.sendSearch,
+    sendSearchSchedule: ownProps.sendSearchSchedule,
+    list: ownProps.items,
+    keywords: ownProps.context?ownProps.context.keywords:[], // TODO: why context is undefined?
+    user: ownProps.user,
+    mermaidRender: ownProps.mermaidRender
+  };
 }
 
 
