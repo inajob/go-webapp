@@ -5,6 +5,7 @@ import (
   "fmt"
   "errors"
   "os"
+  "sort"
   "io"
   "io/ioutil"
   "strings"
@@ -340,6 +341,10 @@ func SaveList(user string, id string) (err error){
     newPageList.Pages = append(newPageList.Pages, *pi)
     pl = &newPageList
   }
+
+  sort.Slice(pl.Pages, func(i, j int) bool{
+    return pl.Pages[i].ModTime.After(pl.Pages[j].ModTime)
+  })
 
   kl := KeywordsList{}
   for _, v := range pl.Pages{
