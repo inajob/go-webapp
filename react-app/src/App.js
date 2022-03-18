@@ -35,11 +35,12 @@ class App extends React.Component{
               cursor={this.props.cursor}
               onMagic={this.props.onMagic}
               user={this.props.user}
+              items={this.props.items}
+              context={this.props.context}
+
               onUpdate={this.props.onUpdate}
               sendSearch={this.props.sendSearch}
               sendSearchSchedule={this.props.sendSearchSchedule}
-              items={this.props.items}
-              context={this.props.context}
               mermaidRender={this.props.mermaidRender}
             />
             <div className="instant-search">

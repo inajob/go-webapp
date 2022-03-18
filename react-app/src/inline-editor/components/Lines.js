@@ -16,14 +16,22 @@ class Lines extends React.Component{
           <Line
                 key={index}
                 {...line}
-                {...calcFocus(this.props.cursor.editable, this.props.cursor.col, this.props.cursor.row, this.props.cursor.dirty, index)}
+                {...calcFocus(
+                  this.props.cursor.editable,
+                  this.props.cursor.col,
+                  this.props.cursor.row,
+                  this.props.cursor.dirty,
+                  index
+                )}
                 no={index}
                 height={numLines(line.text)*24 + "px"}
                 isBlock={isBlock(line.text)}
-                items={this.props.items}
-                context={this.props.context}
                 className={calcClassName(line.text)}
                 indent={calcIndent(line.text)}
+
+                items={this.props.items}
+                context={this.props.context}
+
                 onChange={this.props.onChange(this.props.name)}
                 onUpdate={this.props.onUpdate}
                 onUp={this.props.onUp(

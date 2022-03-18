@@ -590,7 +590,20 @@ loadLine(13, "https://github.com/inajob/inline-editor")
 ReactDOM.render(
   <Provider store={store}>
     <div>
-      <App title={decodeURIComponent(opts.id)} user={opts.user} onUpdate={onUpdate} onLoginClick={onLoginClick} onLogoutClick={onLogoutClick} onNewDiary={onNewDiary} onNewJunk={onNewJunk} onDelete={onDelete} sendSearch={sendSearch} sendSearchSchedule={sendSearchSchedule} sendRename={sendRename} context={context} />
+      <App
+        title={decodeURIComponent(opts.id)}
+        user={opts.user}
+        onUpdate={onUpdate}
+        onLoginClick={onLoginClick}
+        onLogoutClick={onLogoutClick}
+        onNewDiary={onNewDiary}
+        onNewJunk={onNewJunk}
+        onDelete={onDelete}
+        sendSearch={sendSearch}
+        sendSearchSchedule={sendSearchSchedule}
+        sendRename={sendRename}
+        context={context}
+      />
     </div>
   </Provider>,
   document.getElementById('root')
