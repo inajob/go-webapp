@@ -586,7 +586,6 @@ loadLine(11, "https://twitter.com/ina_ani")
 loadLine(12, "# GitHub")
 loadLine(13, "https://github.com/inajob/inline-editor")
 */
-
 ReactDOM.render(
   <Provider store={store}>
     <div>

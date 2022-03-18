@@ -35,9 +35,11 @@ class App extends React.Component{
               cursor={this.props.cursor}
               onMagic={this.props.onMagic}
               user={this.props.user}
+
               items={this.props.items}
               context={this.props.context}
 
+              render={this.props.render}
               onUpdate={this.props.onUpdate}
               sendSearch={this.props.sendSearch}
               sendSearchSchedule={this.props.sendSearchSchedule}

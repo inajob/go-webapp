@@ -28,9 +28,7 @@ class Lines extends React.Component{
                 isBlock={isBlock(line.text)}
                 className={calcClassName(line.text)}
                 indent={calcIndent(line.text)}
-
-                items={this.props.items}
-                context={this.props.context}
+                keywords={this.props.context?this.props.context.keywords:[]}
 
                 onChange={this.props.onChange(this.props.name)}
                 onUpdate={this.props.onUpdate}
@@ -120,7 +118,7 @@ function makeGlobal(ownProps){
     sendSearch: ownProps.sendSearch,
     sendSearchSchedule: ownProps.sendSearchSchedule,
     list: ownProps.items,
-    keywords: ownProps.context?ownProps.context.keywords:[], // TODO: why context is undefined?
+    keywords: ownProps.context?ownProps.context.keywords:[], // in case of menu and side
     user: ownProps.user,
     mermaidRender: ownProps.mermaidRender
   };
