@@ -22,6 +22,7 @@ type SearchResult struct {
   LineNo int `json:"lineNo"`
   Text string `json:"text"`
   Cover string `json:"cover"`
+  ModTime time.Time `json:"modTime"`
 }
 
 type SearchResponse struct {
@@ -91,6 +92,7 @@ func Search(keyword string, user string) (SearchResponse, error){
       LineNo: gr[i].LineNo,
       Text: gr[i].Text,
       Cover: scover,
+      ModTime: gr[i].ModTime,
     }
   }
 

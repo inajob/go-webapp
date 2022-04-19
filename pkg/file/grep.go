@@ -2,6 +2,7 @@ package file
 
 import (
   "os"
+  "time"
   "bufio"
   "strings"
   "path/filepath"
@@ -13,10 +14,16 @@ type GrepResult struct {
   LineNo int `json:"lineNo"`
   Text string `json:"text"`
   Meta map[string]interface{} `json:"meta"`
+  ModTime time.Time `json:"modTime"`
 }
 
 func grepFile(path string, keyword string) []GrepResult{
   results := make([]GrepResult, 0)
+
+  info, err := os.Stat(path)
+  if err != nil {
+    return nil
+  }
 
   file, err := os.Open(path)
   if err != nil {
@@ -31,6 +38,7 @@ func grepFile(path string, keyword string) []GrepResult{
         Path: path,
         LineNo: i,
         Text: scanner.Text(),
+        ModTime: info.ModTime(),
       }
       results = append(results, r)
     }
