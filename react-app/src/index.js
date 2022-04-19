@@ -359,7 +359,7 @@ Promise.all([loadKeywords(), loadList()])
       url.search = "?user=" + encodeURIComponent(opts.user) + "&id=" + encodeURIComponent(jumpTo)
       window.history.pushState({},"", url)
       document.title = jumpTo
-      opts.id = jumpTo
+      opts.id = encodeURIComponent(jumpTo)
       store.dispatch(clearItem())
       loadList().then(() => {
         loadPage("main", true, opts.user, jumpTo)
