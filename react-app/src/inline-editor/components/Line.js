@@ -12,17 +12,21 @@ class Line extends React.Component{
     this.clickHandler = this.clickHandler.bind(this);
   }
   send(e){
-    this.props.onChange(this.props.no, e.target.value)
-
-    if(this.props.onUpdate && this.dirtyByKeyDown){
-      this.props.onUpdate() // trigger save or something
+    if(this.dirtyByKeyDown){
       this.dirtyByKeyDown = false;
+      this.props.onChange(this.props.no, e.target.value)
+
+      if(this.props.onUpdate){
+        this.props.onUpdate() // trigger save or something
+      }
     }
+
     return;
   }
   keyHandler(e){
     switch(e.keyCode){
       case 9: // tab
+      this.dirtyByKeyDown = true
       this.props.onTab(this.props.no, this.props.text, e.shiftKey)
       this.props.onUpdate()
       e.preventDefault()
@@ -48,6 +52,7 @@ class Line extends React.Component{
       }
       break;
       case 13: //enter
+      this.dirtyByKeyDown = true
       let ret = this.props.onEnter(this.props.no, this.props.text, e.target.selectionStart, e.shiftKey)
       if(ret.preventDefault){
         e.preventDefault()
@@ -58,6 +63,7 @@ class Line extends React.Component{
       break;
       case 8: //BS
       // when cursor is head
+      this.dirtyByKeyDown = true
       if(e.target.selectionStart === 0 && e.target.selectionEnd === 0){
         this.props.onBS(this.props.no, this.props.text)
         e.preventDefault()
