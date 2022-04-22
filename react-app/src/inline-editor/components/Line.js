@@ -86,7 +86,10 @@ class Line extends React.Component{
           return this.props.keywords.filter((v) => v.toLowerCase().indexOf(token.toLowerCase()) !== -1).map((v) => {return {"value": "[" + v + "]"}});
         },
         component: ({ entity: { value } }) => <div>{`${value}`}</div>,
-        output: (item, trigger) => item.value
+        output: (item, trigger) => {
+          this.dirtyByKeyDown = true
+          return item.value
+        }
       }
     }
     if(this.props.isBlock){
