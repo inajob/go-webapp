@@ -269,6 +269,19 @@ Promise.all([loadKeywords(), loadList()])
   .then(function(values){
   //let keywords = values[0] // no use
   let list = values[1]
+  list.forEach((p) => {
+    let index = -1
+    context.keywords.forEach((k, i) => {
+      if(k == p.name){
+        index = i
+      }
+    })
+    if(index == -1){
+      console.log("add keywords", p)
+      context.keywords.push(p.name)
+    }else{
+    }
+  })
   // Page require List
   function loadPage(name, isMain, user, id){
     getPage(user, id).then(function(resp){
