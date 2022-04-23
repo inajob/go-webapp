@@ -181,7 +181,7 @@ function getList(user){
 }
 function getKeywords(user){
   let r = Math.floor(Math.random()*1000)
-  var req = new Request(API_SERVER + "/keywords/" + user + "?r=" + r, {
+  var req = new Request(API_SERVER + "/keywords/" + user + "?detail=1&r=" + r, {
     method: "GET"
   })
   return fetch(req)
@@ -272,14 +272,14 @@ Promise.all([loadKeywords(), loadList()])
   list.forEach((p) => {
     let index = -1
     context.keywords.forEach((k, i) => {
-      if(k == p.name){
+      if(k.keyword === p.name){
         index = i
       }
     })
-    if(index == -1){
-      console.log("add keywords", p)
-      context.keywords.push(p.name)
+    if(index === -1){
+      context.keywords.push({keyword: p.name, count: 2})
     }else{
+      context.keywords[index].count += 1;
     }
   })
   // Page require List

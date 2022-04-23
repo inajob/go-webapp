@@ -173,9 +173,10 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
             break;
           case "wikilink":
             tmp = htmlEncode(v.slice(1), user, keywords);
-            let notFound = false;
-            if(!keywords.find((s) => s === tmp)){
-              notFound = true
+            let notFound = true;
+            let k = keywords.find((s) => s.keyword === tmp)
+            if(k){
+              notFound = (k.count <= 1)
             }
             out.push("<span class='label'>")
             out.push("[")
