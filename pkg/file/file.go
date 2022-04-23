@@ -49,6 +49,14 @@ type PageList struct {
 type KeywordsList struct {
   Keywords []string `json:"keywords"`
 }
+type KeywordCount struct {
+  Keyword string `json:"keyword"`
+  Count int `json:"count"`
+}
+type KeywordCountList struct {
+  KeywordCounts []KeywordCount `json:"keywords"`
+}
+
 
 
 var CONTENTS_DIR = filepath.Join("data/contents") // TODO: only support 1 depth dir
@@ -275,6 +283,10 @@ func GetSimpleListFileName(user string) (string){
 func GetKeywordsListFileName(user string) (string){
   return filepath.Join(CACHE_DIR, user, "keywords.json")
 }
+func GetKeywordCountsListFileName(user string) (string){
+  return filepath.Join(CACHE_DIR, user, "keywordcounts.json")
+}
+
 
 func SaveKeywordsList(user string) (err error){
   dirPath := filepath.Join(CACHE_DIR, user, "search")
@@ -283,17 +295,42 @@ func SaveKeywordsList(user string) (err error){
     return nil
   }
   kl := KeywordsList{}
+  kcl := KeywordCountList{}
 
   for _, f := range fs {
-    kl.Keywords = append(kl.Keywords, strings.TrimSuffix(strings.TrimPrefix(f.Name(), "["), "].json"))
+    keyword := strings.TrimSuffix(strings.TrimPrefix(f.Name(), "["), "].json")
+    b, err := ioutil.ReadFile(filepath.Join(dirPath, f.Name()))
+    if err != nil {
+      fmt.Printf("file open error: %v\n", f.Name())
+      continue
+    }
+    var sr = SearchResponse{}
+    if err := json.Unmarshal(b, &sr); err != nil{ // TODO: too slow. I should use Database
+      fmt.Printf("save keyword list error: %v %v\n", f.Name(), b)
+      continue;
+    }
+    count := len(sr.Lines)
+    kl.Keywords = append(kl.Keywords, keyword)
+
+    kc := KeywordCount{
+      Keyword: keyword,
+      Count: count,
+    }
+    kcl.KeywordCounts = append(kcl.KeywordCounts, kc)
   }
 
   data, err := json.Marshal(kl)
   if err != nil {
     return err
   }
-
-  return ioutil.WriteFile(GetKeywordsListFileName(user), data, 644)
+  if err := ioutil.WriteFile(GetKeywordsListFileName(user), data, 644); err != nil{
+    return err
+  }
+  dkcl, err := json.Marshal(kcl)
+  if err != nil {
+    return err
+  }
+  return ioutil.WriteFile(GetKeywordCountsListFileName(user), dkcl, 644)
 }
 
 func SaveList(user string, id string) (err error){

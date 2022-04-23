@@ -373,8 +373,14 @@ func AttachList(r *gin.Engine) {
 func AttachKeywordsList(r *gin.Engine) {
   r.GET("/keywords/:user", func(c *gin.Context){
     user := c.Param("user")
+    detail := c.DefaultQuery("detail", "0")
 
-    fname := file.GetKeywordsListFileName(user)
+    var fname string
+    if detail == "0" {
+      fname = file.GetKeywordsListFileName(user)
+    }else{
+      fname = file.GetKeywordCountsListFileName(user)
+    }
 
     c.File(fname);
     return
