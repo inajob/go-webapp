@@ -28,6 +28,11 @@ textarea {
 textarea:focus{
   outline: none;
 }
+
+.spc{ /* invisible space */
+  font-size: 0px;
+}
+
 table{
   border: solid 1px;
 }
@@ -83,9 +88,9 @@ table.item td{
   font-weight: bold;
 }
 .main .list{
-  margin-left: 20px;
-  border-left: solid;
+  border-left: solid #ddd;
 }
+
 .main .list textarea{
 }
 

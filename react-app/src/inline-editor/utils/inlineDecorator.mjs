@@ -32,11 +32,10 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
     var pos = 0;
     function inner(level){
       var out = [];
-      let isList = (body.search(/-+ /) === 0);
+      let isList = (body.search(/\s*- /) === 0);
       if(pos === 0 && isList){
-        while(body.indexOf("-", pos) === pos){
-          pos ++;
-        }
+        let m = body.match(/^(\s*)- /)
+        pos += m[0].length - 1
         out.push(newPiece("list", body.slice(0, pos)));
       }
       while(true){
@@ -193,12 +192,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
             out.push("" + v.body + "");
             break;
           case "list":
-            let indent = v.body.length;
-            let listHead = "";
-            for(let i = 0; i < indent; i ++){
-              listHead += "-";
-            }
-            out.push(listHead);
+            out.push(v.body.replace(/  /g, "<span class='spc'>&nbsp;&nbsp;</span>"));
             break;
           case "text":
             out.push(v.body);

@@ -89,7 +89,9 @@ const calcClassName = (text) => {
       className = "h2"
     }else if(text.indexOf("#") === 0){
       className = "h1"
-    }else if(text.indexOf("-") === 0){
+    }else if(text.search(/\s*- /) === 0){
+      let m = text.match(/^(\s*)-/)
+      let len = (m[1].length/2)|0
       className = "list"
     }else if(text.length === 0){
       className = "empty"
@@ -100,13 +102,13 @@ const calcClassName = (text) => {
 const calcIndent = (text) => {
   let count = 0;
   if(!isBlock(text)){
-    if(text.indexOf("-") === 0){
-      while(text.indexOf("-", count) === count){
-        count ++;
-      }
+    if(text.search(/\s*- /) === 0){
+      let m = text.match(/^(\s*)-/)
+      let len = (m[1].length/2)|0
+      return len + 1
     }
   }
-  return count;
+  return 0;
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -189,18 +191,18 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     onTab: (name) => (no, text, shift) => {
       if(shift){
-        if(text.search(/-+ /) === 0){ // already list
+        if(text.search(/\s*- /) === 0){ // already list
           if(text.indexOf("- ") === 0){
             text = text.slice(2);
           }else{
-            text = text.slice(1);
+            text = text.slice(2);
           }
         }else{ // not list
           // none
         }
       }else{
-        if(text.search(/-+/) === 0){ // already list
-          text = "-" + text
+        if(text.search(/\s*-+/) === 0){ // already list
+          text = "  " + text
         }else{ // first list
           text = "- " + text
         }
