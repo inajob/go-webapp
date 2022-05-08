@@ -149,7 +149,13 @@ table.item td{
   border-radius: 3px;
   vertical-align: middle;
 }
-
+.invisible{
+  font-size:0px;
+}
+.side-link{
+  padding-left:4px;
+  color: #99f;
+}
 
 .normal{
   margin-left: 20px;
