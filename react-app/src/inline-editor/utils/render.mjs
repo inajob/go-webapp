@@ -333,11 +333,10 @@ export const Render = (name, no, text, global, dispatch) => {
         case "boxlist":
             ret += "<span class='mode'>&gt;&gt; boxlist</span>";
             ret += "<div>loading list..</div>"
-            let showBoxList = () => {
-              if(global.detailList.length === 0){
-                setTimeout(showBoxList, 500)
-              }else{
-                let lineStr = global.detailList.filter((s) => s.name.indexOf(lastPart[0]) === 0).sort((a,b) => b.modTime.getTime() - a.modTime.getTime()).map((s) => {
+            global.getDetailList(global.user).then((resp) => {
+              resp.json().then((o) => {
+                let pages = o.pages;
+                let lineStr = pages.filter((s) => s.name.indexOf(lastPart[0]) === 0).sort((a,b) => (new Date(b.modTime)).getTime() - (new Date(a.modTime)).getTime()).map((s) => {
                   let content = s.description.slice(0,50) + '...'
                   if(s.cover !== ""){
                     content = '<img src="' + s.cover + '">'
@@ -345,11 +344,9 @@ export const Render = (name, no, text, global, dispatch) => {
                   return "<li><div class='boxlist-title'><a href='?&user=" + global.user + "&id=" + encodeURIComponent(s.name) + "' data-jump='" + s.name + "'>" + escapeHTML(s.name, global.user) + "</a><a class='non-select' data-id=" + s.name + ">*</a></div>"+content+"</li>"
                 }).join("")
                 dispatch(previewLine(name, no, "<span class='mode'>&gt;&gt; boxlist</span><div class='boxlist'>" + lineStr + "</div>"));
-              }
-            }
-            setTimeout(showBoxList, 100)
-          break;
-
+              })
+            })
+            break;
         case "url":
             ret += "<span class='mode'>&gt;&gt; url</span>";
             ret +='<div><iframe src="https://hatenablog.com/embed?url=' + encodeURIComponent(lastPart[0]) + '"></iframe></div>'

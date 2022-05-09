@@ -179,6 +179,13 @@ function getList(user){
   })
   return fetch(req)
 }
+function getDetailList(user){
+  let r = Math.floor(Math.random()*1000)
+  var req = new Request(API_SERVER + "/page/" + user + "?detail=1&r=" + r, {
+    method: "GET"
+  })
+  return fetch(req)
+}
 function getKeywords(user){
   let r = Math.floor(Math.random()*1000)
   var req = new Request(API_SERVER + "/keywords/" + user + "?detail=1&r=" + r, {
@@ -255,6 +262,8 @@ let context = {
   detailList: [],
   sendSearchSchedule,
   sendSearch,
+  getDetailList,
+  user: opts.user,
 }
 
 store.dispatch(modalListUpdateProviders([
@@ -265,10 +274,29 @@ store.dispatch(modalListUpdateProviders([
 ]))
 store.dispatch(modalListClose())
 
-Promise.all([loadKeywords(), loadList()])
+function loginCheckFunc(){
+  return loginCheck(opts.user).then(function(resp){
+    return resp.json().then(function(o){
+      if(!o.editable){
+        store.dispatch(setReadOnly("main"))
+      }
+      if(o.login){
+        store.dispatch(logined(o.user))
+      }
+      return o
+    })
+  })
+}
+
+Promise.all([
+  loadKeywords(),
+  loadList(),
+  loginCheckFunc(),
+])
   .then(function(values){
   //let keywords = values[0] // no use
   let list = values[1]
+  let login = values[2]
   list.forEach((p) => {
     let index = -1
     context.keywords.forEach((k, i) => {
@@ -304,7 +332,9 @@ Promise.all([loadKeywords(), loadList()])
         })
       }
       if(resp.ok === false){
-        keywords.push(decodeURIComponent(id))
+        if(login.login && login.user == user){
+          keywords.push(decodeURIComponent(id)) // full search
+        }
         instantSearch()
       }else{
         resp.json().then(function(o){
@@ -342,7 +372,9 @@ Promise.all([loadKeywords(), loadList()])
             let result = analysis()
             preAnalysisResult = result; // save result for check missing keywords
             keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
-            keywords.push(decodeURIComponent(id)) // full search
+            if(login.login && login.user == user){
+              keywords.push(decodeURIComponent(id)) // full search
+            }
             instantSearch()
           }
           })
@@ -399,17 +431,6 @@ try{
 }catch(e){
   console.log(e)
 }
-
-loginCheck(opts.user).then(function(resp){
-  resp.json().then(function(o){
-    if(!o.editable){
-      store.dispatch(setReadOnly("main"))
-    }
-    if(o.login){
-      store.dispatch(logined(o.user))
-    }
-  })
-})
 
 function analysis(){
   let keywords = []

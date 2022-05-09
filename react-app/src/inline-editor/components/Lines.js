@@ -119,9 +119,10 @@ function makeGlobal(ownProps){
   return {
     sendSearch: ownProps.sendSearch,
     sendSearchSchedule: ownProps.sendSearchSchedule,
+    getDetailList: ownProps.context.getDetailList,
     list: ownProps.items,
     keywords: ownProps.context?ownProps.context.keywords:[], // in case of menu and side
-    user: ownProps.user,
+    user: ownProps.context.user,
     mermaidRender: ownProps.mermaidRender
   };
 }
