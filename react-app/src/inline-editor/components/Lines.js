@@ -14,7 +14,7 @@ class Lines extends React.Component{
       <div>
         {this.props.lines.map((line, index) => (
           <Line
-                key={index}
+                key={line.index}
                 {...line}
                 {...calcFocus(
                   this.props.cursor.editable,

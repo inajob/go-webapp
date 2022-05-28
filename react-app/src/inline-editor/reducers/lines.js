@@ -1,4 +1,5 @@
-function lines(state = [{text:""}], action){
+let lineIndex = 1;
+function lines(state = [{text:"", index: 0}], action){
   let newState;
   switch(action.type){
     case 'PREVIEW_LINE':
@@ -9,6 +10,7 @@ function lines(state = [{text:""}], action){
         }
         return {
           text: item.text,
+          index: item.index,
           preview: action.preview
         }
       })
@@ -20,6 +22,7 @@ function lines(state = [{text:""}], action){
         }
         return {
           text: action.text,
+          index: item.index,
           preview: action.preview
         }
       })
@@ -28,6 +31,7 @@ function lines(state = [{text:""}], action){
       newState = state.slice()
       newState.splice(action.no, 0, {
         text: action.text,
+        index: lineIndex ++,
         preview: action.preview
       })
       return newState
@@ -38,7 +42,7 @@ function lines(state = [{text:""}], action){
       return newState
     case 'CLEAR_ALL':
       //console.log("CLEAR_ALL")
-      return [{text:""}]
+      return [{text:"", index: lineIndex ++}]
 
     default:
       // pass
