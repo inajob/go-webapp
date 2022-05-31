@@ -169,7 +169,11 @@ export const Render = (name, no, text, global, dispatch) => {
                 let bd = new Date(b.modTime);
                 return bd.getTime() - ad.getTime();
               }).forEach((v)=>{
-                body.push("<li><div class='boxlist-title'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + v.id + "'>" + v.id + "</a><a class='non-select' data-id='" + encodeURIComponent(v.id) + "'>*</a></div>" + v.text + "</li>")
+                let content = ""
+                if(v.cover !== ""){
+                  content = '<img src="' + v.cover + '">'
+                }
+                body.push("<li><div class='boxlist-title'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + v.id + "'>" + v.id + "</a><a class='non-select' data-id='" + encodeURIComponent(v.id) + "'>*</a></div>" + content + "<div>" + v.text + "</div>" + "</li>")
               })
               body.push("</div>")
               dispatch(previewLine(name, no, body.join("\n")));
