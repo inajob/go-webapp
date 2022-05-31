@@ -12,9 +12,11 @@ class Line extends React.Component{
     this.clickHandler = this.clickHandler.bind(this);
   }
   send(e){
+    this.props.onChange(this.props.no, e.target.value) // onChange calls all time
+
     if(this.dirtyByKeyDown){
       this.dirtyByKeyDown = false;
-      this.props.onChange(this.props.no, e.target.value)
+      //this.props.onChange(this.props.no, e.target.value) // this line doesn't work on iPhone
 
       if(this.props.onUpdate){
         this.props.onUpdate() // trigger save or something
