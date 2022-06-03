@@ -87,6 +87,10 @@ table.item td{
   font-size: medium;
   font-weight: bold;
 }
+.selected {
+  background-color: blue;
+  color: white;
+}
 .main .list{
   border-left: solid #ddd;
 }
@@ -97,7 +101,7 @@ table.item td{
 .block {
   border: solid #aaf 2px;
   border-width: 0px 0px 0px 4px;
-  background-color: #eee;
+  /*background-color: #eee;*/
   margin: 0.5em;
   margin-left: 20px;
 }

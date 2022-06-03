@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import {changeLine, insertLine, deleteLine, setCursor} from '../actions'
+import {changeLine, insertLine, deleteLine, setCursor, deselectAll} from '../actions'
 import Line from './Line'
 import {isBlock, Render, getCursorPos, numLines, getLines} from '../utils/render'
 
@@ -222,6 +222,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       dispatch(deleteLine(name, no))
     },
     onClick: (name) => (no) => {
+      dispatch(deselectAll("main"))
       dispatch(setCursor(name, no, 0, false))
     },
     onRefreshed: (name) => (no, col) => {

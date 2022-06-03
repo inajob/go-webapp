@@ -152,7 +152,12 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(modalListOpen(no, pos, text))
     },
     onDebug: () => {
-      dispatch(modalListOpen())
+      //dispatch(modalListOpen())
+      return navigator.clipboard.writeText("test").then(function() {
+        alert('コピーしました')
+      }).catch(function(error) {
+        alert((error && error.message) || 'コピーに失敗しました')
+      })
     },
   }
 }

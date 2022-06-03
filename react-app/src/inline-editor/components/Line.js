@@ -96,7 +96,7 @@ class Line extends React.Component{
     }
     if(this.props.isBlock){
       return (
-        <div className={'line ' + this.props.className} onClick={this.clickHandler}>
+        <div className={'line ' + (this.props.selected?"selected ":"") + this.props.className} onClick={this.clickHandler} data-lineno={this.props.no}>
           <div style={{display: this.props.isFocus?"block":"none"}}>
             <ReactTextareaAutocomplete
               ref="rawInput"
@@ -110,14 +110,14 @@ class Line extends React.Component{
             />
           </div>
           <div>
-            <div dangerouslySetInnerHTML={{__html:this.props.preview}} />
+            <div ref="renderedContent" dangerouslySetInnerHTML={{__html:this.props.preview}} />
           </div>
         </div>
       )
     }else{
       // inline
       return (
-        <div className={'line ' + this.props.className} style={this.props.indent>0?{marginLeft: (this.props.isFocus?20:(this.props.indent * 10 + 10))+"px"}:{}} onClick={this.clickHandler}>
+        <div className={'line ' + (this.props.selected?"selected ":"") + this.props.className} style={this.props.indent>0?{marginLeft: (this.props.isFocus?20:(this.props.indent * 10 + 10))+"px"}:{}} onClick={this.clickHandler} data-lineno={this.props.no}>
           <div style={{display: this.props.isFocus?"block":"none"}}>
             <ReactTextareaAutocomplete
               ref="rawInput"
@@ -130,7 +130,7 @@ class Line extends React.Component{
             />
           </div>
           <div style={{display: !this.props.isFocus?"block":"none"}}>
-            <div dangerouslySetInnerHTML={{__html:this.props.preview}} />
+            <div ref="renderedContent" dangerouslySetInnerHTML={{__html:this.props.preview}} />
           </div>
         </div>
       )
@@ -166,6 +166,7 @@ Line.propTypes = {
   onBS: PropTypes.func.isRequired,
   onRefreshed: PropTypes.func.isRequired,
   no: PropTypes.number.isRequired,
+  selected: PropTypes.bool.isRequired,
   isBlock: PropTypes.bool.isRequired,
   text: PropTypes.string.isRequired
 }

@@ -29,6 +29,19 @@ export const insertLine = (name, no, text, preview) => ({
   no,
 })
 
+export const selectLine = (name, no, selected) => ({
+  name,
+  type: 'SELECT_LINE',
+  no,
+  selected,
+})
+
+export const deselectAll = (name) => ({
+  name,
+  type: 'DESELECT_ALL',
+})
+
+
 export const clearAll = (name) => ({
   name,
   type: 'CLEAR_ALL',

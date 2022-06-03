@@ -9,7 +9,7 @@ import {mermaidAPI} from 'mermaid'
 // --- inline editor ---
 import rootReducer from './reducers'
 import App from './App'
-import {insertLine, setReadOnly, clearAll, setTitle} from './inline-editor/actions'
+import {insertLine, deleteLine, selectLine, setCursor, setReadOnly, deselectAll, clearAll, setTitle} from './inline-editor/actions'
 import {insertItem, clearItem, logined, updateMessage, error, updateInstantResults,
   clearInstantResults,
   modalListUpdateProviders,
@@ -680,4 +680,68 @@ function setupPaste(){
 }
 setupPaste();
 
+let setupSelection = () => {
+  let findLine = (e) => {
+    if(e == null)return null;
+    if(e.classList && e.classList.contains("line")){return e}
+    return findLine(e.parentNode)
+  }
+  let selected = false
+  let fromNo = -1;
+  let toNo = -1;
+  document.addEventListener("selectionchange", (e) => {
+    let sel = document.getSelection()
+    let fromLine = findLine(sel.anchorNode)
+    let toLine = findLine(sel.focusNode)
+    if(fromLine && toLine){
+      fromNo = parseInt(fromLine.dataset.lineno)
+      toNo = parseInt(toLine.dataset.lineno)
+      if(fromNo != toNo){
+        selected = true
+        store.dispatch(setCursor("main", - 1, 0, true))
+      }
+    }
+  })
+  document.addEventListener("mouseup", (e) => {
+    if(selected){
+      selected = false;
+      store.dispatch(deselectAll("main"))
+      for(let i = fromNo; i <= toNo; i ++){
+        // TODO: batch
+        store.dispatch(selectLine("main", i, true))
+      }
+      let selectedLines = store.getState().lines.slice(fromNo, toNo + 1)
+      let out = [];
+      selectedLines.forEach((l) => {
+        if(isBlock(l.text)){
+          out.push(l.text + "\n<<\n")
+        }else{
+          out.push(l.text)
+        }
+      })
+      let selectedSource = out.join("\n")
+      return navigator.clipboard.writeText(selectedSource).then(function() {
+        //alert('コピーしました')
+      }).catch(function(error) {
+        alert((error && error.message) || 'コピーに失敗しました')
+      })
 
+    }
+  })
+  document.addEventListener("keydown", (e) => {
+    if(document.body == e.srcElement){
+      if(e.keyCode == 8){ // BS
+        let isSelected = store.getState().lines.some((l) => l.selected == true)
+        if(isSelected){
+          for(let i = fromNo; i <= toNo; i ++){
+            store.dispatch(deleteLine("main", fromNo))
+          }
+          store.dispatch(setCursor("main", fromNo, 0, true))
+          save();
+        }
+      }
+    }
+  })
+}
+
+setupSelection()
