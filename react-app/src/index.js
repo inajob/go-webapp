@@ -312,7 +312,7 @@ Promise.all([
   })
   // Page require List
   function loadPage(name, isMain, user, id){
-    getPage(user, id).then(function(resp){
+    return getPage(user, id).then(function(resp){
       let keywords = ["[" + decodeURIComponent(id) + "]"] // link search
       console.log(resp)
       if(isMain){
@@ -332,7 +332,7 @@ Promise.all([
         })
       }
       if(resp.ok === false){
-        if(login.login && login.user == user){
+        if(login.login && login.user === user){
           keywords.push(decodeURIComponent(id)) // full search
         }
         instantSearch()
@@ -372,7 +372,7 @@ Promise.all([
             let result = analysis()
             preAnalysisResult = result; // save result for check missing keywords
             keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
-            if(login.login && login.user == user){
+            if(login.login && login.user === user){
               keywords.push(decodeURIComponent(id)) // full search
             }
             instantSearch()
@@ -696,7 +696,7 @@ let setupSelection = () => {
     if(fromLine && toLine){
       fromNo = parseInt(fromLine.dataset.lineno)
       toNo = parseInt(toLine.dataset.lineno)
-      if(fromNo != toNo){
+      if(fromNo !== toNo){
         selected = true
         store.dispatch(setCursor("main", - 1, 0, true))
       }
@@ -729,9 +729,9 @@ let setupSelection = () => {
     }
   })
   document.addEventListener("keydown", (e) => {
-    if(document.body == e.srcElement){
-      if(e.keyCode == 8){ // BS
-        let isSelected = store.getState().lines.some((l) => l.selected == true)
+    if(document.body === e.srcElement){
+      if(e.keyCode === 8){ // BS
+        let isSelected = store.getState().lines.some((l) => l.selected === true)
         if(isSelected){
           for(let i = fromNo; i <= toNo; i ++){
             store.dispatch(deleteLine("main", fromNo))

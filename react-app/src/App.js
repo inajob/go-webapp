@@ -16,19 +16,18 @@ class App extends React.Component{
   <div className="wrap">
     <div className="header">
       <div className="logo">
-      <h1>inline</h1>
+      <h1>{this.props.cursor.title}</h1>
       <div style={{backgroundColor: "#eee", fontSize:"small"}}>"inline" はインライン編集できるWIKIのようなものです</div>
       </div>
       <LoginButton logined={this.props.loginButton.login} user={this.props.loginButton.user} onLoginClick={this.props.onLoginClick} onLogoutClick={this.props.onLogoutClick} />
     </div>
     <div className="controller">
-      <Controller logined={this.props.loginButton.login} message={this.props.loginButton.message} isError={this.props.loginButton.isError} onNewDiary={this.props.onNewDiary} onDelete={this.props.onDelete(this.props.user, this.props.cursor.title)} onNewJunk={this.props.onNewJunk} onDebug={this.props.onDebug} />
+      <Controller logined={this.props.loginButton.login} message={this.props.loginButton.message} isError={this.props.loginButton.isError} onNewDiary={this.props.onNewDiary} onDelete={this.props.onDelete(this.props.user, this.props.cursor.title)} onNewJunk={this.props.onNewJunk} onDebug={this.props.onDebug(this.props.lines)} />
     </div>
     <div className={this.props.loginButton.isError?"contents error":"contents"}>
       <div className="main">
         <div className="editor-container">
           <div className="left-editor">
-            <h1 className="title">{(this.props.cursor.title)}</h1>
             <Lines
               name="main"
               lines={this.props.lines}
@@ -151,13 +150,16 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(setReadOnly("main"))
       dispatch(modalListOpen(no, pos, text))
     },
-    onDebug: () => {
+    onDebug: (lines) => () => {
       //dispatch(modalListOpen())
-      return navigator.clipboard.writeText("test").then(function() {
-        alert('コピーしました')
-      }).catch(function(error) {
-        alert((error && error.message) || 'コピーに失敗しました')
+      let out = [];
+      lines.forEach((l) => {
+        if(l.selected){
+          out.push(l.text)
+        }
       })
+      console.log(out)
+      // TODO: new page
     },
   }
 }

@@ -7,11 +7,13 @@ class Line extends React.Component{
   constructor(props) {
     super(props)
     this.dirtyByKeyDown = false;
+		this.rows = 1
     this.send = this.send.bind(this);
     this.keyHandler = this.keyHandler.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
   }
   send(e){
+		this.rows = ~~(e.target.scrollHeight/24)
     this.props.onChange(this.props.no, e.target.value) // onChange calls all time
 
     if(this.dirtyByKeyDown){
@@ -121,7 +123,7 @@ class Line extends React.Component{
           <div style={{display: this.props.isFocus?"block":"none"}}>
             <ReactTextareaAutocomplete
               ref="rawInput"
-              style={{height: this.props.height}}
+              style={{height: this.rows * 24}}
               onChange={this.send}
               onKeyDown={this.keyHandler}
               value={this.props.text}
@@ -147,6 +149,13 @@ class Line extends React.Component{
           that.props.onRefreshed(that.props.no, that.props.column);
         },10);
       }
+
+			// fix textarea size (heavy task?)
+			let prev = this.rows
+		  this.rows = ~~(this.refs.rawInput.textareaRef.scrollHeight/24)
+			if(prev !== this.rows){
+          this.props.onRefreshed(this.props.no, this.props.column);
+			}
     }
   }
   componentDidUpdate(){

@@ -24,6 +24,7 @@ textarea {
    font-size: 16px;
    line-height: 24px;
    overflow: hidden;
+	 word-break: break-all;
 }
 textarea:focus{
   outline: none;
@@ -46,6 +47,10 @@ table.item{
 table.item td{
   border: none;
   padding: 0em;
+}
+
+.line {
+  word-break: break-all;
 }
 
 .line textarea{

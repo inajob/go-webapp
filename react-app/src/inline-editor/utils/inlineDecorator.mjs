@@ -192,7 +192,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
             out.push("" + v.body + "");
             break;
           case "list":
-            out.push(v.body.replace(/  /g, "<span class='spc'>&nbsp;&nbsp;</span>"));
+            out.push(v.body.replace(/ {2}/g, "<span class='spc'>&nbsp;&nbsp;</span>"));
             break;
           case "text":
             out.push(v.body);
