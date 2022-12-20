@@ -25,7 +25,7 @@ class Search extends React.Component{
         </form>
         <div>
           {this.props.results.map((o, i) => (
-            <div key={i}>- <a href={"?user=" + o.user + "&id=" + o.id}>{o.user}/{o.id}</a>:{o.lineNo} {o.text}</div>
+            <div key={i}>- <a href={"?user=" + o.user + "&id=" + o.id} data-jump={o.id}>{o.user}/{o.id}</a>:{o.lineNo} {o.text}<a href={"?user=" + o.user + "&id=" + o.id} data-id={o.id}>*</a></div>
           ))}
         </div>
       </div>
