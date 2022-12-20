@@ -6,9 +6,9 @@ import Search from './components/Search'
 import ModalList from './components/ModalList'
 import Controller from './components/Controller'
 import { connect } from 'react-redux'
-import {changeLine, insertLine, setCursor, setReadOnly, setReadWrite} from './inline-editor/actions'
+import {changeLine, insertLine, setCursor, setReadOnly, setReadWrite, clearAll, setTitle} from './inline-editor/actions'
 import {Render} from './inline-editor/utils/render'
-import { updateKeyword, updateResults, modalListOpen} from './actions'
+import { updateKeyword, updateResults, modalListOpen, clearInstantResults, clearItem} from './actions'
 
 class App extends React.Component{
   render() {
@@ -22,7 +22,7 @@ class App extends React.Component{
       <LoginButton logined={this.props.loginButton.login} user={this.props.loginButton.user} onLoginClick={this.props.onLoginClick} onLogoutClick={this.props.onLogoutClick} />
     </div>
     <div className="controller">
-      <Controller logined={this.props.loginButton.login} message={this.props.loginButton.message} isError={this.props.loginButton.isError} onNewDiary={this.props.onNewDiary} onDelete={this.props.onDelete(this.props.user, this.props.cursor.title)} onNewJunk={this.props.onNewJunk} onDebug={this.props.onDebug(this.props.lines)} />
+      <Controller logined={this.props.loginButton.login} message={this.props.loginButton.message} isError={this.props.loginButton.isError} onNewDiary={this.props.onNewDiary} onDelete={this.props.onDelete(this.props.user, this.props.cursor.title)} onNewJunk={this.props.onNewJunk} onDebug={this.props.onDebug(this.props.user, this.props.lines, this.props.context, this.props.opts)} />
     </div>
     <div className={this.props.loginButton.isError?"contents error":"contents"}>
       <div className="main">
@@ -150,7 +150,7 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(setReadOnly("main"))
       dispatch(modalListOpen(no, pos, text))
     },
-    onDebug: (lines) => () => {
+    onDebug: (user, lines, context, opts) => () => {
       //dispatch(modalListOpen())
       let out = [];
       lines.forEach((l) => {
@@ -158,8 +158,22 @@ const mapDispatchToProps = (dispatch) => {
           out.push(l.text)
         }
       })
-      console.log(out)
-      // TODO: new page
+
+      // new page
+      let id = out[0]
+      dispatch(clearInstantResults())
+      dispatch(clearAll("main"))
+      const url = new URL(window.location)
+      url.search = "?user=" + encodeURIComponent(user) + "&id=" + encodeURIComponent(id)
+      window.history.pushState({},"", url)
+      document.title = id
+      opts.id = encodeURIComponent(id) // TODO: replace opts to context
+      dispatch(clearItem())
+
+      dispatch(setTitle("main", decodeURIComponent(id)))
+      out.forEach((l, i) => {
+        dispatch(insertLine("main", i, l , Render("main", i, l, context)))
+      })
     },
   }
 }

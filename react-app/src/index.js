@@ -636,6 +636,7 @@ ReactDOM.render(
         sendSearchSchedule={sendSearchSchedule}
         sendRename={sendRename}
         context={context}
+        opts={opts}
       />
     </div>
   </Provider>,
