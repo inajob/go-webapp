@@ -22,7 +22,7 @@ class App extends React.Component{
       <LoginButton logined={this.props.loginButton.login} user={this.props.loginButton.user} onLoginClick={this.props.onLoginClick} onLogoutClick={this.props.onLogoutClick} />
     </div>
     <div className="controller">
-      <Controller logined={this.props.loginButton.login} message={this.props.loginButton.message} isError={this.props.loginButton.isError} onNewDiary={this.props.onNewDiary} onDelete={this.props.onDelete(this.props.user, this.props.cursor.title)} onNewJunk={this.props.onNewJunk} onDebug={this.props.onDebug(this.props.user, this.props.lines, this.props.context, this.props.opts)} />
+      <Controller logined={this.props.loginButton.login} message={this.props.loginButton.message} isError={this.props.loginButton.isError} onNewDiary={this.props.onNewDiary} onDelete={this.props.onDelete(this.props.user, this.props.cursor.title)} onNewJunk={this.props.onNewJunk} onDebug={this.props.onDebug(this.props.user, this.props.lines, this.props.context, this.props.opts, this.props.meta, this.props.postPage, this.props.savePromise)} />
     </div>
     <div className={this.props.loginButton.isError?"contents error":"contents"}>
       <div className="main">
@@ -150,12 +150,22 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(setReadOnly("main"))
       dispatch(modalListOpen(no, pos, text))
     },
-    onDebug: (user, lines, context, opts) => () => {
+    onDebug: (user, lines, context, opts, meta, postPage, savePromise) => () => {
+      let previousMeta = {...meta};
+      let previousOpts = {id: opts.id, user: opts.user}
       //dispatch(modalListOpen())
+      let newText = [];
       let out = [];
+      let firstLine = true;
       lines.forEach((l) => {
         if(l.selected){
           out.push(l.text)
+          if(firstLine){
+            newText.push("[" + l.text + "]")
+            firstLine = false;
+          }
+        }else{
+          newText.push(l.text)
         }
       })
 
@@ -171,8 +181,16 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(clearItem())
 
       dispatch(setTitle("main", decodeURIComponent(id)))
-      out.forEach((l, i) => {
-        dispatch(insertLine("main", i, l , Render("main", i, l, context)))
+      let lineNo = 0
+      out.unshift("")
+      out[0] = "from [" + previousOpts.id + "]"
+      out[1] = ""
+      out.forEach((l) => {
+        dispatch(insertLine("main", lineNo, l , Render("main", lineNo, l, context)))
+        lineNo ++;
+      })
+      savePromise().then(() => {
+        postPage(previousOpts.user, previousOpts.id, newText.join("\n"), previousMeta.lastUpdate, previousMeta.image)
       })
     },
   }

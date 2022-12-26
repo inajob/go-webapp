@@ -254,7 +254,7 @@ function loadList(){
 }
 
 let opts = getOpts()
-let meta = {}
+let meta = {} // cover, lastUpdate
 global.user = opts.user // TODO: manage context?
 let context = {
   list: [],
@@ -340,7 +340,8 @@ Promise.all([
         resp.json().then(function(o){
           console.log(o)
           if(isMain){
-            meta = o.meta
+            //meta = o.meta
+            Object.assign(meta, o.meta)
           }
           let inBlock = false
           let blockBody;
@@ -504,7 +505,8 @@ let waiting = false;
 function save(){
   saving = true;
   savePromise().then(async (o) => {
-    meta = o.meta // update meta
+    //meta = o.meta // update meta
+    Object.assign(meta, o.meta)
 
     // update Search cache
     let result = analysis()
@@ -637,6 +639,9 @@ ReactDOM.render(
         sendRename={sendRename}
         context={context}
         opts={opts}
+        meta={meta}
+        postPage={postPage}
+        savePromise={savePromise}
       />
     </div>
   </Provider>,

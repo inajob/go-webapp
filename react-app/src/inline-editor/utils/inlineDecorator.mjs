@@ -173,7 +173,10 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
           case "wikilink":
             tmp = htmlEncode(v.slice(1), user, keywords);
             let notFound = true;
-            let k = keywords.find((s) => s.keyword === tmp)
+            let k
+            if(keywords !== undefined){
+              k = keywords.find((s) => s.keyword === tmp)
+            }
             if(k){
               notFound = (k.count <= 1)
             }
