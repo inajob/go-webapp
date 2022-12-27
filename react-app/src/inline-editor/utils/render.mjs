@@ -314,7 +314,7 @@ export const Render = (name, no, text, global, dispatch) => {
                   return "255,255,255";
                 }
                 if(v.show){
-                  body.push("<li><span style='background-color:rgb(" + calcColor(v.priority) + ");'><span class='schedule-label'>"  + v.label + "</span>" + v.text + "</span><span class='tiny'>" +v.priority + " <a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + encodeURIComponent(v.id) + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a><a class='non-select' data-id='" + encodeURIComponent(v.id) + "'>*</a></span></li>")
+                  body.push("<li><span style='background-color:rgb(" + calcColor(v.priority) + ");'><span class='schedule-label'>"  + v.label + "</span>" + v.text + "</span><span class='tiny'>" +v.priority + " <a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + v.id + "'>" + v.user + ":" + v.id + ":" + v.lineNo + "</a><a class='non-select' data-id='" + v.id + "'>*</a></span></li>")
                 }
               })
               dispatch(previewLine(name, no, body.join("\n")));

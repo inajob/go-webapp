@@ -13,6 +13,7 @@ import (
   "time"
   "path/filepath"
   "mime/multipart"
+  "net/url"
   "github.com/inajob/frontmatter"
 )
 
@@ -152,9 +153,10 @@ func SearchSchedule() []SearchScheduleResult{
     path := strings.Split(gr[i].Path, string(os.PathSeparator))
     cover, _ := gr[i].Meta["cover"]
     scover, _ := cover.(string)
+    decodedId, _  := url.QueryUnescape(path[len(path) - 1])
     r[i] = SearchScheduleResult {
       User: path[len(path) - 2],
-      Id: path[len(path) - 1],
+      Id: decodedId,
       LineNo: gr[i].LineNo,
       Text: gr[i].Text,
       Cover: scover,
