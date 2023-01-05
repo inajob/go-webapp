@@ -183,7 +183,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
             out.push("<span class='label'>")
             out.push("<span class='invisible'>[</span>")
             out.push("<a class='" + (notFound?"not-found":"") + "' href='?&user=" + user + "&id=" + tmp + "' data-jump='"+ tmp +"'>" + tmp + "</a>");
-            out.push("<span class='invisible'>]</span><a class='non-select side-link' data-id=" + tmp + ">*</a>")
+            out.push("<span class='invisible'>]</span><a class='non-select side-link' data-id=\"" + tmp + "\">*</a>")
             out.push("</span>")
             break;
           default:
