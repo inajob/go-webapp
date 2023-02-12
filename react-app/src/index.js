@@ -13,7 +13,10 @@ import {insertLine, deleteLine, selectLine, setCursor, setReadOnly, deselectAll,
 import {insertItem, clearItem, logined, updateMessage, error, updateInstantResults,
   clearInstantResults,
   modalListUpdateProviders,
-  modalListClose
+  modalListClose,
+  showPopupMenu,
+  hidePopupMenu,
+  updatePopupMenu,
 } from './actions'
 import './inline-editor/index.css';
 import './index.css';
@@ -186,6 +189,13 @@ function getDetailList(user){
   })
   return fetch(req)
 }
+function getExternalKeywords(user){
+  var req = new Request(API_SERVER + "/web/external-keywords.json", {  // TODO: this is temporary path
+    method: "GET"
+  })
+  return fetch(req)
+}
+
 function getKeywords(user){
   let r = Math.floor(Math.random()*1000)
   var req = new Request(API_SERVER + "/keywords/" + user + "?detail=1&r=" + r, {
@@ -221,6 +231,15 @@ function loadKeywords(){
     })
   })
 }
+function loadExternalKeywords(){
+  return getExternalKeywords(opts.user).then(function(resp){
+    return resp.json().then(function(o){
+      context.externalKeywords = o
+      return o.keywords
+    }).catch((e) => {console.log(e)})
+  })
+}
+
 
 function loadList(){
   return getList(opts.user).then(function(resp){
@@ -259,6 +278,7 @@ global.user = opts.user // TODO: manage context?
 let context = {
   list: [],
   keywords: [],
+  externalKeywords: [],
   detailList: [],
   sendSearchSchedule,
   sendSearch,
@@ -292,6 +312,7 @@ Promise.all([
   loadKeywords(),
   loadList(),
   loginCheckFunc(),
+  loadExternalKeywords(),
 ])
   .then(function(values){
   //let keywords = values[0] // no use
@@ -320,7 +341,7 @@ Promise.all([
       }
       store.dispatch(setTitle(name, decodeURIComponent(id)))
       let instantSearch = () => {
-        keywords.forEach((k) => {
+        keywords.forEach((k, i) => {
           sendSearch(k, false).then((resp) => {
             store.dispatch(updateInstantResults(k, [{text:"loading..."}]))
             resp.json().then((o) => {
@@ -390,16 +411,36 @@ Promise.all([
   // load main page
   loadPage("main", true, opts.user, opts.id)
 
+  function calcScroll(e){
+    if(e.parentNode){
+      let pos = calcScroll(e.parentNode)
+      return [e.scrollLeft + pos[0], e.scrollTop + pos[1]];
+    }
+    return [0, 0]
+  }
+
   // for SPA
   document.getElementById('root').addEventListener("click", (e)=> {
     let rightTo = e.srcElement.dataset.id
     let jumpTo = e.srcElement.dataset.jump
     if(rightTo){
+      let rect = e.srcElement.getBoundingClientRect()
+      let offsetXY = calcScroll(e.srcElement)
+      let keywords = context.externalKeywords.filter((k) => k.title == rightTo)
+      if(keywords.length > 0){
+        store.dispatch(showPopupMenu(rect.left, rect.top + 16))
+        store.dispatch(updatePopupMenu([{
+          title: keywords[0].title,
+          link: "https://scrapbox.io/villagepump/" + encodeURIComponent(keywords[0].title),
+        }]))
+      }
+
       store.dispatch(clearAll("right"))
       loadPage("right", false, opts.user, rightTo)
       e.preventDefault()
+      e.stopPropagation()
     }
-    if(jumpTo){
+    else if(jumpTo){
       store.dispatch(clearAll("main"))
       const url = new URL(window.location)
       url.search = "?user=" + encodeURIComponent(opts.user) + "&id=" + encodeURIComponent(jumpTo)
@@ -411,6 +452,8 @@ Promise.all([
         loadPage("main", true, opts.user, jumpTo)
       })
       e.preventDefault()
+    }else{
+      store.dispatch(hidePopupMenu())
     }
   }, false)
 

@@ -12,7 +12,15 @@ html, body{
 .wrap{
   height: 100%;
 }
-
+.popup{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color: white;
+  color: white;
+  border: solid 2px blue;
+  z-index: 1000;
+}
 .contents{
   position:relative;
   height: calc(100% - 6em - 10px); /* TODO: 10px? */

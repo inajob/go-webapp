@@ -11,6 +11,7 @@ class Line extends React.Component{
     this.send = this.send.bind(this);
     this.keyHandler = this.keyHandler.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
+    this.allKeywords = null;
   }
   send(e){
 		this.rows = ~~(e.target.scrollHeight/24)
@@ -87,7 +88,15 @@ class Line extends React.Component{
     let trigger = {
       "[": {
         dataProvider: token => {
-          return this.props.keywords.filter((v) => v.keyword.toLowerCase().indexOf(token.toLowerCase()) !== -1).map((v) => {return {"value": "[" + v.keyword + "]"}});
+          if(this.allKeywords == null){
+            this.allKeywords = this.props.keywords.concat(
+              this.props.externalKeywords.map(
+                (k) => {return {"keyword": k.title, "count": 1}}
+              ).filter((k) => k!=undefined))
+          }
+          let arr = this.allKeywords.filter((v) => v.keyword.toLowerCase().indexOf(token.toLowerCase()) !== -1).map((v) => {return {"value": "[" + v.keyword + "]"}});
+          // remove doubles
+          return arr.filter((element, index) => arr.findIndex((i) => i.value === element.value) === index);
         },
         component: ({ entity: { value } }) => <div>{`${value}`}</div>,
         output: (item, trigger) => {

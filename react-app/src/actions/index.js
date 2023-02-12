@@ -65,4 +65,18 @@ export const modalListOpen = (no, pos, text) => ({
 export const modalListClose = () => ({
   type: 'MODAL_LIST_CLOSE',
 })
+export const showPopupMenu = (left, top) => ({
+  type: 'POPUP_SHOW',
+  left: left,
+  top: top,
+})
+export const hidePopupMenu = (left, top) => ({
+  type: 'POPUP_HIDE',
+  left: left,
+  top: top,
+})
+export const updatePopupMenu = (items) => ({
+  type: 'POPUP_UPDATE_ITEMS',
+  items: items,
+})
 

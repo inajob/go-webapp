@@ -6,6 +6,7 @@ import loginButton from './loginButton'
 import search from './search'
 import instantSearch from './instantSearch'
 import modalList from './modalList'
+import popupMenu from './popupMenu'
 
 function createFilteredReducer(reducerFunction, reducerPredicate){
   return (state, action) => {
@@ -28,4 +29,5 @@ export default combineReducers({
   search,
   instantSearch,
   modalList,
+  popupMenu,
 })

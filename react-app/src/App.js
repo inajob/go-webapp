@@ -7,7 +7,7 @@ import ModalList from './components/ModalList'
 import Controller from './components/Controller'
 import { connect } from 'react-redux'
 import {changeLine, insertLine, setCursor, setReadOnly, setReadWrite, clearAll, setTitle} from './inline-editor/actions'
-import {Render} from './inline-editor/utils/render'
+import {Render, isBlock} from './inline-editor/utils/render'
 import { updateKeyword, updateResults, modalListOpen, clearInstantResults, clearItem} from './actions'
 
 class App extends React.Component{
@@ -23,6 +23,9 @@ class App extends React.Component{
     </div>
     <div className="controller">
       <Controller logined={this.props.loginButton.login} message={this.props.loginButton.message} isError={this.props.loginButton.isError} onNewDiary={this.props.onNewDiary} onDelete={this.props.onDelete(this.props.user, this.props.cursor.title)} onNewJunk={this.props.onNewJunk} onDebug={this.props.onDebug(this.props.user, this.props.lines, this.props.context, this.props.opts, this.props.meta, this.props.postPage, this.props.savePromise)} />
+    </div>
+    <div className="popup" style={{display: this.props.popupMenu.show?"block":"none", top: this.props.popupMenu.top, left: this.props.popupMenu.left}}>
+    {this.props.popupMenu.items.map((k) => <div><a href={k.link} target="_blank">{k.title}</a></div>)}
     </div>
     <div className={this.props.loginButton.isError?"contents error":"contents"}>
       <div className="main">
@@ -107,6 +110,7 @@ const mapStateToProps = (state, ownProps) => {
     search: state.search,
     instantSearch: state.instantSearch,
     modalList: state.modalList,
+    popupMenu: state.popupMenu,
   }
 }
 const mapDispatchToProps = (dispatch) => {
@@ -190,7 +194,15 @@ const mapDispatchToProps = (dispatch) => {
         lineNo ++;
       })
       savePromise().then(() => {
-        postPage(previousOpts.user, previousOpts.id, newText.join("\n"), previousMeta.lastUpdate, previousMeta.image)
+        let rawLines = newText.map((line) => {
+          if(isBlock(line)){
+            return line + "\n<<"
+          }else{
+            return line
+          }
+        }).join("\n")
+
+        postPage(previousOpts.user, previousOpts.id, rawLines, previousMeta.lastUpdate, previousMeta.image)
       })
     },
   }

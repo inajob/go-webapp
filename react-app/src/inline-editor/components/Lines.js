@@ -29,6 +29,7 @@ class Lines extends React.Component{
                 className={calcClassName(line.text)}
                 indent={calcIndent(line.text)}
                 keywords={this.props.context?this.props.context.keywords:[]}
+                externalKeywords={this.props.context?this.props.context.externalKeywords:[]}
 
                 onChange={this.props.onChange(this.props.name)}
                 onUpdate={this.props.onUpdate}
