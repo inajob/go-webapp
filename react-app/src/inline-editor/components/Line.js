@@ -11,7 +11,7 @@ class Line extends React.Component{
     this.send = this.send.bind(this);
     this.keyHandler = this.keyHandler.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
-    this.allKeywords = null;
+    this.allKeywords = new Set();
   }
   send(e){
 		this.rows = ~~(e.target.scrollHeight/24)
@@ -88,15 +88,20 @@ class Line extends React.Component{
     let trigger = {
       "[": {
         dataProvider: token => {
-          if(this.allKeywords == null){
-            this.allKeywords = this.props.keywords.concat(
-              this.props.externalKeywords.map(
-                (k) => {return {"keyword": k.title, "count": 1}}
-              ).filter((k) => k!=undefined))
+          if(this.allKeywords.size == 0){
+            this.props.externalKeywords.forEach((v) => {
+              this.allKeywords.add(v.title)
+              v.links.forEach((v) => {
+                this.allKeywords.add(v)
+              })
+            })
+            this.props.keywords.forEach((k) => {
+                this.allKeywords.add(k.keyword)
+            })
           }
-          let arr = this.allKeywords.filter((v) => v.keyword.toLowerCase().indexOf(token.toLowerCase()) !== -1).map((v) => {return {"value": "[" + v.keyword + "]"}});
-          // remove doubles
-          return arr.filter((element, index) => arr.findIndex((i) => i.value === element.value) === index);
+          token = token.toLowerCase()
+          let arr = Array.from(this.allKeywords).filter((v) => v.toLowerCase().indexOf(token) !== -1).map((v) => {return {"value": "[" + v + "]"}});
+          return arr.slice(0,30)
         },
         component: ({ entity: { value } }) => <div>{`${value}`}</div>,
         output: (item, trigger) => {
