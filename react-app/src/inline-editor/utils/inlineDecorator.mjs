@@ -206,7 +206,15 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
 
           case "url":
             // todo: escape
-            out.push("<a href='" +  v.body + "'>" + v.body + "</a><a href='http://b.hatena.ne.jp/entry/"+ v.body+"' target='_blank'><img src='http://b.hatena.ne.jp/entry/image/" + v.body + "' /></a>");
+            if(v.body.indexOf("https://scrapbox.io/") == 0){
+              let m = v.body.match(/https:\/\/scrapbox\.io\/([^/]*)\/(.*)/)
+              console.log(m)
+              let project = m[1]
+              let page = decodeURIComponent(m[2])
+              out.push("<a href='" +  v.body + "'>[" + project + "/" + page + "]</a><a href='http://b.hatena.ne.jp/entry/"+ v.body+"' target='_blank'><img src='http://b.hatena.ne.jp/entry/image/" + v.body + "' /></a>");
+            }else{
+              out.push("<a href='" +  v.body + "'>" + v.body + "</a><a href='http://b.hatena.ne.jp/entry/"+ v.body+"' target='_blank'><img src='http://b.hatena.ne.jp/entry/image/" + v.body + "' /></a>");
+            }
             break;
           default:
             throw new Error("unsupported kind: " + v.kind);
