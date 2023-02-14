@@ -211,7 +211,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
               console.log(m)
               let project = m[1]
               let page = decodeURIComponent(m[2])
-              out.push("<a href='" +  v.body + "'>[" + project + "/" + page + "]</a><a href='http://b.hatena.ne.jp/entry/"+ v.body+"' target='_blank'><img src='http://b.hatena.ne.jp/entry/image/" + v.body + "' /></a>");
+              out.push("<a href='" +  v.body + "'><span class='non-select'>[" + project + "/" + page + "]</span><span class='invisible'>" + v.body + "</span></a><a href='http://b.hatena.ne.jp/entry/"+ v.body+"' target='_blank'><img src='http://b.hatena.ne.jp/entry/image/" + v.body + "' /></a>");
             }else{
               out.push("<a href='" +  v.body + "'>" + v.body + "</a><a href='http://b.hatena.ne.jp/entry/"+ v.body+"' target='_blank'><img src='http://b.hatena.ne.jp/entry/image/" + v.body + "' /></a>");
             }
