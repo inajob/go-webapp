@@ -206,7 +206,7 @@ const API_SERVER=process.env.REACT_APP_API_SERVER
 
           case "url":
             // todo: escape
-            if(v.body.indexOf("https://scrapbox.io/") == 0){
+            if(v.body.indexOf("https://scrapbox.io/") === 0){
               let m = v.body.match(/https:\/\/scrapbox\.io\/([^/]*)\/(.*)/)
               console.log(m)
               let project = m[1]

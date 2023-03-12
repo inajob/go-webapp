@@ -88,7 +88,7 @@ class Line extends React.Component{
     let trigger = {
       "[": {
         dataProvider: token => {
-          if(this.allKeywords.size == 0){
+          if(this.allKeywords.size === 0){
             Object.keys(this.props.externalKeywords).forEach((p) => {
               this.props.externalKeywords[p].forEach((v) => {
                 this.allKeywords.add(v.title)

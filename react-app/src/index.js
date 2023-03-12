@@ -411,29 +411,20 @@ Promise.all([
   // load main page
   loadPage("main", true, opts.user, opts.id)
 
-  function calcScroll(e){
-    if(e.parentNode){
-      let pos = calcScroll(e.parentNode)
-      return [e.scrollLeft + pos[0], e.scrollTop + pos[1]];
-    }
-    return [0, 0]
-  }
-
   // for SPA
   document.getElementById('root').addEventListener("click", (e)=> {
     let rightTo = e.srcElement.dataset.id
     let jumpTo = e.srcElement.dataset.jump
     if(rightTo){
       let rect = e.srcElement.getBoundingClientRect()
-      let offsetXY = calcScroll(e.srcElement)
       let keywords = [];
 
       Object.keys(context.externalKeywords).forEach((p) => {
-        let ks = context.externalKeywords[p].filter((k) => k.title == rightTo).map((k) => {return {
+        let ks = context.externalKeywords[p].filter((k) => k.title === rightTo).map((k) => {return {
           title:  p + "/" + k.title,
           link: "https://scrapbox.io/" + encodeURIComponent(p) + "/" + encodeURIComponent(k.title)
         }})
-        if(ks.length != 0){
+        if(ks.length !== 0){
           keywords.push(ks[0])
         }
       })

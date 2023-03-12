@@ -91,8 +91,6 @@ const calcClassName = (text) => {
     }else if(text.indexOf("#") === 0){
       className = "h1"
     }else if(text.search(/\s*- /) === 0){
-      let m = text.match(/^(\s*)-/)
-      let len = (m[1].length/2)|0
       className = "list"
     }else if(text.length === 0){
       className = "empty"
@@ -101,7 +99,6 @@ const calcClassName = (text) => {
   return className;
 }
 const calcIndent = (text) => {
-  let count = 0;
   if(!isBlock(text)){
     if(text.search(/\s*- /) === 0){
       let m = text.match(/^(\s*)-/)
