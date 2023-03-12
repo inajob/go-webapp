@@ -25,7 +25,7 @@ class App extends React.Component{
       <Controller logined={this.props.loginButton.login} message={this.props.loginButton.message} isError={this.props.loginButton.isError} onNewDiary={this.props.onNewDiary} onDelete={this.props.onDelete(this.props.user, this.props.cursor.title)} onNewJunk={this.props.onNewJunk} onDebug={this.props.onDebug(this.props.user, this.props.lines, this.props.context, this.props.opts, this.props.meta, this.props.postPage, this.props.savePromise)} />
     </div>
     <div className="popup" style={{display: this.props.popupMenu.show?"block":"none", top: this.props.popupMenu.top, left: this.props.popupMenu.left}}>
-    {this.props.popupMenu.items.map((k) => <div><a href={k.link} target="_blank">{k.title}</a></div>)}
+    {this.props.popupMenu.items.map((k) => <div key={k.title}><a href={k.link} target="_blank">{k.title}</a></div>)}
     </div>
     <div className={this.props.loginButton.isError?"contents error":"contents"}>
       <div className="main">

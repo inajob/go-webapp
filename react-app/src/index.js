@@ -426,13 +426,21 @@ Promise.all([
     if(rightTo){
       let rect = e.srcElement.getBoundingClientRect()
       let offsetXY = calcScroll(e.srcElement)
-      let keywords = context.externalKeywords.filter((k) => k.title == rightTo)
+      let keywords = [];
+
+      Object.keys(context.externalKeywords).forEach((p) => {
+        let ks = context.externalKeywords[p].filter((k) => k.title == rightTo).map((k) => {return {
+          title:  p + "/" + k.title,
+          link: "https://scrapbox.io/" + encodeURIComponent(p) + "/" + encodeURIComponent(k.title)
+        }})
+        if(ks.length != 0){
+          keywords.push(ks[0])
+        }
+      })
+      console.log(keywords)
       if(keywords.length > 0){
         store.dispatch(showPopupMenu(rect.left, rect.top + 16))
-        store.dispatch(updatePopupMenu([{
-          title: keywords[0].title,
-          link: "https://scrapbox.io/villagepump/" + encodeURIComponent(keywords[0].title),
-        }]))
+        store.dispatch(updatePopupMenu(keywords))
       }
 
       store.dispatch(clearAll("right"))

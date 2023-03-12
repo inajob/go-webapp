@@ -89,10 +89,12 @@ class Line extends React.Component{
       "[": {
         dataProvider: token => {
           if(this.allKeywords.size == 0){
-            this.props.externalKeywords.forEach((v) => {
-              this.allKeywords.add(v.title)
-              v.links.forEach((v) => {
-                this.allKeywords.add(v)
+            Object.keys(this.props.externalKeywords).forEach((p) => {
+              this.props.externalKeywords[p].forEach((v) => {
+                this.allKeywords.add(v.title)
+                v.links.forEach((v) => {
+                  this.allKeywords.add(v)
+                })
               })
             })
             this.props.keywords.forEach((k) => {
