@@ -52,7 +52,7 @@ class App extends React.Component{
                 <div className="piece" key={j}>
                   <div>Search result of '{k}'</div>
                   <div className="pages">
-                  {this.props.instantSearch.results[k].map((r, i) => (
+                  {this.props.instantSearch.results[k].slice(0,20).map((r, i) => (
                     <li key={i}><div><a href={"?user=" + r.user + "&id=" + r.id} data-jump={r.id}>{r.id}</a><a href={"?user=" + r.user + "&id=" + r.id} data-id={r.id}>*</a></div>
                       <div>
                         {(() => {if(r.cover) return <img src={r.cover} alt="cover" />})()}
