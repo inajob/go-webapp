@@ -66,6 +66,14 @@ class Line extends React.Component{
         this.props.onUpdate()
       }
       break;
+      case 32: //Space
+        if(e.target.selectionStart === 0 && e.target.selectionEnd === 0){
+          this.dirtyByKeyDown = true
+          this.props.onTab(this.props.no, this.props.text, false)
+          this.props.onUpdate()
+          e.preventDefault()
+        }
+      break;
       case 8: //BS
       // when cursor is head
       this.dirtyByKeyDown = true
