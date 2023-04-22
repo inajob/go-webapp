@@ -29,6 +29,7 @@ class Line extends React.Component{
     return;
   }
   keyHandler(e){
+    let matchIndent;
     switch(e.keyCode){
       case 9: // tab
       this.dirtyByKeyDown = true
@@ -68,7 +69,7 @@ class Line extends React.Component{
       break;
       case 32: //Space
         let isTabEvent = e.target.selectionStart === 0 && e.target.selectionEnd === 0
-        let matchIndent = this.props.text.match(/(\s*)- /)
+        matchIndent = this.props.text.match(/(\s*)- /)
         if(matchIndent){
           let indent = matchIndent[0].length
           isTabEvent |= e.target.selectionStart === indent && e.target.selectionEnd === indent
@@ -81,13 +82,22 @@ class Line extends React.Component{
         }
       break;
       case 8: //BS
-      // when cursor is head
-      this.dirtyByKeyDown = true
-      if(e.target.selectionStart === 0 && e.target.selectionEnd === 0){
-        this.props.onBS(this.props.no, this.props.text)
-        e.preventDefault()
-      }
-      this.props.onUpdate()
+        // when cursor is head
+        this.dirtyByKeyDown = true
+        if(e.target.selectionStart === 0 && e.target.selectionEnd === 0){
+          this.props.onBS(this.props.no, this.props.text)
+          e.preventDefault()
+        }
+        matchIndent = this.props.text.match(/(\s*)- /)
+        if(matchIndent){
+          let indent = matchIndent[0].length
+          if(e.target.selectionStart === indent && e.target.selectionEnd === indent){
+            this.props.onTab(this.props.no, this.props.text, true)
+            this.props.onUpdate()
+            e.preventDefault()
+          }
+        }
+        this.props.onUpdate()
       break;
       default:
         // pass
