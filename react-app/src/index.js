@@ -533,7 +533,7 @@ function savePromise(filter){
   if(images.length > 0){image = images[0]}
   return postPage(opts.user, opts.id, rawLines, lastUpdate, image).then(function(resp){
     if(resp.ok){
-      store.dispatch(updateMessage("Save OK, update Cache"))
+      store.dispatch(updateMessage("Saved"))
       return resp.json()
     }else{
       store.dispatch(updateMessage("Save Error"))
