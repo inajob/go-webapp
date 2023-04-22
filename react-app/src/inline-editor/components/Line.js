@@ -67,7 +67,13 @@ class Line extends React.Component{
       }
       break;
       case 32: //Space
-        if(e.target.selectionStart === 0 && e.target.selectionEnd === 0){
+        let isTabEvent = e.target.selectionStart === 0 && e.target.selectionEnd === 0
+        let matchIndent = this.props.text.match(/(\s*)- /)
+        if(matchIndent){
+          let indent = matchIndent[0].length
+          isTabEvent |= e.target.selectionStart === indent && e.target.selectionEnd === indent
+        }
+        if(isTabEvent){
           this.dirtyByKeyDown = true
           this.props.onTab(this.props.no, this.props.text, false)
           this.props.onUpdate()
