@@ -174,15 +174,28 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         return {preventDefault: false, update: true};
       }else{
         if(shift){
+          // show magic popup
           dispatch(setCursor(name, no, pos, true))
           onMagic(no, pos, text)
           return {preventDefault: false, update: false};
         }else{
           dispatch(setCursor(name, no + 1, 0, true))
           if(text === undefined)text = ""
+          let listMatch = text.match(/(\s*)- /)
+          let indent = -1;
+          if(listMatch){
+            indent = listMatch[1].length/2
+          }
           let t1 = text.slice(0, pos)
           dispatch(changeLine(name, no, t1, Render(name, no, t1, makeGlobal(ownProps), dispatch)))
           let t2 = text.slice(pos)
+          if(indent != -1){
+            t2 = "- " + t2
+            for(let i = 0; i < indent; i ++){
+              t2 = "  " + t2
+            }
+            dispatch(setCursor(name, no + 1, t2.length, true))
+          }
           dispatch(insertLine(name, no + 1, t2, Render(name, no + 1, t2, makeGlobal(ownProps), dispatch)))
           return {preventDefault: true, update: true}; // prevent default
         }
