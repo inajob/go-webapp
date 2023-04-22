@@ -189,7 +189,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
           let t1 = text.slice(0, pos)
           dispatch(changeLine(name, no, t1, Render(name, no, t1, makeGlobal(ownProps), dispatch)))
           let t2 = text.slice(pos)
-          if(indent != -1){
+          if(indent !== -1){
             t2 = "- " + t2
             for(let i = 0; i < indent; i ++){
               t2 = "  " + t2
