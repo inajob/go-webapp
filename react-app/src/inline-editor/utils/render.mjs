@@ -14,6 +14,11 @@ function escapeHTML(s, user, list){
   return htmlEncode(parse(s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")), user, list);
 }
 
+const choice = (l) => {
+  let r = Math.floor(Math.random() * l.length)
+  return l[r]
+}
+
 export const parseBlock = (text) => {
   if(isBlock(text)){
     let lines = getLines(text);
@@ -179,6 +184,15 @@ export const Render = (name, no, text, global, dispatch) => {
               dispatch(previewLine(name, no, body.join("\n")));
             })
           })
+        break;
+        case "randompages":
+          ret += "<span class='mode'>&gt;&gt; randompages</span>";
+          ret += "<div>"
+          for(let i = 0; i < 10; i ++){
+            let page = choice(global.list)
+            ret += "<li><a href='?user=" + encodeURIComponent(global.user) + "&id=" + encodeURIComponent(page.name) + "' data-jump='" + page.name + "'>" + escapeHTML(page.name, global.user) + "</a><a class='non-select' data-id='" + page.name + "'>*</a></li>"
+          }
+          ret += "</div>"
         break;
         case "pages":
           ret += "<span class='mode'>&gt;&gt; pages</span>";
