@@ -1,8 +1,15 @@
 run:
 	go run cmd/server/main.go
 
+run-frontend:
+	cd react-app
+	yarn start
+
 local-run:
 	ALLOW_ORIGIN=http://localhost:3000 go run cmd/server/main.go
+
+lan-run:
+	ALLOW_ORIGIN=http://192.168.1.16:3000 REACT_APP_API_SERVER="http://192.168.1.16:8088" go run cmd/server/main.go
 
 build:
 	go build -o server cmd/server/main.go

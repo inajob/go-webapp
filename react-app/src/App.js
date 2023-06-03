@@ -193,7 +193,9 @@ const mapDispatchToProps = (dispatch) => {
         dispatch(insertLine("main", lineNo, l , Render("main", lineNo, l, context)))
         lineNo ++;
       })
-      savePromise().then(() => {
+      // save new page
+      savePromise().then((o) => {
+        Object.assign(meta, o.meta)
         let rawLines = newText.map((line) => {
           if(isBlock(line)){
             return line + "\n<<"
@@ -201,7 +203,7 @@ const mapDispatchToProps = (dispatch) => {
             return line
           }
         }).join("\n")
-
+        // save original page
         postPage(previousOpts.user, previousOpts.id, rawLines, previousMeta.lastUpdate, previousMeta.image)
       })
     },
