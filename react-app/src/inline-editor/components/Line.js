@@ -11,7 +11,7 @@ class Line extends React.Component{
     this.send = this.send.bind(this);
     this.keyHandler = this.keyHandler.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
-    this.allKeywords = new Set();
+    this.allKeywords = {};
   }
   send(e){
 		this.rows = ~~(e.target.scrollHeight/24)
@@ -112,24 +112,24 @@ class Line extends React.Component{
     let trigger = {
       "[": {
         dataProvider: token => {
-          if(this.allKeywords.size === 0){
+          if(Object.keys(this.allKeywords).length === 0){
             Object.keys(this.props.externalKeywords).forEach((p) => {
               this.props.externalKeywords[p].forEach((v) => {
-                this.allKeywords.add(v.title)
+                this.allKeywords[v.title] = {src: p + "::", title: v.title}
                 v.links.forEach((v) => {
-                  this.allKeywords.add(v)
+                  this.allKeywords[v] = {src: p + "::", title: v}
                 })
               })
             })
             this.props.keywords.forEach((k) => {
-                this.allKeywords.add(k.keyword)
+                this.allKeywords[k.keyword] = {src: "", title:k.keyword}
             })
           }
           token = token.toLowerCase()
-          let arr = Array.from(this.allKeywords).filter((v) => v.toLowerCase().indexOf(token) !== -1).map((v) => {return {"value": "[" + v + "]"}});
+          let arr = Object.values(this.allKeywords).filter((v) => v.title.toLowerCase().indexOf(token) !== -1).map((v) => {return {"value": "[" + v.title + "]", "src": v.src}});
           return arr.slice(0,30)
         },
-        component: ({ entity: { value } }) => <div>{`${value}`}</div>,
+        component: ({ entity: { value, src } }) => <div>{`${src}${value}`}</div>,
         output: (item, trigger) => {
           this.dirtyByKeyDown = true
           return item.value
