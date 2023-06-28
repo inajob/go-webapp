@@ -2,8 +2,7 @@ run:
 	go run cmd/server/main.go
 
 run-frontend:
-	cd react-app
-	yarn start
+	cd react-app && yarn start
 
 local-run:
 	ALLOW_ORIGIN=http://localhost:3000 go run cmd/server/main.go

@@ -187,7 +187,7 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(setTitle("main", decodeURIComponent(id)))
       let lineNo = 0
       out.unshift("")
-      out[0] = "from [" + previousOpts.id + "]"
+      out[0] = "from [" + decodeURIComponent(previousOpts.id) + "]"
       out[1] = ""
       out.forEach((l) => {
         dispatch(insertLine("main", lineNo, l , Render("main", lineNo, l, context)))
