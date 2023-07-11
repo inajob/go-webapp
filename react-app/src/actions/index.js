@@ -29,12 +29,14 @@ export const updateResults = (results) => ({
   type: 'SEARCH_UPDATE_RESULTS',
   results: results,
 })
-export const updateInstantResults = (keyword, results) => ({
+export const updateInstantResults = (name, keyword, results) => ({
+  name,
   type: 'INSTANT_SEARCH_UPDATE_RESULT',
   keyword: keyword,
   results: results,
 })
-export const clearInstantResults = () => ({
+export const clearInstantResults = (name) => ({
+  name,
   type: 'INSTANT_SEARCH_CLEAR',
 })
 

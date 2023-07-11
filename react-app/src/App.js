@@ -1,6 +1,7 @@
 import React from 'react'
 import Lines from './inline-editor/components/Lines'
 import List from './components/List'
+import InstantSearch from './components/InstantSearch'
 import LoginButton from './components/LoginButton'
 import Search from './components/Search'
 import ModalList from './components/ModalList'
@@ -47,23 +48,7 @@ class App extends React.Component{
               sendSearchSchedule={this.props.sendSearchSchedule}
               mermaidRender={this.props.mermaidRender}
             />
-            <div className="instant-search">
-              {Object.keys(this.props.instantSearch.results).map((k, j) => (
-                <div className="piece" key={j}>
-                  <div>Search result of '{k}'</div>
-                  <div className="pages">
-                  {this.props.instantSearch.results[k].slice(0,20).map((r, i) => (
-                    <li key={i}><div><a href={"?user=" + r.user + "&id=" + r.id} data-jump={r.id}>{r.id}</a><a href={"?user=" + r.user + "&id=" + r.id} data-id={r.id}>*</a></div>
-                      <div>
-                        {(() => {if(r.cover) return <img src={r.cover} alt="cover" />})()}
-                        {r.text}
-                      </div>
-                    </li>
-                  ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <InstantSearch item={this.props.instantSearch.results} />
             <Search onUpdateKeyword={this.props.updateKeyword} onSearch={this.props.onSearch(this.props.sendSearch)} keyword={this.props.search.keyword} results={this.props.search.results} />
           </div>
           <div className="right-editor">
@@ -74,6 +59,7 @@ class App extends React.Component{
               sendSearch={this.props.sendSearch}
               items={this.props.items}
             />
+            <InstantSearch item={this.props.rightInstantSearch.results} />
           </div>
         </div>
       </div>
@@ -109,6 +95,7 @@ const mapStateToProps = (state, ownProps) => {
     loginButton: state.loginButton,
     search: state.search,
     instantSearch: state.instantSearch,
+    rightInstantSearch: state.rightInstantSearch,
     modalList: state.modalList,
     popupMenu: state.popupMenu,
   }

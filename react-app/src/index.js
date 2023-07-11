@@ -335,19 +335,16 @@ Promise.all([
   function loadPage(name, isMain, user, id){
     return getPage(user, id).then(function(resp){
       let keywords = ["[" + decodeURIComponent(id) + "]"] // link search
-      console.log(resp)
-      if(isMain){
-        store.dispatch(clearInstantResults())
-      }
+      store.dispatch(clearInstantResults(name))
       store.dispatch(setTitle(name, decodeURIComponent(id)))
       let instantSearch = () => {
         keywords.forEach((k, i) => {
           sendSearch(k, false).then((resp) => {
-            store.dispatch(updateInstantResults(k, [{text:"loading..."}]))
+            store.dispatch(updateInstantResults(name, k, [{text:"loading..."}]))
             resp.json().then((o) => {
               let lines = o.lines
               let is = grepToInstantSearch(lines, user, id)
-              store.dispatch(updateInstantResults(k, is))
+              store.dispatch(updateInstantResults(name, k, is))
             })
           })
         })
@@ -368,37 +365,35 @@ Promise.all([
           let blockBody;
           let index = 0;
           batch(() => {
-          let lines = o.body.split(/[\r\n]/)
-          lines.forEach(function(line, i){
-            if(inBlock){
-              if(line === "<<"){ // end of block
-                loadLine(name, index, blockBody, list)
-                inBlock = false
-                index ++;
-              }else{
-                blockBody += "\n" + line
-              }
-            }else{
-              if(isBlock(line)){ // start of block
-                inBlock = true
-                blockBody = line
-              }else{ // not block line
-                if(!(i === lines.length - 1 && line.length === 0)){ // skip tail
-                  loadLine(name, index, line, list)
+            let lines = o.body.split(/[\r\n]/)
+            lines.forEach(function(line, i){
+              if(inBlock){
+                if(line === "<<"){ // end of block
+                  loadLine(name, index, blockBody, list)
+                  inBlock = false
                   index ++;
+                }else{
+                  blockBody += "\n" + line
+                }
+              }else{
+                if(isBlock(line)){ // start of block
+                  inBlock = true
+                  blockBody = line
+                }else{ // not block line
+                  if(!(i === lines.length - 1 && line.length === 0)){ // skip tail
+                    loadLine(name, index, line, list)
+                    index ++;
+                  }
                 }
               }
-            }
-          })
-          if(isMain){
-            let result = analysis()
+            })
+            let result = analysis(name)
             preAnalysisResult = result; // save result for check missing keywords
             keywords = keywords.concat(result.keywords.map((k) => "[" + k +"]"))
             if(login.login && login.user === user){
               keywords.push(decodeURIComponent(id)) // full search
             }
             instantSearch()
-          }
           })
         })
       }
@@ -475,11 +470,17 @@ try{
   console.log(e)
 }
 
-function analysis(){
+function analysis(name){
   let keywords = []
   let images = []
   // TODO: nested wiki link
-  store.getState().lines.forEach((item) => {
+  let lines;
+  if(name === "main"){
+    lines = store.getState().lines
+  }else{
+    lines = store.getState().rightLines
+  }
+  lines.forEach((item) => {
     if(!isBlock(item.text)){
       let parsed = parse(item.text)
       parsed.forEach((l) => {
@@ -513,7 +514,7 @@ function analysis(){
 }
 
 function savePromise(filter){
-  let result = analysis()
+  let result = analysis("main")
   let images = result.images;
   let lines = store.getState().lines
   if(filter){
@@ -551,7 +552,7 @@ function save(){
     Object.assign(meta, o.meta)
 
     // update Search cache
-    let result = analysis()
+    let result = analysis("main")
     let keywords = ["[" + decodeURIComponent(opts.id) + "]"] // link search
     // add missing keywords for cleaning keyword cache
     if(preAnalysisResult){

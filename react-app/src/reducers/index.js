@@ -27,7 +27,8 @@ export default combineReducers({
   items,
   loginButton,
   search,
-  instantSearch,
+  instantSearch: createFilteredReducer(instantSearch, action => action.name === "main"),
+  rightInstantSearch: createFilteredReducer(instantSearch, action => action.name === "right"),
   modalList,
   popupMenu,
 })
