@@ -113,6 +113,9 @@ class Line extends React.Component{
       "[": {
         dataProvider: token => {
           if(Object.keys(this.allKeywords).length === 0){
+            this.props.keywords.forEach((k) => {
+                this.allKeywords[k.keyword] = {src: "", title:k.keyword}
+            })
             Object.keys(this.props.externalKeywords).forEach((p) => {
               this.props.externalKeywords[p].forEach((v) => {
                 this.allKeywords[v.title] = {src: p + "::", title: v.title}
@@ -120,9 +123,6 @@ class Line extends React.Component{
                   this.allKeywords[v] = {src: p + "::", title: v}
                 })
               })
-            })
-            this.props.keywords.forEach((k) => {
-                this.allKeywords[k.keyword] = {src: "", title:k.keyword}
             })
           }
           token = token.toLowerCase()
@@ -133,7 +133,8 @@ class Line extends React.Component{
         output: (item, trigger) => {
           this.dirtyByKeyDown = true
           return item.value
-        }
+        },
+        allowWhitespace: true,
       }
     }
     if(this.props.isBlock){
