@@ -430,7 +430,7 @@ Promise.all([
       }
 
       store.dispatch(clearAll("right"))
-      loadPage("right", false, opts.user, rightTo)
+      loadPage("right", false, opts.user, encodeURIComponent(rightTo))
       e.preventDefault()
       e.stopPropagation()
     }
@@ -443,7 +443,7 @@ Promise.all([
       opts.id = encodeURIComponent(jumpTo)
       store.dispatch(clearItem())
       loadList().then(() => {
-        loadPage("main", true, opts.user, jumpTo)
+        loadPage("main", true, opts.user, encodeURIComponent(jumpTo))
       })
       e.preventDefault()
     }else{
