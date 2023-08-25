@@ -120,6 +120,12 @@ function sendRename(from, to){
     return fetch(req)
   })
 }
+function sendSimilar(keyword){
+  var req = new Request("https://inline-qdrant.inajob.tk/" + "/similar/" + keyword, {
+    method: "GET",
+  })
+  return fetch(req)
+}
 
 function sendSearch(keyword, noCache){
   let f = new FormData()
@@ -346,6 +352,16 @@ Promise.all([
               let is = grepToInstantSearch(lines, user, id)
               store.dispatch(updateInstantResults(name, k, is))
             })
+          })
+        })
+        sendSimilar(id).then((resp) => {
+          store.dispatch(updateInstantResults(name, "sim:" + decodeURIComponent(id), [{text:"loading..."}]))
+          resp.json().then((o) => {
+            let is = []
+            o.forEach((p) => {
+              is.push({user: user, id: p, text: "none", cover: ""})
+            })
+            store.dispatch(updateInstantResults(name, "sim:" + decodeURIComponent(id), is))
           })
         })
       }
