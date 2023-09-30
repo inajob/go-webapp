@@ -178,7 +178,7 @@ export const Render = (name, no, text, global, dispatch) => {
                 if(v.cover !== ""){
                   content = '<img src="' + v.cover + '">'
                 }
-                body.push("<li><div class='boxlist-title'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + v.id + "'>" + v.id + "</a><a class='non-select' data-id='" + encodeURIComponent(v.id) + "'>*</a></div>" + content + "<div>" + v.text + "</div></li>")
+                body.push("<li><div class='boxlist-title'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + v.id + "'>" + v.id + "</a><a class='non-select' data-id='" + v.id + "'>*</a></div>" + content + "<div>" + v.text + "</div></li>")
               })
               body.push("</div>")
               dispatch(previewLine(name, no, body.join("\n")));
@@ -197,7 +197,10 @@ export const Render = (name, no, text, global, dispatch) => {
         case "pages":
           ret += "<span class='mode'>&gt;&gt; pages</span>";
           ret += "<div>"
-          ret += global.list.join("<br>")
+          //ret += global.list.map((n) => n.name).join("<br>")
+          global.list.forEach((page) => {
+            ret += "<li><a href='?user=" + encodeURIComponent(global.user) + "&id=" + encodeURIComponent(page.name) + "' data-jump='" + page.name + "'>" + escapeHTML(page.name, global.user) + "</a><a class='non-select' data-id='" + page.name + "'>*</a></li>"
+          })
           ret += "</div>"
         break;
         case "schedule":
