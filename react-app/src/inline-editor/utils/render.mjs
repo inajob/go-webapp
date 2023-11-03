@@ -351,8 +351,9 @@ export const Render = (name, no, text, global, dispatch) => {
               queue.push(["&", e.slice(2)])
             }else if(e === "*"){
               queue.push(["*", ""])
+            }else if(e.indexOf("r ") === 0){
+              queue.push(["r", e.slice(2)])
             }else{
-              console.log("Simple Query", e)
               queue.push(["", e])
             }
           })
@@ -381,7 +382,6 @@ export const Render = (name, no, text, global, dispatch) => {
             }else{
               let command = queue.shift()
               if(command[0] === "*"){
-                console.log("TEST wildcard")
                 global.getDetailList(global.user).then((resp) => {
                   resp.json().then((o) => {
                       o.pages.forEach((e) => {
@@ -389,11 +389,24 @@ export const Render = (name, no, text, global, dispatch) => {
                         e.user = global.user
                         e.id = e.name
                         e.text = e.description
-                        console.log("TEST", e)
                       })
                       run()
                   })
                 })
+              }else if(command[0] === "r"){
+                let newResult = {}
+                let pageNameSet = new Set()
+                let n = parseInt(command[1])
+                if(!n){ n = 10}
+                for(let i = 0; i < n; i ++){
+                  let page = choice(Object.values(result))
+                  if(!pageNameSet.has(page.user + "/" + page.id)){
+                    pageNameSet.add(page.user + "/" + page.id)
+                    newResult[page.user + "/" + page.id] = page
+                  }
+                }
+                result = newResult
+                run()
               }else{
                 global.sendSearch(command[1]).then((resp) => {
                   resp.json().then((o) => {
