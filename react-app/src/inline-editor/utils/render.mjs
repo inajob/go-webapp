@@ -338,6 +338,76 @@ export const Render = (name, no, text, global, dispatch) => {
             })
           })
         break;
+        case "find":
+          ret += "<span class='mode'>&gt;&gt; find</span>";
+          ret += "<div>"
+          ret += "Query:" + lastPart.join(",")
+          ret += "</div>"
+          let queue = []
+          lastPart.forEach((e) => {
+            if(e.indexOf("!& ") === 0){
+              queue.push(["!&", e.slice(3)])
+            }else if(e.indexOf("& ") === 0){
+              queue.push(["&", e.slice(2)])
+            }else{
+              console.log("Simple Query", e)
+              queue.push(["", e])
+            }
+          })
+          let result = {}
+          let run = () => {
+            if(queue.length === 0){
+              // end of command
+              let body = [];
+              body.push("<span class='mode'>&gt;&gt; find &quot;" + lastPart.join(",") + "&quot;</span>")
+              body.push("<div class='boxlist'>")
+
+              let lines = Object.values(result)
+              lines.sort((a,b) => { // sort new -> old
+                let ad = new Date(a.modTime);
+                let bd = new Date(b.modTime);
+                return bd.getTime() - ad.getTime();
+              }).forEach((v)=>{
+                let content = ""
+                if(v.cover !== ""){
+                  content = '<img src="' + v.cover + '">'
+                }
+                body.push("<li><div class='boxlist-title'><a href='?user=" + encodeURIComponent(v.user) + "&id=" + encodeURIComponent(v.id) + "' data-jump='" + v.id + "'>" + v.id + "</a><a class='non-select' data-id='" + v.id + "'>*</a></div>" + content + "<div>" + v.text + "</div></li>")
+              })
+              body.push("</div>")
+              dispatch(previewLine(name, no, body.join("\n")));
+            }else{
+              let command = queue.shift()
+              global.sendSearch(command[1]).then((resp) => {
+                resp.json().then((o) => {
+                  if(command[0] === "!&"){
+                    o.lines.forEach((e) => {
+                      if(result[e.user + "/" + e.id]){
+                        delete result[e.user + "/" + e.id]
+                      }
+                    })
+                  }else if(command[0] === "&"){
+                    let newResult = {}
+                    o.lines.forEach((e) => {
+                      if(result[e.user + "/" + e.id]){
+                        newResult[e.user + "/" + e.id] = e
+                      }
+                    })
+                    result = newResult
+                  }else{ // OR
+                    o.lines.forEach((e) => {
+                      if(!result[e.user + "/" + e.id]){
+                        result[e.user + "/" + e.id] = e
+                      }
+                    })
+                  }
+                  run()
+                })
+              })
+            }
+          }
+          run()
+          break;
         case "list":
             ret += "<span class='mode'>&gt;&gt; list</span>";
             ret += "<div>loading list..</div>"

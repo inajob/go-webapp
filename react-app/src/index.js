@@ -121,7 +121,7 @@ function sendRename(from, to){
   })
 }
 function sendSimilar(keyword){
-  var req = new Request("https://inline-qdrant.inajob.tk/" + "/similar/" + keyword, {
+  var req = new Request("https://inline-qdrant.inajob.tk/similar/" + keyword, {
     method: "GET",
   })
   return fetch(req)
