@@ -52,6 +52,12 @@ function getOpts(){
 
 function postPage(user, id, body, lastUpdate, image){
   let f = new FormData()
+
+  if(body.length === 0){
+    store.dispatch(updateMessage("empty content update error"))
+    store.dispatch(error())
+    return
+  }
   f.append('body', body)
   f.append('lastUpdate', lastUpdate)
   f.append('cover', image)
