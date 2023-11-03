@@ -349,6 +349,8 @@ export const Render = (name, no, text, global, dispatch) => {
               queue.push(["!&", e.slice(3)])
             }else if(e.indexOf("& ") === 0){
               queue.push(["&", e.slice(2)])
+            }else if(e === "*"){
+              queue.push(["*", ""])
             }else{
               console.log("Simple Query", e)
               queue.push(["", e])
@@ -378,32 +380,48 @@ export const Render = (name, no, text, global, dispatch) => {
               dispatch(previewLine(name, no, body.join("\n")));
             }else{
               let command = queue.shift()
-              global.sendSearch(command[1]).then((resp) => {
-                resp.json().then((o) => {
-                  if(command[0] === "!&"){
-                    o.lines.forEach((e) => {
-                      if(result[e.user + "/" + e.id]){
-                        delete result[e.user + "/" + e.id]
-                      }
-                    })
-                  }else if(command[0] === "&"){
-                    let newResult = {}
-                    o.lines.forEach((e) => {
-                      if(result[e.user + "/" + e.id]){
-                        newResult[e.user + "/" + e.id] = e
-                      }
-                    })
-                    result = newResult
-                  }else{ // OR
-                    o.lines.forEach((e) => {
-                      if(!result[e.user + "/" + e.id]){
-                        result[e.user + "/" + e.id] = e
-                      }
-                    })
-                  }
-                  run()
+              if(command[0] === "*"){
+                console.log("TEST wildcard")
+                global.getDetailList(global.user).then((resp) => {
+                  resp.json().then((o) => {
+                      o.pages.forEach((e) => {
+                        result[global.user + "/" + e.name] = e
+                        e.user = global.user
+                        e.id = e.name
+                        e.text = e.description
+                        console.log("TEST", e)
+                      })
+                      run()
+                  })
                 })
-              })
+              }else{
+                global.sendSearch(command[1]).then((resp) => {
+                  resp.json().then((o) => {
+                    if(command[0] === "!&"){
+                      o.lines.forEach((e) => {
+                        if(result[e.user + "/" + e.id]){
+                          delete result[e.user + "/" + e.id]
+                        }
+                      })
+                    }else if(command[0] === "&"){
+                      let newResult = {}
+                      o.lines.forEach((e) => {
+                        if(result[e.user + "/" + e.id]){
+                          newResult[e.user + "/" + e.id] = e
+                        }
+                      })
+                      result = newResult
+                    }else{ // OR
+                      o.lines.forEach((e) => {
+                        if(!result[e.user + "/" + e.id]){
+                          result[e.user + "/" + e.id] = e
+                        }
+                      })
+                    }
+                    run()
+                  })
+                })
+              }
             }
           }
           run()
