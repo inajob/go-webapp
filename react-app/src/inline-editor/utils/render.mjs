@@ -293,7 +293,7 @@ export const Render = (name, no, text, global, dispatch) => {
                         number = 30;
                     }
 
-                    v.priority = Math.floor(number*(-1 + Math.cos(Math.PI*2*(today.getTime() - date.getTime())/oneday/number)));
+                    v.priority = Math.floor(number*(-1 + Math.cos(Math.PI*2*(today.getTime() - date.getTime())/oneday/number))) - 7;
                     break;
                   case "+": // todo
                     v.label = "ToDo";
