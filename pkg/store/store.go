@@ -86,7 +86,7 @@ func AddSearchRequest(sr SearchRequest) int{
 }
 func CheckSearchRequest() {
   var targetSearchRequests []SearchRequest
-  {
+  (func (){
     mu.Lock()
     defer mu.Unlock()
     now := time.Now()
@@ -103,7 +103,7 @@ func CheckSearchRequest() {
       }
     }
     searchRequests = newSearchRequests
-  }
+  })()
 
   for _, sr := range targetSearchRequests{
     _, err := file.Search(sr.Keyword, sr.User)
