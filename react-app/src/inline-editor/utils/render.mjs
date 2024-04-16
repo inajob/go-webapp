@@ -5,6 +5,7 @@ import {mceRender} from '../render/mce.js' // this is not module
 import {parse, htmlEncode}  from '../utils/inlineDecorator.mjs'
 import {previewLine} from '../actions/index.mjs'
 import {jsonp}  from './jsonp.mjs'
+import {preprocess}  from './mcl-preprocessor.mjs'
 import pkg from 'mathjs'
 const {create, all} = pkg
 
@@ -82,9 +83,18 @@ export const Render = (name, no, text, global, dispatch) => {
             if(lastPart){
               try{
                 // TODO: slow
-                mceRender(lastPart.join("\n"), (svg) => {
-                  ret += "<div>" + svg + "</div>"
-                });
+                preprocess(lastPart.join("\n"), global.user).then((source) => {
+                  try{
+                  mceRender(source, (svg) => {
+                    let s= "<div>" + svg + "</div>"
+                    dispatch(previewLine(name, no, s));
+                  });
+                  }catch(e){
+                    dispatch(previewLine(name, no, ""+e));
+                    console.log(e)
+                  }
+                })
+                ret += "<div>mce ..." +no+ "</div>"
               }catch(e){console.log(e); ret += e}
             }
           }
