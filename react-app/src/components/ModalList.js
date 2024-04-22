@@ -124,7 +124,7 @@ const mapDispatchToProps = (dispatch) => {
                   dispatch(modalListUpdateList(viewList))
                 break;
                 case "amazon":
-                jsonp("amazon", "//web.inajob.tk/ad/amz.php?callback=amazon&q=" + encodeURIComponent(query), function(data){
+                jsonp("amazon", "//inline.inajob.freeddns.org/ad/amz.php?callback=amazon&q=" + encodeURIComponent(query), function(data){
                   let list = []
                   data.forEach((i) => {
                     list.push({
@@ -137,7 +137,7 @@ const mapDispatchToProps = (dispatch) => {
                 })
                 break
                 case "aliexpress":
-                  jsonp("aliexpress", "//web.inajob.tk/ali-search/api.php?callback=aliexpress&q=" + encodeURIComponent(query), function(data){
+                  jsonp("aliexpress", "//inline.inajob.freeddns.org/ali-search/api.php?callback=aliexpress&q=" + encodeURIComponent(query), function(data){
                     let list = []
                     data.items.forEach((i) => {
                       let title = i.product_title.replace(/<[^>]*>/g, "")
