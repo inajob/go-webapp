@@ -6,6 +6,8 @@ run-frontend:
 
 local-run:
 	ALLOW_ORIGIN=http://localhost:3000 go run cmd/server/main.go
+local-run2:
+	ALLOW_ORIGIN=http://localhost:5173 go run cmd/server/main.go
 
 lan-run:
 	ALLOW_ORIGIN=http://192.168.1.16:3000 REACT_APP_API_SERVER="http://192.168.1.16:8088" go run cmd/server/main.go
@@ -16,7 +18,10 @@ build:
 buildweb:
 	cd react-app &&  REACT_APP_API_SERVER="" yarn run build
 
-build-backend: buildweb
+buildngweb:
+	cd ng-front &&  VITE_API_SERVER="" npm run build
+
+build-backend: buildweb buildngweb
 	docker build -t inajob1/go-webapp-backend .
 
 push-backend: build-backend

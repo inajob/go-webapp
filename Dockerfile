@@ -17,6 +17,7 @@ FROM scratch
 
 COPY --from=builder /go/src/github.com/inajob/go-webapp/server /server
 COPY ./web /web
+COPY ./ng-web /ng-web
 
 ENTRYPOINT ["/server"]
 
