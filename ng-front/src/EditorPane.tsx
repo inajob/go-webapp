@@ -18,7 +18,8 @@ export interface EditorPaneProps {
 
 const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     const [lines, setLines] = useState(["initializing..."]);
-    const [keywords, setKeywords] = useState(["loading keywords..."]);
+    const [keywords, setKeywords] = useState<string[]>([])
+    const [relatedPages, setRelatedPages] = useState<{[key:string]:[{id:string,text:string}]|[]}>({})
     const [initialized, setInitialized] = useState(false)
     const lastUpdate = useRef("");
     const saveTimer = useRef(0);
@@ -128,24 +129,81 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     // get Page
     useEffect(() => {
         const r = Math.floor(Math.random()*1000)
-        const req = new Request(API_SERVER + "/page/" + props.user + "/" + props.pageId + "?r=" + r, {
+        console.log("get page", props.user, props.pageId)
+        const req = new Request(API_SERVER + "/page/" + props.user + "/" + encodeURIComponent(props.pageId) + "?r=" + r, {
         method: "GET"
         })
         fetch(req).then((response) => {
         response.json().then((obj) => {
             console.log(obj)
-            console.log("CHANGE LINE get Page", props.pageId)
-            setLines(convertInlineToMD(obj.body.split("\n")))
-            lastUpdate.current = obj.meta.lastUpdate;
+            if(obj["error"]){
+              setLines([""])
+            }else{
+              console.log("CHANGE LINE get Page", props.pageId)
+              setLines(convertInlineToMD(obj.body.split("\n")))
+              lastUpdate.current = obj.meta.lastUpdate;
+            }
             setInitialized(false)
         })
         })        
     }, [props.pageId, props.user])
 
+    function sendSearch(user:string, keyword:string, noCache:boolean){
+      const f = new FormData()
+      f.append('keyword', keyword)
+      f.append('user', user)
+      f.append('noCache', noCache?"1":"0")
+      const req = new Request(API_SERVER + "/search", {
+        method: "POST",
+        credentials: "include", // for save another domain
+        headers: {
+          'Accept': 'applicatoin/json',
+        },
+        body: f,
+      })
+      return fetch(req)
+    }
+    
+    useEffect(() => {
+      console.log("recalc related pages", keywords)
+      const ks = keywords.filter((k) => k != props.pageId)
+      if(ks.length > 0){
+        Promise.all(ks.map((k) => sendSearch(props.user, k, false)))
+          .then((r) => Promise.all(r.map((o) => o.json())))
+          .then((r) => {
+            console.log(r)
+            const rp:{[key: string]:[{id:string, text:string}]} = {}
+            for(let i = 0; i < ks.length; i ++){
+              console.log(ks[i], r[i])
+              const pages:[{id:string, text:string}] = r[i].lines.filter((l:{[id: string]: string}) => l.id != props.pageId)
+              if(pages.length > 0){
+                rp[ks[i]] = pages
+              }
+            }
+            setRelatedPages(rp)
+          })
+      }else{
+        console.log("empty related pages")
+        setRelatedPages({})
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [keywords])
+
+    /*
+    useEffect(() => {
+      setRelatedPages(reCalcRelatedPages)
+      console.log("change related pages")
+    }, [reCalcRelatedPages])
+    */
+
     useEffect(() => {
         console.log("CHANGE LINE", initialized, lines)
         const md = convertMDToInline(lines)
-        setKeywords(extractKeywords(md))
+        //const rp:{[key:string]:string[]|[]} = {}
+        const ks = extractKeywords(md)
+        if(ks.toString() != keywords.toString()){
+          setKeywords(ks)
+        }
 
         if(initialized){
         // save
@@ -177,8 +235,39 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
                 onLinkClick={props.onLinkClick}
                 onSubLinkClick={props.onSubLinkClick}
             />
-            <div>
-              {keywords.map(((k, i) => <div key={"keyword"+i}>{k}</div>))}
+            <div className="related-pages">
+              {Object.entries(relatedPages).map((p, i) => <div key={"related-pages-" + i}>
+                  <div className="related-page-title">
+                    <a href="#" onClick={(e) => {
+                      props.onLinkClick(p[0])
+                      e.preventDefault()
+                      return false
+                    }}>{p[0]}</a>
+                    <span className="bracket-icon" onClick={(e) => {
+                      props.onSubLinkClick(p[0])
+                      e.preventDefault()
+                      return false
+                    }}>[]</span>
+                  </div>
+                  <div className="related-pages-item">{p[1].map((ks:{id:string, text:string}, i) => 
+                    <div key={ks.id + i}>
+                      <div className="item-title">
+                        <a href="#" onClick={(e) => {
+                          props.onLinkClick(ks.id)
+                          e.preventDefault()
+                          return false
+                        }}>{ks.id}</a>
+                        <span className="bracket-icon" onClick={(e) => {
+                          props.onSubLinkClick(ks.id)
+                          e.preventDefault()
+                          return false
+                        }}>[]</span>
+                      </div>
+                        <div className="item-desc">{ks.text}</div>
+                      
+                    </div>
+                  )}</div>
+                </div>)}
             </div>
         </div>
     </>

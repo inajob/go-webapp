@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import '../node_modules/simple-inline-editor/dist/style.css'
 
+// TODO: 同じものがApp.tsxにある
 function getOpts(){
   let search = document.location.search
   search = search.replace(/^\?/,"")
@@ -10,7 +11,7 @@ function getOpts(){
   const ret:Record<string, string> = {}
   list.forEach(function(item){
     const parts = item.split("=")
-    ret[parts[0]] = parts[1]
+    ret[parts[0]] = decodeURIComponent(parts[1])
   })
   return ret
 }

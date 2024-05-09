@@ -12,10 +12,13 @@
 #root, #root > div, body, html {
   height: 100%;
 }
+body{
+  font-size: 0.8em;
+}
 #main {
   padding-left: 120px;
   display: flex;
-  height: 100%;
+  height: calc(100% - 30px);
 }
 #left-editor {
   flex: 2 1;
@@ -45,13 +48,21 @@
   overflow-y: scroll;
   height: calc(100% - 2em);
 }
+#controller{
+  height: 30px;
+  display:flex;
+  justify-content: flex-end;
+}
+#controller .button{
+  border:solid 1px;
+}
 #side {
   position: absolute;
-  top: 0;
+  top: 30px;
   width: 120px;
   background-color: white;
   overflow-y: scroll;
-  height: 100%;
+  height: calc(100% - 30px);
 }
 #side > h3 {
   display: none;
@@ -70,4 +81,31 @@ ul.list-block li{
   white-space: pre;
   background-color: black;
   color:white;
+}
+
+.related-pages {
+}
+.related-pages > div {
+  border: solid 1px;
+}
+.related-pages-title {
+  width: 100px;
+  height: 100px;
+}
+.related-pages-item {
+  display: flex;
+  flex-wrap:wrap;
+}
+.related-pages-item > div {
+  width: 100px;
+  height: 100px;
+  border: solid 1px;
+  border-radius: 5px;
+  background-color: white;
+}
+.related-pages-item .item-title{
+  font-size: small;
+}
+.related-pages-item .item-desc{
+  font-size: x-small;  
 }

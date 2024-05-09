@@ -19,8 +19,9 @@ function getOpts(){
   const ret:Record<string, string> = {}
   list.forEach(function(item){
     const parts = item.split("=")
-    ret[parts[0]] = parts[1]
+    ret[parts[0]] = decodeURIComponent(parts[1])
   })
+  console.log("getOpts", ret)
   return ret
 }
 const choice = (l:string[]) => {
@@ -42,7 +43,8 @@ const App: React.FC<AppProps> = (props) =>  {
   const linkClick = useCallback((id:string) => {
     console.log("CHANGE setPageId", id)
     setPageId({user: pageId.user, pageId: id})
-    history.pushState({}, "", "?user=" + pageId.user + "&id=" + id)
+    history.pushState({}, "", "?user=" + pageId.user + "&id=" + encodeURIComponent(id))
+    return false
   }, [pageId.user])
   const subLinkClick = useCallback((id:string) => {
     setRightPageId({user: rightPageId.user, pageId: id})
@@ -81,7 +83,14 @@ const App: React.FC<AppProps> = (props) =>  {
               <span className="block-type">list</span>
               <ul className="list-block">
                 {keywordCache.filter((k) => k.indexOf(body) == 0)
-                .map((k, i) => <li key={i}><a href="#" onClick={(e) => {linkClick(k); e.stopPropagation()}}>{k}</a></li>)}
+                .map((k, i) => <li key={i}>
+                    <a href="#" onClick={(e) => {
+                      linkClick(decodeURIComponent(k)); e.stopPropagation();e.preventDefault(); return false
+                    }}>{k}</a>
+                    <span className="bracket-icon" onClick={(e) => {
+                      subLinkClick(decodeURIComponent(k)); e.stopPropagation();e.preventDefault(); return false
+                    }}>[]</span>
+                  </li>)}
               </ul>
             </div>
           )
@@ -91,7 +100,7 @@ const App: React.FC<AppProps> = (props) =>  {
       {keywords.filter((k) => k.indexOf(body) == 0)
       .map((k, i) => <li key={i}><a href="#" onClick={(e) => {linkClick(k); e.stopPropagation()}}>{k}</a></li>)}
       </div>;
-  }, [keywords, linkClick]);
+  }, [keywords, linkClick, subLinkClick]);
 
   const urlBlock = (body:string) => {
     return <div>
@@ -100,7 +109,7 @@ const App: React.FC<AppProps> = (props) =>  {
       </div>
   }
 
-  const randompagesBlock = () => {
+  const randompagesBlock = useCallback(() => {
     const r = Math.floor(Math.random()*1000)
     const req = new Request(API_SERVER + "/page/" + "inajob" + "?r=" + r, {
       method: "GET"
@@ -121,13 +130,16 @@ const App: React.FC<AppProps> = (props) =>  {
               <span className="block-type">randompages</span>
               <ul className="list-block">
                 {pages
-                .map((k, i) => <li key={i}><a href="#" onClick={(e) => {linkClick(k); e.stopPropagation()}}>{k}</a></li>)}
+                .map((k, i) => <li key={i}>
+                    <a href="#" onClick={(e) => {linkClick(k); e.stopPropagation()}}>{k}</a>
+                    <span className="bracket-icon" onClick={(e) => {subLinkClick(k); e.stopPropagation()}}>[]</span>
+                  </li>)}
               </ul>
             </div>
           )
         })
       })
-  }
+  }, [linkClick, subLinkClick])
   const codeBlock = (body: string) => {
     console.log("codeBlock", body)
     const result = hljs.highlightAuto(body)
@@ -136,7 +148,6 @@ const App: React.FC<AppProps> = (props) =>  {
     })
   }
 const mermaidBlock = (body: string) => {
-  //mermaidAPI.parse(body);
   const r = Math.floor(Math.random()*1000)
   throw mermaid.render("mermaid-" + r, body).then((o) => {
     console.log("svg", o)
@@ -155,7 +166,7 @@ const mermaidBlock = (body: string) => {
     code: codeBlock,
     mermaid: mermaidBlock,
   }
-  },[listBlock]); // なぜlistBlockだけ？
+  },[listBlock, randompagesBlock]); // なぜlistBlockだけ？
   
   // 入力補完用keywordを取得
   useEffect(() => {
@@ -191,6 +202,7 @@ const mermaidBlock = (body: string) => {
   useEffect(() => {
     window.addEventListener("popstate", function() {
       const opts = getOpts()
+      //console.log("popstate", opts)
       if(pageId.user != opts.user || pageId.pageId != opts.id){
        setPageId({user: opts.user, pageId: opts.id})
       }
@@ -201,6 +213,11 @@ const mermaidBlock = (body: string) => {
   return (
     <>
       <div>
+        <div id="controller">
+          <div className="button">New Diary</div>
+          <div className="button">Delete</div>
+          <div className="button">Rename</div>
+        </div>
         <div id="main">
           <div id="left-editor">
             <EditorPane
@@ -235,7 +252,7 @@ const mermaidBlock = (body: string) => {
               blockStyles={blockStyles}
               onLinkClick={linkClick}
               onSubLinkClick={subLinkClick}
-              user={"inajob"}
+              user={pageId.user}
               pageId={"menu"}
             />
         </div>
