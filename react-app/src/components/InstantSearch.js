@@ -22,7 +22,16 @@ class InstantSearch extends React.Component{
             <div>Search result of '{k}'</div>
             <div className="pages">
             {sorter(this.props.item[k]).slice(0,20).map((r, i) => (
-              <li key={i}><div><a href={"?user=" + r.user + "&id=" + r.id} data-jump={r.id}>{r.id}</a><a href={"?user=" + r.user + "&id=" + r.id} data-id={r.id}>*</a></div>
+              <li key={i}>
+                {r.url?
+                  (<div>
+                    <a href={r.url}>{r.id}</a>
+                  </div>):
+                  (<div>
+                    <a href={"?user=" + r.user + "&id=" + r.id} data-jump={r.id}>{r.id}</a>
+                    <a href={"?user=" + r.user + "&id=" + r.id} data-id={r.id}>*</a>
+                  </div>)
+                }
                 <div>
                   {(() => {if(r.cover) return <img src={r.cover} alt="cover" />})()}
                   {r.text}

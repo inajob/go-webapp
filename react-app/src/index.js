@@ -126,8 +126,12 @@ function sendRename(from, to){
     return fetch(req)
   })
 }
-function sendSimilar(keyword){
-  var req = new Request("https://inline-qdrant.inajob.freeddns.org/similar/" + keyword, {
+function sendSimilar(keyword, collection){
+  var arg = "";
+  if(collection){
+    arg = "?collection="+encodeURIComponent(collection)
+  }
+  var req = new Request("https://inline-qdrant.inajob.freeddns.org/similar/" + keyword + arg, {
     method: "GET",
   })
   return fetch(req)
@@ -365,9 +369,37 @@ Promise.all([
           resp.json().then((o) => {
             let is = []
             o.forEach((p) => {
-              is.push({user: user, id: p, text: "none", cover: ""})
+              is.push({user: user, id: p.title, text: p.text, cover: ""})
             })
             store.dispatch(updateInstantResults(name, "sim:" + decodeURIComponent(id), is))
+          })
+        })
+        sendSimilar(id, "nishio").then((resp) => {
+          store.dispatch(updateInstantResults(name, "n:" + decodeURIComponent(id), [{text:"loading..."}]))
+          resp.json().then((o) => {
+            let is = []
+            o.forEach((p) => {
+              is.push({
+                user: user, id: p.title, url: "https://scrapbox.io/nishio/" + encodeURIComponent(p.title),
+                text: p.text.slice(0,40),
+                cover: ""
+              })
+            })
+            store.dispatch(updateInstantResults(name, "n:" + decodeURIComponent(id), is))
+          })
+        })
+        sendSimilar(id, "tweets_ina_ani").then((resp) => {
+          store.dispatch(updateInstantResults(name, "x:" + decodeURIComponent(id), [{text:"loading..."}]))
+          resp.json().then((o) => {
+            let is = []
+            o.forEach((p) => { 
+              is.push({
+                user: user, id: p.title, url: "https://twitter.com/ina_ani/status/" + encodeURIComponent(p.title),
+                text: p.text.slice(0,40),
+                cover: ""
+              })
+            })
+            store.dispatch(updateInstantResults(name, "x:" + decodeURIComponent(id), is))
           })
         })
       }
