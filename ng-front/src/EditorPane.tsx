@@ -17,7 +17,7 @@ export interface EditorPaneProps {
 }
 
 const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
-    const [lines, setLines] = useState(["initializing..."]);
+    const [lines, setLines] = useState([{body: "initializing...", key: 0}]);
     const [keywords, setKeywords] = useState<string[]>([])
     const [relatedPages, setRelatedPages] = useState<{[key:string]:[{id:string,text:string}]|[]}>({})
     const [initialized, setInitialized] = useState(false)
@@ -137,10 +137,11 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         response.json().then((obj) => {
             console.log(obj)
             if(obj["error"]){
-              setLines([""])
+              setLines([{body: "", key: 0}])
+              setKeywords([])
             }else{
               console.log("CHANGE LINE get Page", props.pageId)
-              setLines(convertInlineToMD(obj.body.split("\n")))
+              setLines(convertInlineToMD(obj.body.split("\n")).map((l, i) => {return {body: l, key: i}}))
               lastUpdate.current = obj.meta.lastUpdate;
             }
             setInitialized(false)
@@ -166,7 +167,8 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     
     useEffect(() => {
       console.log("recalc related pages", keywords)
-      const ks = keywords.filter((k) => k != props.pageId)
+      const ks = keywords.filter((k) => k != props.pageId).map((k) => "[" + k +"]")
+      ks.push(props.pageId)
       if(ks.length > 0){
         Promise.all(ks.map((k) => sendSearch(props.user, k, false)))
           .then((r) => Promise.all(r.map((o) => o.json())))
@@ -189,16 +191,9 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [keywords])
 
-    /*
-    useEffect(() => {
-      setRelatedPages(reCalcRelatedPages)
-      console.log("change related pages")
-    }, [reCalcRelatedPages])
-    */
-
     useEffect(() => {
         console.log("CHANGE LINE", initialized, lines)
-        const md = convertMDToInline(lines)
+        const md = convertMDToInline(lines.map((l) => l.body))
         //const rp:{[key:string]:string[]|[]} = {}
         const ks = extractKeywords(md)
         if(ks.toString() != keywords.toString()){
@@ -238,16 +233,7 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
             <div className="related-pages">
               {Object.entries(relatedPages).map((p, i) => <div key={"related-pages-" + i}>
                   <div className="related-page-title">
-                    <a href="#" onClick={(e) => {
-                      props.onLinkClick(p[0])
-                      e.preventDefault()
-                      return false
-                    }}>{p[0]}</a>
-                    <span className="bracket-icon" onClick={(e) => {
-                      props.onSubLinkClick(p[0])
-                      e.preventDefault()
-                      return false
-                    }}>[]</span>
+                    {p[0]}
                   </div>
                   <div className="related-pages-item">{p[1].map((ks:{id:string, text:string}, i) => 
                     <div key={ks.id + i}>

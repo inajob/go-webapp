@@ -37,8 +37,19 @@ export interface AppProps {
 const App: React.FC<AppProps> = (props) =>  {
   const [pageId, setPageId] = useState({user: props.user, pageId: props.pageId});
   const [rightPageId, setRightPageId] = useState({user: props.user, pageId: props.pageId});
-  const linePopupHandlers: LinePopupHandler[] = []
   const [keywords, setKeywords] = useState(["test"]);
+
+  const linePopupHandlers: LinePopupHandler[] = [
+    {
+    name: "debug",
+    handler: (lines, range) => {
+      console.log(lines, range)
+      // TODO: make new page
+      // TODO: remove range and wikilink
+    }
+    }
+  ]
+  
 
   const linkClick = useCallback((id:string) => {
     console.log("CHANGE setPageId", id)
@@ -68,7 +79,7 @@ const App: React.FC<AppProps> = (props) =>  {
   const listBlock = useCallback((body: string) => {
     console.log("body[" + body + "]");
     const r = Math.floor(Math.random()*1000)
-    const req = new Request(API_SERVER + "/page/" + "inajob" + "?r=" + r, {
+    const req = new Request(API_SERVER + "/page/" + props.user + "?r=" + r, {
       method: "GET"
     })
     
@@ -100,7 +111,7 @@ const App: React.FC<AppProps> = (props) =>  {
       {keywords.filter((k) => k.indexOf(body) == 0)
       .map((k, i) => <li key={i}><a href="#" onClick={(e) => {linkClick(k); e.stopPropagation()}}>{k}</a></li>)}
       </div>;
-  }, [keywords, linkClick, subLinkClick]);
+  }, [keywords, linkClick, props.user, subLinkClick]);
 
   const urlBlock = (body:string) => {
     return <div>
@@ -111,7 +122,7 @@ const App: React.FC<AppProps> = (props) =>  {
 
   const randompagesBlock = useCallback(() => {
     const r = Math.floor(Math.random()*1000)
-    const req = new Request(API_SERVER + "/page/" + "inajob" + "?r=" + r, {
+    const req = new Request(API_SERVER + "/page/" + props.user + "?r=" + r, {
       method: "GET"
     })
     
@@ -139,7 +150,7 @@ const App: React.FC<AppProps> = (props) =>  {
           )
         })
       })
-  }, [linkClick, subLinkClick])
+  }, [linkClick, props.user, subLinkClick])
   const codeBlock = (body: string) => {
     console.log("codeBlock", body)
     const result = hljs.highlightAuto(body)
@@ -171,7 +182,7 @@ const mermaidBlock = (body: string) => {
   // 入力補完用keywordを取得
   useEffect(() => {
     const r = Math.floor(Math.random()*1000)
-      const req = new Request(API_SERVER + "/keywords/" + "inajob" + "?detail=1&r=" + r, {
+      const req = new Request(API_SERVER + "/keywords/" + props.user + "?detail=1&r=" + r, {
       method: "GET"
     })
     fetch(req).then((response) => {
@@ -180,7 +191,7 @@ const mermaidBlock = (body: string) => {
       console.log(response)
       setKeywords(response.keywords.map((k: { keyword: string }) => k.keyword))
     })
-  }, [])
+  }, [props.user])
 
   // == Text Popup Handlers ============================
   const onBracket = (select: TextFragment|null) => {
@@ -202,7 +213,7 @@ const mermaidBlock = (body: string) => {
   useEffect(() => {
     window.addEventListener("popstate", function() {
       const opts = getOpts()
-      //console.log("popstate", opts)
+      console.log("popstate", "pageId", pageId, "opts", opts) // これが無いと動かない？
       if(pageId.user != opts.user || pageId.pageId != opts.id){
        setPageId({user: opts.user, pageId: opts.id})
       }
@@ -256,8 +267,8 @@ const mermaidBlock = (body: string) => {
               pageId={"menu"}
             />
         </div>
-
       </div>
+      <dialog open>test</dialog>
     </>
   )
 }
