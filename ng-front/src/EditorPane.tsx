@@ -23,6 +23,7 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     const [initialized, setInitialized] = useState(false)
     const lastUpdate = useRef("");
     const saveTimer = useRef(0);
+    const preKeywords = useRef<string[]>([]);
 
     const makeDirty = useCallback(() => {
         setInitialized(true)
@@ -122,6 +123,17 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
           postPage(p.user, p.id, p.body, p.lastUpdate, p.image)?.then((o) => o.json()).then((o) => {
             // TODO: external function
             lastUpdate.current = o.meta.lastUpdate
+          }).then(() => {
+            const p = getter()
+            const md = convertMDToInline(lines.map((l) => l.body))
+            const ks = extractKeywords(md)
+            ks.concat(preKeywords.current)
+            const kmap:{[key: string]: boolean} = {}
+            ks.forEach((k => {kmap[k] = true}))
+            const keywords = Object.keys(kmap)
+            const sscs = keywords.map((k) => sendSearchCache(p.user ,k))
+            preKeywords.current = keywords
+            return Promise.all(sscs)
           })
         }, 1000 * 3)
       }
@@ -148,6 +160,21 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         })
         })        
     }, [props.pageId, props.user])
+
+    function sendSearchCache(user:string, keyword:string){
+      const f = new FormData()
+      f.append('keyword', keyword)
+      f.append('user', user)
+      const req = new Request(API_SERVER + "/search-cache", {
+        method: "POST",
+        credentials: "include", // for save another domain
+        headers: {
+          'Accept': 'applicatoin/json',
+        },
+        body: f,
+      })
+      return fetch(req)
+    }
 
     function sendSearch(user:string, keyword:string, noCache:boolean){
       const f = new FormData()
