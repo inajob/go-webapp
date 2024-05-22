@@ -50,7 +50,6 @@ const App: React.FC<AppProps> = (props) =>  {
     }
   ]
   
-
   const linkClick = useCallback((id:string) => {
     console.log("CHANGE setPageId", id)
     setPageId({user: pageId.user, pageId: id})
@@ -151,6 +150,34 @@ const App: React.FC<AppProps> = (props) =>  {
         })
       })
   }, [linkClick, props.user, subLinkClick])
+  const rssBlock = useCallback((body: string) => {
+    const lines = body.split(/[\r\n]/);
+    let title = ""
+    if(lines.length >= 2){
+      title = lines[1]
+    }
+    const req = new Request("https://info-proxy.inajob.freeddns.org/test?rss=" + encodeURIComponent(lines[0]), {
+      method: "GET"
+    })
+    
+    throw fetch(req).then((response) => {
+      return response.json()
+    }).then((obj) => {
+        console.log(obj)
+        if(title == ""){
+          title=obj.title
+        }
+        return new Promise((resolve) => {
+          resolve(
+            <div>
+              {obj.entries.map((e: { title: string }, i:number) => <li key={i}>
+                <a href="#" onClick={(ev) => {linkClick(title+"-"+e.title); ev.stopPropagation()}}>{title}-{e.title}</a>
+                </li>)}
+            </div>
+          )
+        })
+      })
+  }, [linkClick])
   const codeBlock = (body: string) => {
     console.log("codeBlock", body)
     const result = hljs.highlightAuto(body)
@@ -176,6 +203,7 @@ const mermaidBlock = (body: string) => {
     randompages: randompagesBlock,
     code: codeBlock,
     mermaid: mermaidBlock,
+    rss: rssBlock,
   }
   },[listBlock, randompagesBlock]); // なぜlistBlockだけ？
   
