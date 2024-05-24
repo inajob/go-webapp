@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import EditorPane from './EditorPane.tsx'
-import { LinePopupHandler } from 'simple-inline-editor/dist/components/Editor'
 import { TextFragment, TextChangeRequest } from 'simple-inline-editor/dist/components/TextareaWithMenu'
 import './App.css'
 
@@ -38,17 +37,6 @@ const App: React.FC<AppProps> = (props) =>  {
   const [pageId, setPageId] = useState({user: props.user, pageId: props.pageId});
   const [rightPageId, setRightPageId] = useState({user: props.user, pageId: props.pageId});
   const [keywords, setKeywords] = useState(["test"]);
-
-  const linePopupHandlers: LinePopupHandler[] = [
-    {
-    name: "debug",
-    handler: (lines, range) => {
-      console.log(lines, range)
-      // TODO: make new page
-      // TODO: remove range and wikilink
-    }
-    }
-  ]
   
   const linkClick = useCallback((id:string) => {
     console.log("CHANGE setPageId", id)
@@ -205,7 +193,7 @@ const mermaidBlock = (body: string) => {
     mermaid: mermaidBlock,
     rss: rssBlock,
   }
-  },[listBlock, randompagesBlock]); // なぜlistBlockだけ？
+  },[listBlock, randompagesBlock, rssBlock]); // なぜlistBlockだけ？
   
   // 入力補完用keywordを取得
   useEffect(() => {
@@ -260,7 +248,6 @@ const mermaidBlock = (body: string) => {
         <div id="main">
           <div id="left-editor">
             <EditorPane
-              linePopupHandlers={linePopupHandlers}
               textPopupHandlers={textPopupHandlers}
               keywords={keywords}
               blockStyles={blockStyles}
@@ -272,7 +259,6 @@ const mermaidBlock = (body: string) => {
           </div>
           <div id="right-editor">
             <EditorPane
-              linePopupHandlers={linePopupHandlers}
               textPopupHandlers={textPopupHandlers}
               keywords={keywords}
               blockStyles={blockStyles}
@@ -285,7 +271,6 @@ const mermaidBlock = (body: string) => {
         </div>
         <div id="side">
           <EditorPane
-              linePopupHandlers={linePopupHandlers}
               textPopupHandlers={textPopupHandlers}
               keywords={keywords}
               blockStyles={blockStyles}

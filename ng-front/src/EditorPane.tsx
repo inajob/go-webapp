@@ -10,7 +10,7 @@ export interface EditorPaneProps {
     onLinkClick: (title: string) => void;
     keywords: string[];
     blockStyles: Record<string, (body: string) => React.JSX.Element>;
-    linePopupHandlers: LinePopupHandler[];
+    //linePopupHandlers: LinePopupHandler[];
     textPopupHandlers: TextPopupHandler[];
     user: string;
     pageId: string;
@@ -23,8 +23,8 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     const [initialized, setInitialized] = useState(false)
     const lastUpdate = useRef("");
     const saveTimer = useRef(0);
-    const preKeywords = useRef<string[]>([]);
-
+    const preKeywords = useRef<string[]>([]); // 削除されたキーワードも更新できるように保存しておく
+  
     const makeDirty = useCallback(() => {
         setInitialized(true)
       }, [])
@@ -70,7 +70,7 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
             mdLines.push(l)
             }
         })
-    return mdLines
+        return mdLines
     }
     function convertMDToInline(lines: string[]): string{
         const out:string[] = []
@@ -93,51 +93,100 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     }
 
     function postPage(user: string, id: string, body: string, lastUpdate:string, image: string){
-        const f = new FormData()
-    
-        if(body.length === 0){
-          return
-        }
-        f.append('body', body)
-        f.append('lastUpdate', lastUpdate)
-        f.append('cover', image)
-        const req = new Request(API_SERVER + "/page/" + user + "/" + id, {
-          method: "POST",
-          credentials: "include", // for save another domain
-          headers: {
-            'Accept': 'applicatoin/json',
-            'User': user, // this header is deleted by login-proxy but useful for debug
-          },
-          body: f,
-        })
-        return fetch(req)
+      const f = new FormData()
+  
+      if(body.length === 0){
+        return
       }
+      f.append('body', body)
+      f.append('lastUpdate', lastUpdate)
+      f.append('cover', image)
+      const req = new Request(API_SERVER + "/page/" + user + "/" + encodeURIComponent(id), {
+        method: "POST",
+        credentials: "include", // for save another domain
+        headers: {
+          'Accept': 'applicatoin/json',
+          'User': user, // this header is deleted by login-proxy but useful for debug
+        },
+        body: f,
+      })
+      return fetch(req)
+    }
 
-      function pageSave(getter: { (): { user: string; id: string; body: string; lastUpdate: string; image: string }; (): void }){
-        if(saveTimer.current != 0){
-          clearTimeout(saveTimer.current);
-        }
-        saveTimer.current = setTimeout(() => {
-          saveTimer.current = 0;
-          const p = getter()
-          postPage(p.user, p.id, p.body, p.lastUpdate, p.image)?.then((o) => o.json()).then((o) => {
-            // TODO: external function
-            lastUpdate.current = o.meta.lastUpdate
-          }).then(() => {
-            const p = getter()
-            const md = convertMDToInline(lines.map((l) => l.body))
-            const ks = extractKeywords(md)
-            ks.concat(preKeywords.current)
-            const kmap:{[key: string]: boolean} = {}
-            ks.forEach((k => {kmap[k] = true}))
-            const keywords = Object.keys(kmap)
-            const sscs = keywords.map((k) => sendSearchCache(p.user ,k))
-            preKeywords.current = keywords
-            return Promise.all(sscs)
-          })
-        }, 1000 * 3)
+    function pageSave(user: string, id: string, body: string, pLastUpdate:string, image: string){
+      return postPage(user, id, body, pLastUpdate, image)?.then((o) => o.json()).then((o) => {
+        lastUpdate.current = o.meta.lastUpdate
+      }).then(() => {
+        const md = convertMDToInline(lines.map((l) => l.body))
+        const ks = extractKeywords(md)
+        ks.concat(preKeywords.current)
+        const kmap:{[key: string]: boolean} = {}
+        ks.forEach((k => {kmap[k] = true}))
+        const keywords = Object.keys(kmap)
+        const sscs = keywords.map((k) => sendSearchCache(user ,k))
+        preKeywords.current = keywords
+        return Promise.all(sscs)
+      })
+    }
+
+    function delayedPageSave(getter: { (): { user: string; id: string; body: string; lastUpdate: string; image: string }; (): void }){
+      if(saveTimer.current != 0){
+        clearTimeout(saveTimer.current);
       }
+      saveTimer.current = setTimeout(() => {
+        saveTimer.current = 0;
+        const p = getter()
+        pageSave(p.user, p.id, p.body, p.lastUpdate, p.image)
+      }, 1000 * 3)
+    }
+
+    function checkPage(user:string, id:string){
+      const r = Math.floor(Math.random()*1000)
+      const req = new Request(API_SERVER + "/page/" + user + "/" + encodeURIComponent(id) + "?r=" + r, {
+        method: "GET"
+        })
+      return fetch(req).then((response) => {
+        return response.json()
+      })
+    }
     
+    const linePopupHandlers: LinePopupHandler[] = [
+      {
+      name: "debug",
+      handler: (selectedLines, range) => {
+        console.log(selectedLines, range)
+        const title = selectedLines[0]
+        selectedLines[0] = "from [" + props.pageId + "]"
+        const body = selectedLines.join("\n")
+        checkPage(props.user, title).then((o) => {
+          console.log(o)
+          if(o.error && o.error.indexOf("The system cannot find the file specified.") != -1){
+            // not found
+            console.log("page not found")
+            return postPage(props.user, title, body, "0", "")
+          }
+          throw "page found"
+        }).then((o) => {
+          if(o && o.ok){
+            // TODO: 保存する前にlinesを変更していい感じにする
+            const l = lines.map((l) => l.body)
+            if(range == undefined){
+              throw "range is undefined"
+            }
+            l[range[0]] = "[" + l[range[0]] + "]"
+            l.splice(range[0] + 1, range[1] - range[0])
+            return pageSave(props.user, props.pageId, l.join("\n"), lastUpdate.current, "")
+          }
+          throw "page save failed"
+        }).then(() => {
+          props.onLinkClick(title)  
+        })
+
+        // TODO: remove range and wikilink
+      }
+      }
+    ]
+
     // get Page
     useEffect(() => {
         const r = Math.floor(Math.random()*1000)
@@ -230,7 +279,7 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         if(initialized){
         // save
         console.log("CHANGE LINE SAVE", md)
-        pageSave(() => {
+        delayedPageSave(() => {
             return {
             user: props.user,
             id: props.pageId,
@@ -249,7 +298,7 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
             <Editor
                 lines={lines}
                 setLines={setLines}
-                linePopupHandlers={props.linePopupHandlers}
+                linePopupHandlers={linePopupHandlers}
                 textPopupHandlers={props.textPopupHandlers}
                 keywords={props.keywords}
                 blockStyles={props.blockStyles}
