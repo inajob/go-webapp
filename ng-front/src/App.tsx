@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import EditorPane from './EditorPane.tsx'
+import {EditorPane} from './EditorPane.tsx'
 import { TextFragment, TextChangeRequest } from 'simple-inline-editor/dist/components/TextareaWithMenu'
 import './App.css'
+import {Dialog, DialogListItem} from './Dialog.tsx'
 
 import 'highlight.js/styles/github-dark-dimmed.min.css';  // choose your style!
 import hljs from 'highlight.js'
@@ -37,9 +38,22 @@ const App: React.FC<AppProps> = (props) =>  {
   const [pageId, setPageId] = useState({user: props.user, pageId: props.pageId});
   const [rightPageId, setRightPageId] = useState({user: props.user, pageId: props.pageId});
   const [keywords, setKeywords] = useState(["test"]);
-  
-  const linkClick = useCallback((id:string) => {
+  const [listInDialog, setListInDialog] = useState<DialogListItem[]>([])
+  const [defaultLines, setDefaultLines] = useState<string[]>([""])
+  const [openDialog, setOpenDialog] = useState<boolean>(false)
+
+  const showListDialog = (items:DialogListItem[]) => {
+    setListInDialog(items.map((i: DialogListItem) => {return {title: i.title, handler: i.handler}}))
+    setOpenDialog(true)
+  }
+
+  const linkClick = useCallback((id:string, defaultLines?:string[]) => {
     console.log("CHANGE setPageId", id)
+    if(defaultLines){
+      setDefaultLines(defaultLines)
+    }else{
+      setDefaultLines([""])
+    }
     setPageId({user: pageId.user, pageId: id})
     history.pushState({}, "", "?user=" + pageId.user + "&id=" + encodeURIComponent(id))
     return false
@@ -158,8 +172,11 @@ const App: React.FC<AppProps> = (props) =>  {
         return new Promise((resolve) => {
           resolve(
             <div>
-              {obj.entries.map((e: { title: string }, i:number) => <li key={i}>
-                <a href="#" onClick={(ev) => {linkClick(title+"-"+e.title); ev.stopPropagation()}}>{title}-{e.title}</a>
+              {obj.entries.map((e: { title: string, link: string }, i:number) => <li key={i}>
+                <a href="#" onClick={(ev) => {
+                  linkClick(title+"-"+e.title, ["", e.link, "[" + title + "]"]);
+                  ev.stopPropagation()
+                  }}>{title}-{e.title}</a>
                 </li>)}
             </div>
           )
@@ -183,7 +200,21 @@ const mermaidBlock = (body: string) => {
       </div>
   })
 }
-
+const itemBlock = (body:string) => {
+  const lines = body.split(/[\r\n]/);
+  const link = lines[0]
+  const img = lines[1]
+  const title = lines[2]
+  return <div>
+      <div><span className="block-type">item</span></div>
+      <div className="item-block">
+        <a href={link}>
+          <div className="item-block-img"><img src={img} /></div>
+          <div className="item-block-title">{title}</div>
+          </a>
+      </div>
+    </div>
+}
   const blockStyles = useMemo(() => { return {
     list: listBlock,
     table: csvToTable,
@@ -192,6 +223,7 @@ const mermaidBlock = (body: string) => {
     code: codeBlock,
     mermaid: mermaidBlock,
     rss: rssBlock,
+    item: itemBlock,
   }
   },[listBlock, randompagesBlock, rssBlock]); // なぜlistBlockだけ？
   
@@ -244,6 +276,9 @@ const mermaidBlock = (body: string) => {
           <div className="button">New Diary</div>
           <div className="button">Delete</div>
           <div className="button">Rename</div>
+          <div className="button" onClick={() => {
+            alert("Info button")
+          }}>Info</div>
         </div>
         <div id="main">
           <div id="left-editor">
@@ -255,6 +290,8 @@ const mermaidBlock = (body: string) => {
               onSubLinkClick={subLinkClick}
               user={pageId.user}
               pageId={pageId.pageId}
+              showListDialog={showListDialog}
+              defaultLines={defaultLines}
               />
           </div>
           <div id="right-editor">
@@ -266,6 +303,8 @@ const mermaidBlock = (body: string) => {
               onSubLinkClick={subLinkClick}
               user={rightPageId.user}
               pageId={rightPageId.pageId}
+              showListDialog={showListDialog}
+              defaultLines={defaultLines}
             />
           </div>
         </div>
@@ -278,10 +317,12 @@ const mermaidBlock = (body: string) => {
               onSubLinkClick={subLinkClick}
               user={pageId.user}
               pageId={"menu"}
+              showListDialog={showListDialog}
+              defaultLines={defaultLines}
             />
         </div>
       </div>
-      <dialog open>test</dialog>
+      <Dialog listInDialog={listInDialog} isOpen={openDialog} setIsOpen={setOpenDialog} />
     </>
   )
 }

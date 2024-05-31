@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import {Editor} from 'simple-inline-editor'
 import { LinePopupHandler } from 'simple-inline-editor/dist/components/Editor'
 import { TextPopupHandler } from 'simple-inline-editor/dist/components/TextareaWithMenu'
+import {DialogListItem} from './Dialog.tsx'
 
 const API_SERVER = import.meta.env.VITE_API_SERVER
 
@@ -14,15 +15,32 @@ export interface EditorPaneProps {
     textPopupHandlers: TextPopupHandler[];
     user: string;
     pageId: string;
+    defaultLines: string[];
+    showListDialog: (items: DialogListItem[]) => void
 }
 
-const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const jsonp = (name:string, src:string, f: (arg0: any) => void) => {
+  // https://am-yu.net/2023/06/04/typescript_jsonp_promise/
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any)[name] = function(data: any){
+    f(data);
+  }
+  const script = document.createElement("script");
+  script.type = "text/javascript";
+  script.async = true;
+  script.src = src;
+  document.body.appendChild(script);
+}
+
+export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     const [lines, setLines] = useState([{body: "initializing...", key: 0}]);
     const [keywords, setKeywords] = useState<string[]>([])
     const [relatedPages, setRelatedPages] = useState<{[key:string]:[{id:string,text:string}]|[]}>({})
     const [initialized, setInitialized] = useState(false)
     const lastUpdate = useRef("");
     const saveTimer = useRef(0);
+    const saveFunc = useRef(() => {});
     const preKeywords = useRef<string[]>([]); // 削除されたキーワードも更新できるように保存しておく
   
     const makeDirty = useCallback(() => {
@@ -132,12 +150,14 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     function delayedPageSave(getter: { (): { user: string; id: string; body: string; lastUpdate: string; image: string }; (): void }){
       if(saveTimer.current != 0){
         clearTimeout(saveTimer.current);
+        saveFunc.current = () => {}
       }
-      saveTimer.current = setTimeout(() => {
+      saveFunc.current = () => {
         saveTimer.current = 0;
         const p = getter()
-        pageSave(p.user, p.id, p.body, p.lastUpdate, p.image)
-      }, 1000 * 3)
+        return pageSave(p.user, p.id, p.body, p.lastUpdate, p.image)
+      }
+      saveTimer.current = setTimeout(saveFunc.current, 1000 * 3)
     }
 
     function checkPage(user:string, id:string){
@@ -160,7 +180,7 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         const body = selectedLines.join("\n")
         checkPage(props.user, title).then((o) => {
           console.log(o)
-          if(o.error && o.error.indexOf("The system cannot find the file specified.") != -1){
+          if(o.error){
             // not found
             console.log("page not found")
             return postPage(props.user, title, body, "0", "")
@@ -187,8 +207,23 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
       }
     ]
 
+    useEffect(() => {
+      window.addEventListener("beforeunload", () => {
+        if(saveTimer.current != 0){
+          clearTimeout(saveTimer.current);
+          saveFunc.current()
+          saveFunc.current = () => {}
+        }
+      });
+    }, [])
+
     // get Page
     useEffect(() => {
+        if(saveTimer.current != 0){
+          clearTimeout(saveTimer.current);
+          saveFunc.current()
+          saveFunc.current = () => {}
+        }
         const r = Math.floor(Math.random()*1000)
         console.log("get page", props.user, props.pageId)
         const req = new Request(API_SERVER + "/page/" + props.user + "/" + encodeURIComponent(props.pageId) + "?r=" + r, {
@@ -198,7 +233,7 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         response.json().then((obj) => {
             console.log(obj)
             if(obj["error"]){
-              setLines([{body: "", key: 0}])
+              setLines(props.defaultLines.map((l, i) => {return {body: l, key: i}}))
               setKeywords([])
             }else{
               console.log("CHANGE LINE get Page", props.pageId)
@@ -208,7 +243,7 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
             setInitialized(false)
         })
         })        
-    }, [props.pageId, props.user])
+    }, [props.pageId, props.user, props.defaultLines])
 
     function sendSearchCache(user:string, keyword:string){
       const f = new FormData()
@@ -292,6 +327,52 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lines])
 
+    const onMagicFunc = (row:number) => () => {
+      console.log(row)
+
+      props.showListDialog([
+        {title: "amazon", handler: (close: () => void) => {
+          close()
+          jsonp("amazon", "//web.inajob.freeddns.org/ad/amz.php?callback=amazon&q=" + encodeURIComponent(lines[row].body), (data) => {
+            console.log("get amz", data)
+            props.showListDialog(data.map((d: { handler: (close: () => void) => void; link: string[]; limage: string[]; title: string }) => {
+              d.handler = (close: () => void) => {
+                setLines(lines.map((l, i) => {
+                  if(i == row){
+                    return {body: "```item\n" + d.link[0] + "\n" + d.limage[0] + "\n" + d.title, key: l.key}
+                  }else{
+                    return l
+                  }
+                }))
+                close()
+              }
+              return d
+            }))
+          })
+        }},
+        {title: "ogp", handler: (close: () => void) => {
+          close()
+          const req = new Request("https://info-proxy.inajob.freeddns.org/ogp?url=" + encodeURIComponent(lines[row].body), {
+            method: "GET"
+          })
+          console.log(req)
+          fetch(req).then((response) => {
+            console.log(response)
+            return response.json()
+          }).then((obj) => {
+            setLines(lines.map((l, i) => {
+              if(i == row){
+                return {body: "```item\n" + lines[row].body + "\n" + obj.ogImage[0].url + "\n" + obj.ogTitle, key: l.key}
+              }else{
+                return l
+              }
+            }))
+            close()
+          })
+        }}
+      ])
+    }
+
     return <>
         <h3>{props.pageId}</h3>
         <div className="container">
@@ -305,6 +386,7 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
                 onChange={makeDirty}
                 onLinkClick={props.onLinkClick}
                 onSubLinkClick={props.onSubLinkClick}
+                onMagicFunc={onMagicFunc}
             />
             <div className="related-pages">
               {Object.entries(relatedPages).map((p, i) => <div key={"related-pages-" + i}>
@@ -334,4 +416,3 @@ const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         </div>
     </>
 }
-export default EditorPane

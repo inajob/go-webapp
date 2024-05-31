@@ -9,6 +9,7 @@
   border:inset 1px;
 }
 
+@media screen and (min-width:480px) {
 #root, #root > div, body, html {
   height: 100%;
 }
@@ -48,14 +49,6 @@ body{
   overflow-y: scroll;
   height: calc(100% - 2em);
 }
-#controller{
-  height: 30px;
-  display:flex;
-  justify-content: flex-end;
-}
-#controller .button{
-  border:solid 1px;
-}
 #side {
   position: absolute;
   top: 30px;
@@ -67,10 +60,72 @@ body{
 #side > h3 {
   display: none;
 }
+}
+.dialog::backdrop {
+  backdrop-filter: blur(8px);
+}
+.dialog {
+  box-shadow: 0px 20px 36px 0px rgba(0, 0, 0, 0.6);
+}
+
+#controller{
+  height: 30px;
+  display:flex;
+  justify-content: flex-end;
+}
+#controller .button{
+  border:solid 1px;
+}
 .editor{
   margin:0px !important;
   padding:0px !important;
 }
+
+.h1-style textarea, .h1-style .menu-pos, .h1-style div.elm{
+  font-size: 1.5em !important;
+  font-weight: bold;
+}
+.h1-style {
+  background-color: #ddf;
+}
+.h2-style textarea, .h2-style .menu-pos, .h2-style div.elm{
+  font-size: 1.5em !important; 
+  font-weight: bold;
+}
+.h3-style textarea, .h3-style .menu-pos, .h3-style div.elm{
+  font-size: 1.2em !important; 
+  font-weight: bold;
+}
+
+.list-indent-1{
+  margin-left: 1em;
+}
+.list-indent-2{
+  margin-left: 2em;
+}
+.list-indent-3{
+  margin-left: 3em;
+}
+.list-indent-4{
+  margin-left: 4em;
+}
+.list-indent-5{
+  margin-left: 5em;
+}
+.list-indent-6{
+  margin-left: 6em;
+}
+.list-indent-7{
+  margin-left: 7em;
+}
+.list-indent-8{
+  margin-left: 8em;
+}
+.list-indent-9{
+  margin-left: 9em;
+}
+
+
 ul.list-block{
   background-color: #dfd;
 }
@@ -83,8 +138,14 @@ ul.list-block li{
   color:white;
 }
 
-.related-pages {
+.item-block a{
+  display: flex;
+  align-items: center;
 }
+.item-block img{
+  height: 150px;
+}
+
 .related-pages > div {
   border: solid 1px;
 }
