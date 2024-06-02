@@ -124,7 +124,16 @@ body{
 .list-indent-9{
   margin-left: 9em;
 }
-
+span.braket.unknown{
+  background-color: #ddf;
+  color: gray;
+  cursor: pointer;
+}
+span.braket.red{
+  background-color: #ddf;
+  color: red;
+  cursor: pointer;
+}
 
 ul.list-block{
   background-color: #dfd;

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {Editor} from 'simple-inline-editor'
 import { LinePopupHandler } from 'simple-inline-editor/dist/components/Editor'
-import { TextPopupHandler } from 'simple-inline-editor/dist/components/TextareaWithMenu'
+import { TextPopupHandler, Keyword } from 'simple-inline-editor/dist/components/TextareaWithMenu'
 import {DialogListItem} from './Dialog.tsx'
 
 const API_SERVER = import.meta.env.VITE_API_SERVER
@@ -9,7 +9,7 @@ const API_SERVER = import.meta.env.VITE_API_SERVER
 export interface EditorPaneProps {
     onSubLinkClick: (title: string) => void;
     onLinkClick: (title: string) => void;
-    keywords: string[];
+    keywords: Keyword[];
     blockStyles: Record<string, (body: string) => React.JSX.Element>;
     //linePopupHandlers: LinePopupHandler[];
     textPopupHandlers: TextPopupHandler[];
@@ -141,7 +141,7 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         const kmap:{[key: string]: boolean} = {}
         ks.forEach((k => {kmap[k] = true}))
         const keywords = Object.keys(kmap)
-        const sscs = keywords.map((k) => sendSearchCache(user ,k))
+        const sscs = keywords.map((k) => sendSearchCache(user ,"[" + k + "]"))
         preKeywords.current = keywords
         return Promise.all(sscs)
       })

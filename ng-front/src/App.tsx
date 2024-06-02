@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import {EditorPane} from './EditorPane.tsx'
-import { TextFragment, TextChangeRequest } from 'simple-inline-editor/dist/components/TextareaWithMenu'
+import { TextFragment, TextChangeRequest, Keyword } from 'simple-inline-editor/dist/components/TextareaWithMenu'
 import './App.css'
 import {Dialog, DialogListItem} from './Dialog.tsx'
 
@@ -37,7 +37,7 @@ export interface AppProps {
 const App: React.FC<AppProps> = (props) =>  {
   const [pageId, setPageId] = useState({user: props.user, pageId: props.pageId});
   const [rightPageId, setRightPageId] = useState({user: props.user, pageId: props.pageId});
-  const [keywords, setKeywords] = useState(["test"]);
+  const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [listInDialog, setListInDialog] = useState<DialogListItem[]>([])
   const [defaultLines, setDefaultLines] = useState<string[]>([""])
   const [openDialog, setOpenDialog] = useState<boolean>(false)
@@ -108,11 +108,13 @@ const App: React.FC<AppProps> = (props) =>  {
           )
         })
       })
+    /*
     return <div>
       {keywords.filter((k) => k.indexOf(body) == 0)
       .map((k, i) => <li key={i}><a href="#" onClick={(e) => {linkClick(k); e.stopPropagation()}}>{k}</a></li>)}
       </div>;
-  }, [keywords, linkClick, props.user, subLinkClick]);
+      */
+  }, [linkClick, props.user, subLinkClick]);
 
   const urlBlock = (body:string) => {
     return <div>
@@ -235,9 +237,27 @@ const itemBlock = (body:string) => {
     })
     fetch(req).then((response) => {
       return response.json()
-    }).then((response) => {
-      console.log(response)
-      setKeywords(response.keywords.map((k: { keyword: string }) => k.keyword))
+    }).then((keywordsResponse) => {
+
+      const r = Math.floor(Math.random()*1000)
+      const req = new Request(API_SERVER + "/page/" + props.user + "?r=" + r, {
+        method: "GET"
+      })
+      fetch(req).then((response) => {
+        return response.json()
+      }).then((response) => {
+        const realKeywords:string[] = response.keywords
+        setKeywords(keywordsResponse.keywords.map((k: { keyword: string, count: number }) => {
+          let count = k.count
+          if(realKeywords.find((e) => e == k.keyword)){
+            count ++;
+          }
+          return {value: k.keyword, style: count>1?"blue":"red"}
+        }))
+      })
+
+      //setKeywords(response.keywords.map((k: { keyword: string, count: number }) => {return {value: k.keyword, style: k.count>1?"blue":"red"}}))
+      //console.log(keywords)
     })
   }, [props.user])
 
