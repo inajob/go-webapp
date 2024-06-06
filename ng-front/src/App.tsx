@@ -38,6 +38,7 @@ const App: React.FC<AppProps> = (props) =>  {
   const [pageId, setPageId] = useState({user: props.user, pageId: props.pageId});
   const [rightPageId, setRightPageId] = useState({user: props.user, pageId: props.pageId});
   const [keywords, setKeywords] = useState<Keyword[]>([]);
+  const [pageTitles, setPageTitles] = useState<string[]>([]);
   const [listInDialog, setListInDialog] = useState<DialogListItem[]>([])
   const [defaultLines, setDefaultLines] = useState<string[]>([""])
   const [openDialog, setOpenDialog] = useState<boolean>(false)
@@ -178,13 +179,16 @@ const App: React.FC<AppProps> = (props) =>  {
                 <a href="#" onClick={(ev) => {
                   linkClick(title+"-"+e.title, ["", e.link, "[" + title + "]"]);
                   ev.stopPropagation()
-                  }}>{title}-{e.title}</a>
+                  }}><span className={"braket " + (pageTitles.find((k) => k == (title + "-" + e.title))?"blue":"red")}>
+                    {title}-{e.title}
+                    </span>
+                  </a>
                 </li>)}
             </div>
           )
         })
       })
-  }, [linkClick])
+  }, [pageTitles, linkClick])
   const codeBlock = (body: string) => {
     console.log("codeBlock", body)
     const result = hljs.highlightAuto(body)
@@ -246,6 +250,7 @@ const itemBlock = (body:string) => {
       fetch(req).then((response) => {
         return response.json()
       }).then((response) => {
+        setPageTitles(response.keywords)
         const realKeywords:string[] = response.keywords
         setKeywords(keywordsResponse.keywords.map((k: { keyword: string, count: number }) => {
           let count = k.count
