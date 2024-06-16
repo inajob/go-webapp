@@ -214,7 +214,10 @@ const itemBlock:BlockStyleHandler = (body:string) => {
 }
 const imgBlock:BlockStyleHandler = (body:string) => {
   const lines = body.split(/[\r\n]/);
-  const img = lines[0]
+  let img = lines[0]
+  if(!(img.indexOf("http://") == 0 || img.indexOf("https://") == 0)){
+    img = API_SERVER + "/img/"+img
+  }
   return <div>
       <div><span className="block-type">img</span></div>
       <div className="img-block">
