@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import {Editor} from 'simple-inline-editor'
+import {BlockStyleHandler, Editor} from 'simple-inline-editor'
 import { LinePopupHandler } from 'simple-inline-editor/dist/components/Editor'
 import { TextPopupHandler, Keyword } from 'simple-inline-editor/dist/components/TextareaWithMenu'
 import {DialogListItem} from './Dialog.tsx'
+import {jsonp} from './jsonp.tsx'
 
 const API_SERVER = import.meta.env.VITE_API_SERVER
 
@@ -10,27 +11,13 @@ export interface EditorPaneProps {
     onSubLinkClick: (title: string) => void;
     onLinkClick: (title: string) => void;
     keywords: Keyword[];
-    blockStyles: Record<string, (body: string) => React.JSX.Element>;
+    blockStyles: Record<string, BlockStyleHandler>;
     //linePopupHandlers: LinePopupHandler[];
     textPopupHandlers: TextPopupHandler[];
     user: string;
     pageId: string;
     defaultLines: string[];
     showListDialog: (items: DialogListItem[]) => void
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const jsonp = (name:string, src:string, f: (arg0: any) => void) => {
-  // https://am-yu.net/2023/06/04/typescript_jsonp_promise/
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any)[name] = function(data: any){
-    f(data);
-  }
-  const script = document.createElement("script");
-  script.type = "text/javascript";
-  script.async = true;
-  script.src = src;
-  document.body.appendChild(script);
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {

@@ -8,7 +8,8 @@ import 'highlight.js/styles/github-dark-dimmed.min.css';  // choose your style!
 import hljs from 'highlight.js'
 
 import mermaid from 'mermaid'
-
+import {jsonp} from './jsonp.tsx'
+import { BlockStyleHandler } from 'simple-inline-editor'
 
 const API_SERVER = import.meta.env.VITE_API_SERVER
 
@@ -65,7 +66,7 @@ const App: React.FC<AppProps> = (props) =>  {
   }, [rightPageId.user])
 
   // == block styles ============================
-  const csvToTable = (body: string) => {
+  const csvToTable:BlockStyleHandler = (body: string) => {
     const rows: React.JSX.Element[] = [];
     const lines = body.split(/[\r\n]/);
     lines.forEach((l, tri) => {
@@ -78,59 +79,52 @@ const App: React.FC<AppProps> = (props) =>  {
     });
     return <table>{rows}</table>;
   };
-  const listBlock = useCallback((body: string) => {
+  const listBlock:BlockStyleHandler = useCallback((body: string, setRenderElement) => {
     console.log("body[" + body + "]");
     const r = Math.floor(Math.random()*1000)
     const req = new Request(API_SERVER + "/page/" + props.user + "?r=" + r, {
       method: "GET"
     })
     
-    throw fetch(req).then((response) => {
+    fetch(req).then((response) => {
       return response.json()
     }).then((obj) => {
-        console.log(obj)
-        const keywordCache:string[] = obj.keywords
-        return new Promise((resolve) => {
-          resolve(
-            <div>
-              <span className="block-type">list</span>
-              <ul className="list-block">
-                {keywordCache.filter((k) => k.indexOf(body) == 0)
-                .map((k, i) => <li key={i}>
-                    <a href="#" onClick={(e) => {
-                      linkClick(decodeURIComponent(k)); e.stopPropagation();e.preventDefault(); return false
-                    }}>{k}</a>
-                    <span className="bracket-icon" onClick={(e) => {
-                      subLinkClick(decodeURIComponent(k)); e.stopPropagation();e.preventDefault(); return false
-                    }}>[]</span>
-                  </li>)}
-              </ul>
-            </div>
-          )
-        })
-      })
-    /*
-    return <div>
-      {keywords.filter((k) => k.indexOf(body) == 0)
-      .map((k, i) => <li key={i}><a href="#" onClick={(e) => {linkClick(k); e.stopPropagation()}}>{k}</a></li>)}
-      </div>;
-      */
+      console.log(obj)
+      const keywordCache:string[] = obj.keywords
+      setRenderElement(
+        <div>
+          <span className="block-type">list</span>
+          <ul className="list-block">
+            {keywordCache.filter((k) => k.indexOf(body) == 0)
+            .map((k, i) => <li key={i}>
+                <a href="#" onClick={(e) => {
+                  linkClick(decodeURIComponent(k)); e.stopPropagation();e.preventDefault(); return false
+                }}>{k}</a>
+                <span className="bracket-icon" onClick={(e) => {
+                  subLinkClick(decodeURIComponent(k)); e.stopPropagation();e.preventDefault(); return false
+                }}>[]</span>
+              </li>)}
+          </ul>
+        </div>
+      )
+    })
+    return <div>list loading...</div>
   }, [linkClick, props.user, subLinkClick]);
 
-  const urlBlock = (body:string) => {
+  const urlBlock:BlockStyleHandler = (body:string) => {
     return <div>
         <div><span className="block-type">url</span></div>
         <iframe src={"https://hatenablog.com/embed?url=" + encodeURIComponent(body)}></iframe>
       </div>
   }
 
-  const randompagesBlock = useCallback(() => {
+  const randompagesBlock:BlockStyleHandler = useCallback((_: string, setRenderElement) => {
     const r = Math.floor(Math.random()*1000)
     const req = new Request(API_SERVER + "/page/" + props.user + "?r=" + r, {
       method: "GET"
     })
     
-    throw fetch(req).then((response) => {
+    fetch(req).then((response) => {
       return response.json()
     }).then((obj) => {
         console.log(obj)
@@ -139,23 +133,22 @@ const App: React.FC<AppProps> = (props) =>  {
         for(let i = 0; i < 10; i ++){
           pages.push(choice(keywordCache))
         }
-        return new Promise((resolve) => {
-          resolve(
-            <div>
-              <span className="block-type">randompages</span>
-              <ul className="list-block">
-                {pages
-                .map((k, i) => <li key={i}>
-                    <a href="#" onClick={(e) => {linkClick(k); e.stopPropagation()}}>{k}</a>
-                    <span className="bracket-icon" onClick={(e) => {subLinkClick(k); e.stopPropagation()}}>[]</span>
-                  </li>)}
-              </ul>
-            </div>
-          )
-        })
+        setRenderElement(
+          <div>
+            <span className="block-type">randompages</span>
+            <ul className="list-block">
+              {pages
+              .map((k, i) => <li key={i}>
+                  <a href="#" onClick={(e) => {linkClick(k); e.stopPropagation()}}>{k}</a>
+                  <span className="bracket-icon" onClick={(e) => {subLinkClick(k); e.stopPropagation()}}>[]</span>
+                </li>)}
+            </ul>
+          </div>
+        )
       })
+      return <div>randompage loading...</div>
   }, [linkClick, props.user, subLinkClick])
-  const rssBlock = useCallback((body: string) => {
+  const rssBlock:BlockStyleHandler = useCallback((body: string, setRenderElement) => {
     const lines = body.split(/[\r\n]/);
     let title = ""
     if(lines.length >= 2){
@@ -165,48 +158,46 @@ const App: React.FC<AppProps> = (props) =>  {
       method: "GET"
     })
     
-    throw fetch(req).then((response) => {
+    fetch(req).then((response) => {
       return response.json()
     }).then((obj) => {
         console.log(obj)
         if(title == ""){
           title=obj.title
         }
-        return new Promise((resolve) => {
-          resolve(
-            <div>
-              {obj.entries.map((e: { title: string, link: string }, i:number) => <li key={i}>
-                <a href="#" onClick={(ev) => {
-                  linkClick(title+"-"+e.title, ["", e.link, "[" + title + "]"]);
-                  ev.stopPropagation()
-                  }}><span className={"braket " + (pageTitles.find((k) => k == (title + "-" + e.title))?"blue":"red")}>
-                    {title}-{e.title}
-                    </span>
-                  </a>
-                </li>)}
-            </div>
-          )
-        })
+        setRenderElement(
+          <div>
+            {obj.entries.map((e: { title: string, link: string }, i:number) => <li key={i}>
+              <a href="#" onClick={(ev) => {
+                linkClick(title+"-"+e.title, ["", e.link, "[" + title + "]"]);
+                ev.stopPropagation()
+                }}><span className={"braket " + (pageTitles.find((k) => k == (title + "-" + e.title))?"blue":"red")}>
+                  {title}-{e.title}
+                  </span>
+                </a>
+              </li>)}
+          </div>
+        )
       })
+    return <div>rss loading...</div>
   }, [pageTitles, linkClick])
-  const codeBlock = (body: string) => {
+  const codeBlock:BlockStyleHandler = (body: string) => {
     console.log("codeBlock", body)
     const result = hljs.highlightAuto(body)
-    throw new Promise((resolve) => {
-      resolve(<div className="code-block" dangerouslySetInnerHTML={{__html: result.value}}></div>)
-    })
+    return <div className="code-block" dangerouslySetInnerHTML={{__html: result.value}}></div>
   }
-const mermaidBlock = (body: string) => {
+const mermaidBlock:BlockStyleHandler = (body: string, setRenderElement) => {
   const r = Math.floor(Math.random()*1000)
-  throw mermaid.render("mermaid-" + r, body).then((o) => {
+  mermaid.render("mermaid-" + r, body).then((o) => {
     console.log("svg", o)
-    return <div>
+    setRenderElement(<div>
       <span className="block-type">mermaid</span>
       <div dangerouslySetInnerHTML={{__html: o.svg}}></div>
-      </div>
+      </div>)
   })
+  return <div>mermaid loading...</div>
 }
-const itemBlock = (body:string) => {
+const itemBlock:BlockStyleHandler = (body:string) => {
   const lines = body.split(/[\r\n]/);
   const link = lines[0]
   const img = lines[1]
@@ -221,7 +212,38 @@ const itemBlock = (body:string) => {
       </div>
     </div>
 }
-  const blockStyles = useMemo(() => { return {
+const imgBlock:BlockStyleHandler = (body:string) => {
+  const lines = body.split(/[\r\n]/);
+  const img = lines[0]
+  return <div>
+      <div><span className="block-type">img</span></div>
+      <div className="img-block">
+        <img src={img} />
+      </div>
+    </div>
+}
+const oembedBlock:BlockStyleHandler = (body:string, setRenderElement) => {
+  const lines = body.split(/[\r\n]/);
+  const target = lines[0]
+  const fname = "oembed_callback_" + Math.random().toString(36).slice(-8);
+  let url = "https://api.twitter.com/1/statuses/oembed.json"
+  url += "?url="+encodeURIComponent(target)+'&callback=' + fname;
+  jsonp(fname, url, (data) => {
+    console.log("get oembed", data)
+    setRenderElement(<div className="oembed-block" dangerouslySetInnerHTML={{__html: data.html}}></div>)
+    setTimeout(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).twttr.widgets.load()
+    },100)
+  })
+  return <div>
+      <div><span className="block-type">oembed</span></div>
+      <div className="oembed-block">
+        {target}
+      </div>
+    </div>
+}
+  const blockStyles:Record<string,BlockStyleHandler> = useMemo(() => { return {
     list: listBlock,
     table: csvToTable,
     url: urlBlock,
@@ -230,6 +252,8 @@ const itemBlock = (body:string) => {
     mermaid: mermaidBlock,
     rss: rssBlock,
     item: itemBlock,
+    img: imgBlock,
+    oembed: oembedBlock, 
   }
   },[listBlock, randompagesBlock, rssBlock]); // なぜlistBlockだけ？
   

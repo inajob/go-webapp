@@ -154,6 +154,12 @@ ul.list-block li{
 .item-block img{
   height: 150px;
 }
+.img-block img {
+  height: 150px;
+}
+.oembed-block iframe{
+  width: auto !important;
+}
 
 .related-pages > div {
   border: solid 1px;
