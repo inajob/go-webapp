@@ -46,6 +46,9 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
           inKeyword = false
           out.push(keyword)
           keyword = ""
+        }else if(s[i] == "\n"){
+          inKeyword = false
+          keyword = ""
         }else{
           if(inKeyword){
             keyword += s[i]
@@ -123,12 +126,13 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         lastUpdate.current = o.meta.lastUpdate
       }).then(() => {
         const md = convertMDToInline(lines.map((l) => l.body))
-        const ks = extractKeywords(md)
-        ks.concat(preKeywords.current)
+        let ks = extractKeywords(md)
+        ks = ks.concat(preKeywords.current)
         const kmap:{[key: string]: boolean} = {}
         ks.forEach((k => {kmap[k] = true}))
         const keywords = Object.keys(kmap)
         const sscs = keywords.map((k) => sendSearchCache(user ,"[" + k + "]"))
+        // TODO: ここでpreKeywordsにあったものを消しても良い
         preKeywords.current = keywords
         return Promise.all(sscs)
       })
