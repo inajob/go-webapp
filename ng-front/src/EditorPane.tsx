@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import {BlockStyleHandler, Editor} from 'simple-inline-editor'
+import {Editor, isBlock, parseBlock} from 'simple-inline-editor'
+import { BlockStyleHandler } from 'simple-inline-editor/dist/components/Line'
 import { LinePopupHandler } from 'simple-inline-editor/dist/components/Editor'
 import { TextPopupHandler, Keyword } from 'simple-inline-editor/dist/components/TextareaWithMenu'
 import {DialogListItem} from './Dialog.tsx'
@@ -17,7 +18,8 @@ export interface EditorPaneProps {
     user: string;
     pageId: string;
     defaultLines: string[];
-    showListDialog: (items: DialogListItem[]) => void
+    showListDialog: (items: DialogListItem[]) => void;
+    setStatueMessage: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
@@ -56,6 +58,23 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         }
       }
       return out
+    }
+    function extractImages(lines: string[]): string[]{
+      const images:string[] = []
+      lines.forEach((l) => {
+        if(isBlock(l)){
+          const parts = parseBlock(l)
+          const typeName = parts[0]
+          if(typeName == "img"){
+            let img = parts[1]
+            if(!(img.indexOf("http://") || img.indexOf("https://"))){
+              img = API_SERVER + "/img/" + img
+            }
+            images.push(parts[1])
+          }
+        }
+      })
+      return images
     }
     function convertInlineToMD(inlineLines:string[]): string[]{
         const mdLines:string[] = []
@@ -122,9 +141,11 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     }
 
     function pageSave(user: string, id: string, body: string, pLastUpdate:string, image: string){
+      props.setStatueMessage("saving.." + id)
       return postPage(user, id, body, pLastUpdate, image)?.then((o) => o.json()).then((o) => {
         lastUpdate.current = o.meta.lastUpdate
       }).then(() => {
+        props.setStatueMessage("saved:" + id)
         const md = convertMDToInline(lines.map((l) => l.body))
         let ks = extractKeywords(md)
         ks = ks.concat(preKeywords.current)
@@ -135,6 +156,9 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         // TODO: ここでpreKeywordsにあったものを消しても良い
         preKeywords.current = keywords
         return Promise.all(sscs)
+      }).catch((e) => {
+        props.setStatueMessage(e.toString())
+        console.log(e)
       })
     }
 
@@ -186,7 +210,13 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
             }
             l[range[0]] = "[" + l[range[0]] + "]"
             l.splice(range[0] + 1, range[1] - range[0])
-            return pageSave(props.user, props.pageId, l.join("\n"), lastUpdate.current, "")
+            
+            const images = extractImages(l)
+            let image = ""
+            if(images.length > 0){
+              image = images[0]
+            }
+            return pageSave(props.user, props.pageId, l.join("\n"), lastUpdate.current, image)
           }
           throw "page save failed"
         }).then(() => {
@@ -295,6 +325,11 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
 
     useEffect(() => {
         console.log("CHANGE LINE", initialized, lines)
+        const images = extractImages(lines.map((l) => l.body))
+        let image = ""
+        if(images.length > 0){
+          image = images[0]
+        }
         const md = convertMDToInline(lines.map((l) => l.body))
         //const rp:{[key:string]:string[]|[]} = {}
         const ks = extractKeywords(md)
@@ -311,7 +346,7 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
             id: props.pageId,
             body: md,
             lastUpdate: lastUpdate.current,
-            image: ""
+            image: image
             }
         })
         }

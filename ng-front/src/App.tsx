@@ -43,6 +43,7 @@ const App: React.FC<AppProps> = (props) =>  {
   const [listInDialog, setListInDialog] = useState<DialogListItem[]>([])
   const [defaultLines, setDefaultLines] = useState<string[]>([""])
   const [openDialog, setOpenDialog] = useState<boolean>(false)
+  const [statusMessage, setStausMessage] = useState("")
 
   const showListDialog = (items:DialogListItem[]) => {
     setListInDialog(items.map((i: DialogListItem) => {return {title: i.title, handler: i.handler}}))
@@ -325,6 +326,7 @@ const oembedBlock:BlockStyleHandler = (body:string, setRenderElement) => {
     <>
       <div>
         <div id="controller">
+          <div>{statusMessage}</div>
           <div className="button">New Diary</div>
           <div className="button">Delete</div>
           <div className="button">Rename</div>
@@ -344,6 +346,7 @@ const oembedBlock:BlockStyleHandler = (body:string, setRenderElement) => {
               pageId={pageId.pageId}
               showListDialog={showListDialog}
               defaultLines={defaultLines}
+              setStatueMessage={setStausMessage}
               />
           </div>
           <div id="right-editor">
@@ -357,6 +360,7 @@ const oembedBlock:BlockStyleHandler = (body:string, setRenderElement) => {
               pageId={rightPageId.pageId}
               showListDialog={showListDialog}
               defaultLines={defaultLines}
+              setStatueMessage={setStausMessage}
             />
           </div>
         </div>
@@ -371,6 +375,7 @@ const oembedBlock:BlockStyleHandler = (body:string, setRenderElement) => {
               pageId={"menu"}
               showListDialog={showListDialog}
               defaultLines={defaultLines}
+              setStatueMessage={setStausMessage}
             />
         </div>
       </div>
