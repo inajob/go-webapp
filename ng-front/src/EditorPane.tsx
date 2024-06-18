@@ -25,7 +25,7 @@ export interface EditorPaneProps {
 export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     const [lines, setLines] = useState([{body: "initializing...", key: 0}]);
     const [keywords, setKeywords] = useState<string[]>([])
-    const [relatedPages, setRelatedPages] = useState<{[key:string]:[{id:string,text:string}]|[]}>({})
+    const [relatedPages, setRelatedPages] = useState<{[key:string]:[{id:string,text:string,cover:string}]|[]}>({})
     const [initialized, setInitialized] = useState(false)
     const lastUpdate = useRef("");
     const saveTimer = useRef(0);
@@ -71,6 +71,9 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
               img = API_SERVER + "/img/" + img
             }
             images.push(parts[1])
+          }else if(typeName == "item" && parts.length > 1){
+            const img = parts[1].split("\n")[1]
+            images.push(img)
           }
         }
       })
@@ -306,10 +309,10 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
           .then((r) => Promise.all(r.map((o) => o.json())))
           .then((r) => {
             console.log(r)
-            const rp:{[key: string]:[{id:string, text:string}]} = {}
+            const rp:{[key: string]:[{id:string, text:string, cover:string}]} = {}
             for(let i = 0; i < ks.length; i ++){
               console.log(ks[i], r[i])
-              const pages:[{id:string, text:string}] = r[i].lines.filter((l:{[id: string]: string}) => l.id != props.pageId)
+              const pages:[{id:string, text:string, cover:string}] = r[i].lines.filter((l:{[id: string]: string}) => l.id != props.pageId)
               if(pages.length > 0){
                 rp[ks[i]] = pages
               }
@@ -419,7 +422,7 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
                   <div className="related-page-title">
                     {p[0]}
                   </div>
-                  <div className="related-pages-item">{p[1].map((ks:{id:string, text:string}, i) => 
+                  <div className="related-pages-item">{p[1].map((ks:{id:string, text:string, cover:string}, i) => 
                     <div key={ks.id + i}>
                       <div className="item-title">
                         <a href="#" onClick={(e) => {
@@ -433,8 +436,9 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
                           return false
                         }}>[]</span>
                       </div>
-                        <div className="item-desc">{ks.text}</div>
-                      
+                        {ks.cover == ""?
+                          (<div className="item-desc">{ks.text}</div>):
+                          (<div className="item-desc"><img src={ks.cover} /></div>)}
                     </div>
                   )}</div>
                 </div>)}

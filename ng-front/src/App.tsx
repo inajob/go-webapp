@@ -50,6 +50,37 @@ const App: React.FC<AppProps> = (props) =>  {
     setOpenDialog(true)
   }
 
+  const newDiary = () => {
+    const d = new Date()
+    const page = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
+    setPageId({user: pageId.user, pageId: page})
+  }
+
+  const deletePage = (user:string, id:string) => {
+    const f = new FormData()
+    f.append('user', user)
+    f.append('id', id)
+    const req = new Request(API_SERVER + "/delete", {
+      method: "POST",
+      credentials: "include", // for save another domain
+      headers: {
+        'Accept': 'applicatoin/json',
+        'User': user, // this header is deleted by login-proxy but useful for debug
+      },
+      body: f,
+    })
+    return fetch(req)
+  }
+
+  const deleteButtonClick = () => {
+    deletePage(pageId.user, pageId.pageId).then((o) => {
+      console.log(o)
+      setPageId({user: pageId.user, pageId: "FrontPage"})
+    }).catch((e) => {
+      setStausMessage("delete failed:" + e.toString())
+    })
+  }
+
   const linkClick = useCallback((id:string, defaultLines?:string[]) => {
     console.log("CHANGE setPageId", id)
     if(defaultLines){
@@ -327,8 +358,8 @@ const oembedBlock:BlockStyleHandler = (body:string, setRenderElement) => {
       <div>
         <div id="controller">
           <div>{statusMessage}</div>
-          <div className="button">New Diary</div>
-          <div className="button">Delete</div>
+          <div className="button" onClick={newDiary}>New Diary</div>
+          <div className="button" onClick={deleteButtonClick}>Delete</div>
           <div className="button">Rename</div>
           <div className="button" onClick={() => {
             alert("Info button")

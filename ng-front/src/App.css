@@ -185,3 +185,8 @@ ul.list-block li{
 .related-pages-item .item-desc{
   font-size: x-small;  
 }
+.related-pages-item .item-desc img{
+  object-fit: contain;
+  width: 100px;
+  height: 80px;
+}
