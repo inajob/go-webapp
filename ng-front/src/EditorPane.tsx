@@ -37,26 +37,30 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
       }, [])
 
 
-    function extractKeywords(s: string): string[]{
-      const out = []
+    function extractKeywords(lines: string[]): string[]{
+      const out:string[] = []
       let inKeyword = false
       let keyword = ""
-      for(let i = 0; i < s.length; i ++){
-        if(s[i] == "["){ // ネストには対応していない
-          inKeyword = true
-        }else if(s[i] == "]"){
-          inKeyword = false
-          out.push(keyword)
-          keyword = ""
-        }else if(s[i] == "\n"){
+      lines.forEach((l) => {
+        if(!isBlock(l)){
           inKeyword = false
           keyword = ""
-        }else{
-          if(inKeyword){
-            keyword += s[i]
+          for(let i = 0; i < l.length; i ++){
+            if(l[i] == "["){ // ネストには対応していない
+              inKeyword = true
+            }else if(l[i] == "]"){
+              inKeyword = false
+              out.push(keyword)
+              keyword = ""
+            }else{
+              if(inKeyword){
+                keyword += l[i]
+              }
+            }
           }
         }
-      }
+      })
+      
       return out
     }
     function extractImages(lines: string[]): string[]{
@@ -149,8 +153,7 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         lastUpdate.current = o.meta.lastUpdate
       }).then(() => {
         props.setStatueMessage("saved:" + id)
-        const md = convertMDToInline(lines.map((l) => l.body))
-        let ks = extractKeywords(md)
+        let ks = extractKeywords(lines.map((l) => l.body))
         ks = ks.concat(preKeywords.current)
         const kmap:{[key: string]: boolean} = {}
         ks.forEach((k => {kmap[k] = true}))
@@ -335,7 +338,7 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         }
         const md = convertMDToInline(lines.map((l) => l.body))
         //const rp:{[key:string]:string[]|[]} = {}
-        const ks = extractKeywords(md)
+        const ks = extractKeywords(lines.map((l) => l.body))
         if(ks.toString() != keywords.toString()){
           setKeywords(ks)
         }
