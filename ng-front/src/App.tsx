@@ -52,7 +52,7 @@ const App: React.FC<AppProps> = (props) =>  {
 
   const newDiary = () => {
     const d = new Date()
-    const page = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
+    const page = d.getFullYear() + "-" + ("0"+(d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2)
     setPageId({user: pageId.user, pageId: page})
   }
 
