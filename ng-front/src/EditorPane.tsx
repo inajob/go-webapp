@@ -5,6 +5,7 @@ import { LinePopupHandler } from 'simple-inline-editor/dist/components/Editor'
 import { TextPopupHandler, Keyword } from 'simple-inline-editor/dist/components/TextareaWithMenu'
 import {DialogListItem} from './Dialog.tsx'
 import {jsonp} from './jsonp.tsx'
+import {sendSearch, sendSearchCache} from './api.ts'
 
 const API_SERVER = import.meta.env.VITE_API_SERVER
 
@@ -272,41 +273,12 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         })        
     }, [props.pageId, props.user, props.defaultLines])
 
-    function sendSearchCache(user:string, keyword:string){
-      const f = new FormData()
-      f.append('keyword', keyword)
-      f.append('user', user)
-      const req = new Request(API_SERVER + "/search-cache", {
-        method: "POST",
-        credentials: "include", // for save another domain
-        headers: {
-          'Accept': 'applicatoin/json',
-        },
-        body: f,
-      })
-      return fetch(req)
-    }
-
-    function sendSearch(user:string, keyword:string, noCache:boolean){
-      const f = new FormData()
-      f.append('keyword', keyword)
-      f.append('user', user)
-      f.append('noCache', noCache?"1":"0")
-      const req = new Request(API_SERVER + "/search", {
-        method: "POST",
-        credentials: "include", // for save another domain
-        headers: {
-          'Accept': 'applicatoin/json',
-        },
-        body: f,
-      })
-      return fetch(req)
-    }
     
     useEffect(() => {
       console.log("recalc related pages", keywords)
       const ks = keywords.filter((k) => k != props.pageId).map((k) => "[" + k +"]")
       ks.push(props.pageId)
+      ks.push("["+ props.pageId +"]")
       if(ks.length > 0){
         Promise.all(ks.map((k) => sendSearch(props.user, k, false)))
           .then((r) => Promise.all(r.map((o) => o.json())))

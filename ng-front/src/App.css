@@ -161,6 +161,27 @@ ul.list-block li{
   width: auto !important;
 }
 
+.boxlist{
+  display: flex;
+  flex-wrap: wrap;
+}
+.boxlist li {
+  width:100px;
+  height:100px;
+  background-color: white;
+  word-break: break-all;
+  list-style-type: none;
+  border:solid 1px;
+  overflow: hidden;
+  border-radius: 3px;
+  font-size: xx-small;
+}
+.boxlist li img{
+  object-fit: contain;
+  width:100px;
+  height:100px;
+}
+
 .related-pages > div {
   border: solid 1px;
 }

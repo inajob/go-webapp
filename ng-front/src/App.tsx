@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 import {EditorPane} from './EditorPane.tsx'
 import { TextFragment, TextChangeRequest, Keyword } from 'simple-inline-editor/dist/components/TextareaWithMenu'
 import './App.css'
@@ -10,6 +10,7 @@ import hljs from 'highlight.js'
 import mermaid from 'mermaid'
 import {jsonp} from './jsonp.tsx'
 import { BlockStyleHandler } from 'simple-inline-editor'
+import { sendSearch } from './api.ts'
 
 const API_SERVER = import.meta.env.VITE_API_SERVER
 
@@ -25,7 +26,7 @@ function getOpts(){
   console.log("getOpts", ret)
   return ret
 }
-const choice = (l:string[]) => {
+function choice<T>(l:T[]){
   const r = Math.floor(Math.random() * l.length)
   return l[r]
 }
@@ -278,6 +279,125 @@ const oembedBlock:BlockStyleHandler = (body:string, setRenderElement) => {
       </div>
     </div>
 }
+const findBlock:BlockStyleHandler = (body: string, setRenderElement) => {
+  const queue: string[][] = []
+  body.split("\n").forEach((e) => {
+    if(e.indexOf("!& ") === 0){
+      queue.push(["!&", e.slice(3)])
+    }else if(e.indexOf("& ") === 0){
+      queue.push(["&", e.slice(2)])
+    }else if(e === "*"){
+      queue.push(["*", ""])
+    }else if(e.indexOf("r ") === 0){
+      queue.push(["r", e.slice(2)])
+    }else{
+      queue.push(["", e])
+    }
+  })
+  let result:Record<string, {id:string, modTime: string, cover: string, text:string, user:string}> = {}
+  const run = () => {
+    if(queue.length === 0){
+      // end of command
+      const body:ReactNode[] = [];
+      
+      const lines = Object.values(result)
+      lines.sort((a,b) => { // sort new -> old
+        const ad = new Date(a.modTime);
+        const bd = new Date(b.modTime);
+        return bd.getTime() - ad.getTime();
+      }).forEach((v)=>{
+        let content
+        if(v.cover !== ""){
+          content = <img src={v.cover} />
+        }
+        body.push(
+          <li>
+            <div className='boxlist-title'>
+              <a onClick={(e) => {
+                linkClick(v.id)
+                e.preventDefault()
+                e.stopPropagation()
+                }}>{v.id}</a>
+              <a className='non-select' onClick={(e) => {
+                subLinkClick(v.id)
+                e.preventDefault()
+                e.stopPropagation()
+                }}>*</a>
+            </div>{content}<div>{v.text}</div>
+          </li>)
+      })
+      setRenderElement(<>
+      <span className='block-type'>{"find " + queue.join(",") + ""}</span>
+      <div className="boxlist">{body}</div>
+      </>)
+    }else{
+      const command = queue.shift()
+      if(command && command[0] === "*"){
+
+        // === get detailed list ===
+        const r = Math.floor(Math.random()*1000)
+        const req = new Request(API_SERVER + "/page/" + pageId.user + "?detail=1&r=" + r, {
+          method: "GET"
+        })
+        
+        fetch(req).then((response) => {
+          return response.json()
+        }).then((o) => {
+          o.pages.forEach((e:{user: string, name: string, description: string, id: string, text:string, cover:string, modTime:string}) => {
+            result[pageId.user + "/" + e.name] = e
+            e.user = pageId.user
+            e.id = e.name
+            e.text = e.description
+          })
+          run()
+        })
+      }else if(command && command[0] === "r"){
+        const newResult:Record<string, {id:string, modTime: string, cover: string, text:string, user:string}> = {}
+        const pageNameSet = new Set()
+        let n = parseInt(command[1])
+        if(!n){ n = 10}
+        for(let i = 0; i < n; i ++){
+          const page = choice(Object.values(result))
+          if(!pageNameSet.has(page.user + "/" + page.id)){
+            pageNameSet.add(page.user + "/" + page.id)
+            newResult[page.user + "/" + page.id] = page
+          }
+        }
+        result = newResult
+        run()
+      }else if(command){
+        sendSearch(pageId.user, command[1], false).then((resp) => {
+          resp.json().then((o) => {
+            if(command[0] === "!&"){
+              o.lines.forEach((e:{id:string, user:string}) => {
+                if(result[e.user + "/" + e.id]){
+                  delete result[e.user + "/" + e.id]
+                }
+              })
+            }else if(command[0] === "&"){
+              const newResult:Record<string, {id:string, modTime: string, cover: string, text:string, user:string}> = {}
+              o.lines.forEach((e:{id:string, modTime: string, cover: string, text:string, user:string}) => {
+                if(result[e.user + "/" + e.id]){
+                  newResult[e.user + "/" + e.id] = e
+                }
+              })
+              result = newResult
+            }else{ // OR
+              o.lines.forEach((e:{id:string, modTime: string, cover: string, text:string, user:string}) => {
+                if(!result[e.user + "/" + e.id]){
+                  result[e.user + "/" + e.id] = e
+                }
+              })
+            }
+            run()
+          })
+        })
+      }
+    }
+  }
+  run()
+  return <div><span className="block-type">find</span></div>
+}
   const blockStyles:Record<string,BlockStyleHandler> = useMemo(() => { return {
     list: listBlock,
     table: csvToTable,
@@ -289,6 +409,7 @@ const oembedBlock:BlockStyleHandler = (body:string, setRenderElement) => {
     item: itemBlock,
     img: imgBlock,
     oembed: oembedBlock, 
+    find: findBlock,
   }
   },[listBlock, randompagesBlock, rssBlock]); // なぜlistBlockだけ？
   
