@@ -265,8 +265,12 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
               setKeywords([])
             }else{
               console.log("CHANGE LINE get Page", props.pageId)
-              setLines(convertInlineToMD(obj.body.split("\n")).map((l, i) => {return {body: l, key: i}}))
+              const ls = convertInlineToMD(obj.body.split("\n")).map((l, i) => {return {body: l, key: i}})
+              setLines(ls)
               lastUpdate.current = obj.meta.lastUpdate;
+
+              const ks = extractKeywords(ls.map((l) => l.body))
+              setKeywords(ks)
             }
             setInitialized(false)
         })
@@ -300,7 +304,7 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [keywords])
-
+    
     useEffect(() => {
         console.log("CHANGE LINE", initialized, lines)
         const images = extractImages(lines.map((l) => l.body))
@@ -309,12 +313,7 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
           image = images[0]
         }
         const md = convertMDToInline(lines.map((l) => l.body))
-        //const rp:{[key:string]:string[]|[]} = {}
-        const ks = extractKeywords(lines.map((l) => l.body))
-        if(ks.toString() != keywords.toString()){
-          setKeywords(ks)
-        }
-
+        
         if(initialized){
         // save
         console.log("CHANGE LINE SAVE", md)
