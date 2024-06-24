@@ -168,6 +168,11 @@ ul.list-block li{
   display: flex;
   flex-wrap: wrap;
 }
+.boxlist .boxlist-title{
+  color: blue;
+  background-color: #ddf;
+  cursor: pointer;
+}
 .boxlist li {
   width:100px;
   height:100px;

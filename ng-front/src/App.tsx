@@ -319,11 +319,11 @@ const findBlock:BlockStyleHandler = (body: string, setRenderElement) => {
                 e.preventDefault()
                 e.stopPropagation()
                 }}>{v.id}</a>
-              <a className='non-select' onClick={(e) => {
+              <a className='bracket-icon' onClick={(e) => {
                 subLinkClick(v.id)
                 e.preventDefault()
                 e.stopPropagation()
-                }}>*</a>
+                }}>[]</a>
             </div>{content}<div>{v.text}</div>
           </li>)
       })
