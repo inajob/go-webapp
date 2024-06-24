@@ -280,7 +280,7 @@ const oembedBlock:BlockStyleHandler = (body:string, setRenderElement) => {
       </div>
     </div>
 }
-const findBlock:BlockStyleHandler = (body: string, setRenderElement) => {
+const findBlock:BlockStyleHandler = useCallback((body: string, setRenderElement) => {
   const queue: string[][] = []
   body.split("\n").forEach((e) => {
     if(e.indexOf("!& ") === 0){
@@ -398,7 +398,8 @@ const findBlock:BlockStyleHandler = (body: string, setRenderElement) => {
   }
   run()
   return <div><span className="block-type">find</span></div>
-}
+}, [linkClick, pageId.user, subLinkClick])
+
   const blockStyles:Record<string,BlockStyleHandler> = useMemo(() => { return {
     list: listBlock,
     table: csvToTable,
@@ -412,7 +413,7 @@ const findBlock:BlockStyleHandler = (body: string, setRenderElement) => {
     oembed: oembedBlock, 
     find: findBlock,
   }
-  },[listBlock, randompagesBlock, rssBlock]); // なぜlistBlockだけ？
+  },[findBlock, listBlock, randompagesBlock, rssBlock]); // なぜlistBlockだけ？
   
   // 入力補完用keywordを取得
   useEffect(() => {
