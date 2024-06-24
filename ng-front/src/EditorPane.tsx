@@ -21,6 +21,7 @@ export interface EditorPaneProps {
     defaultLines: string[];
     showListDialog: (items: DialogListItem[]) => void;
     setStatueMessage: React.Dispatch<React.SetStateAction<string>>;
+    setIsError: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
@@ -165,6 +166,7 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         return Promise.all(sscs)
       }).catch((e) => {
         props.setStatueMessage(e.toString())
+        props.setIsError(true)
         console.log(e)
       })
     }

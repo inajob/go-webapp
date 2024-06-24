@@ -76,6 +76,9 @@ body{
 #controller .button{
   border:solid 1px;
 }
+#controller.error {
+  background-color: red;
+}
 .editor{
   margin:0px !important;
   padding:0px !important;

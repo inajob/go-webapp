@@ -45,6 +45,7 @@ const App: React.FC<AppProps> = (props) =>  {
   const [defaultLines, setDefaultLines] = useState<string[]>([""])
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [statusMessage, setStausMessage] = useState("")
+  const [isError, setIsError] = useState(false)
 
   const showListDialog = (items:DialogListItem[]) => {
     setListInDialog(items.map((i: DialogListItem) => {return {title: i.title, handler: i.handler}}))
@@ -477,7 +478,7 @@ const findBlock:BlockStyleHandler = (body: string, setRenderElement) => {
   return (
     <>
       <div>
-        <div id="controller">
+        <div className={isError?"error":""} id="controller">
           <div>{statusMessage}</div>
           <div className="button" onClick={newDiary}>New Diary</div>
           <div className="button" onClick={deleteButtonClick}>Delete</div>
@@ -499,6 +500,7 @@ const findBlock:BlockStyleHandler = (body: string, setRenderElement) => {
               showListDialog={showListDialog}
               defaultLines={defaultLines}
               setStatueMessage={setStausMessage}
+              setIsError={setIsError}
               />
           </div>
           <div id="right-editor">
@@ -513,6 +515,7 @@ const findBlock:BlockStyleHandler = (body: string, setRenderElement) => {
               showListDialog={showListDialog}
               defaultLines={defaultLines}
               setStatueMessage={setStausMessage}
+              setIsError={setIsError}
             />
           </div>
         </div>
@@ -528,6 +531,7 @@ const findBlock:BlockStyleHandler = (body: string, setRenderElement) => {
               showListDialog={showListDialog}
               defaultLines={defaultLines}
               setStatueMessage={setStausMessage}
+              setIsError={setIsError}
             />
         </div>
       </div>
