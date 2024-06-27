@@ -434,13 +434,19 @@ const findBlock:BlockStyleHandler = useCallback((body: string, setRenderElement)
       }).then((response) => {
         setPageTitles(response.keywords)
         const realKeywords:string[] = response.keywords
-        setKeywords(keywordsResponse.keywords.map((k: { keyword: string, count: number }) => {
+        const ks = keywordsResponse.keywords.map((k: { keyword: string, count: number }) => {
           let count = k.count
           if(realKeywords.find((e) => e == k.keyword)){
             count ++;
           }
           return {value: k.keyword, style: count>1?"blue":"red"}
-        }))
+        })
+        realKeywords.forEach((k) => {
+          if(!ks.find((l:Keyword) => l.value == k)){
+            ks.push({value: k, style: "blue"})
+          }
+        })
+        setKeywords(ks)
       })
 
       //setKeywords(response.keywords.map((k: { keyword: string, count: number }) => {return {value: k.keyword, style: k.count>1?"blue":"red"}}))

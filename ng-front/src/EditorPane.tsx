@@ -201,13 +201,19 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         console.log(selectedLines, range)
         const title = selectedLines[0]
         selectedLines[0] = "from [" + props.pageId + "]"
-        const body = selectedLines.join("\n")
+        const md = convertMDToInline(selectedLines)
+        const body = md
         checkPage(props.user, title).then((o) => {
           console.log(o)
           if(o.error){
             // not found
             console.log("page not found")
-            return postPage(props.user, title, body, "0", "")
+            const images = extractImages(selectedLines)
+            let image = ""
+            if(images.length > 0){
+              image = images[0]
+            }
+            return postPage(props.user, title, body, "0", image)
           }
           throw "page found"
         }).then((o) => {
@@ -225,7 +231,8 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
             if(images.length > 0){
               image = images[0]
             }
-            return pageSave(props.user, props.pageId, l.join("\n"), lastUpdate.current, image)
+            const md = convertMDToInline(l)
+            return pageSave(props.user, props.pageId, md, lastUpdate.current, image)
           }
           throw "page save failed"
         }).then(() => {
@@ -308,7 +315,7 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     }, [keywords])
     
     useEffect(() => {
-        console.log("CHANGE LINE", initialized, lines)
+        //console.log("CHANGE LINE", initialized, lines)
         const images = extractImages(lines.map((l) => l.body))
         let image = ""
         if(images.length > 0){
@@ -318,7 +325,7 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
         
         if(initialized){
         // save
-        console.log("CHANGE LINE SAVE", md)
+        //console.log("CHANGE LINE SAVE", md)
         delayedPageSave(() => {
             return {
             user: props.user,
