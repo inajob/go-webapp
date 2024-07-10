@@ -73,37 +73,52 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
           const typeName = parts[0]
           if(typeName == "img"){
             let img = parts[1]
-            if(!(img.indexOf("http://") || img.indexOf("https://"))){
-              img = API_SERVER + "/img/" + img
+            if(!(img.indexOf("http://")==0 || img.indexOf("https://")==0)){
+              img = "/img/" + img
             }
-            images.push(parts[1])
+            images.push(img)
           }else if(typeName == "item" && parts.length > 1){
             const img = parts[1].split("\n")[1]
             images.push(img)
           }
         }
       })
+      console.log("extractImages", images)
       return images
     }
     function convertInlineToMD(inlineLines:string[]): string[]{
         const mdLines:string[] = []
         let inBlock = false
         let block:string[] = []
+        let inQuote = false
+        let quotePrefix = ""
         inlineLines.forEach((l) => {
             if(l.indexOf(">>") == 0){
-            inBlock = true
-            block = []
-            l = l.replace(/^>> /,"```") // convert inline block to markdown block
+              inBlock = true
+              block = []
+              l = l.replace(/^>> /,"```") // convert inline block to markdown block
             }
             if(l.indexOf("<<") == 0){
-            inBlock = false
-            mdLines.push(block.join("\n"))
-            return
+              inBlock = false
+              mdLines.push(block.join("\n"))
+              return
             }
-            if(inBlock){
-            block.push(l)
+            const mpre = l.match(/(\s*> )/)
+            if(mpre){
+              if(inQuote){
+                block.push(l.slice(quotePrefix.length))
+              }else{
+                inQuote = true
+                quotePrefix = mpre[0]
+                block = [l]
+              }
+            }else if(inQuote){
+              inQuote = false
+              mdLines.push(block.join("\n"))
+            }else if(inBlock){
+              block.push(l)
             }else{
-            mdLines.push(l)
+              mdLines.push(l)
             }
         })
         return mdLines
@@ -114,13 +129,18 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
             const bLines = l.split(/[\r\n]/)
             // インデント付きブロック記法はサポート外なのでインデントを消す
             const m = bLines[0].match(/(\s*```)/)
+            const mpre = bLines[0].match(/(\s*> )/)
             if(m) {
             const prefix = m[1]
             bLines[0] = ">> " + bLines[0].slice(prefix.length)
             bLines.push("<<")
             out.push(bLines.join("\n"))
+            }else if(mpre){
+              const prefix = mpre[1]
+              out.push(bLines[0])
+              out.push(bLines.slice(1).map((l) => prefix + l).join("\n"))
             }else if(bLines.length > 1){
-            throw "unknown block"
+              throw "unknown block"
             }else{
             out.push(l)
             }
@@ -196,7 +216,19 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
     
     const linePopupHandlers: LinePopupHandler[] = [
       {
-      name: "debug",
+        name: "delete",
+        handler: (_, range) => {
+          if(range == undefined){
+            throw "range is undefined"
+          }
+          setLines((prevLines) => {
+            prevLines.splice(range[0], range[1] - range[0] + 1)
+            return prevLines
+          })
+        }
+      },
+      {
+      name: "new page",
       handler: (selectedLines, range) => {
         console.log(selectedLines, range)
         const title = selectedLines[0]
