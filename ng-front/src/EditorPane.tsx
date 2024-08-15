@@ -6,6 +6,7 @@ import { TextPopupHandler, Keyword } from 'simple-inline-editor/dist/components/
 import {DialogListItem} from './Dialog.tsx'
 import {jsonp} from './jsonp.tsx'
 import {sendSearch, sendSearchCache} from './api.ts'
+import {convertInlineToMD, convertMDToInline} from './inlineMd.tsx'
 
 const API_SERVER = import.meta.env.VITE_API_SERVER
 
@@ -85,67 +86,6 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
       })
       console.log("extractImages", images)
       return images
-    }
-    function convertInlineToMD(inlineLines:string[]): string[]{
-        const mdLines:string[] = []
-        let inBlock = false
-        let block:string[] = []
-        let inQuote = false
-        let quotePrefix = ""
-        inlineLines.forEach((l) => {
-            if(l.indexOf(">>") == 0){
-              inBlock = true
-              block = []
-              l = l.replace(/^>> /,"```") // convert inline block to markdown block
-            }
-            if(l.indexOf("<<") == 0){
-              inBlock = false
-              mdLines.push(block.join("\n"))
-              return
-            }
-            const mpre = l.match(/(\s*> )/)
-            if(mpre){
-              if(inQuote){
-                block.push(l.slice(quotePrefix.length))
-              }else{
-                inQuote = true
-                quotePrefix = mpre[0]
-                block = [l]
-              }
-            }else if(inQuote){
-              inQuote = false
-              mdLines.push(block.join("\n"))
-            }else if(inBlock){
-              block.push(l)
-            }else{
-              mdLines.push(l)
-            }
-        })
-        return mdLines
-    }
-    function convertMDToInline(lines: string[]): string{
-        const out:string[] = []
-        lines.forEach((l) => {
-            const bLines = l.split(/[\r\n]/)
-            // インデント付きブロック記法はサポート外なのでインデントを消す
-            const m = bLines[0].match(/(\s*```)/)
-            const mpre = bLines[0].match(/(\s*> )/)
-            if(m) {
-            const prefix = m[1]
-            bLines[0] = ">> " + bLines[0].slice(prefix.length)
-            bLines.push("<<")
-            out.push(bLines.join("\n"))
-            }else if(mpre){
-              const prefix = mpre[1]
-              out.push(bLines[0])
-              out.push(bLines.slice(1).map((l) => prefix + l).join("\n"))
-            }else if(bLines.length > 1){
-              throw "unknown block"
-            }else{
-            out.push(l)
-            }
-        })
-        return out.join("\n")
     }
 
     function postPage(user: string, id: string, body: string, lastUpdate:string, image: string){
@@ -332,7 +272,15 @@ export const EditorPane: React.FC<EditorPaneProps> = (props) =>  {
             const rp:{[key: string]:[{id:string, text:string, cover:string}]} = {}
             for(let i = 0; i < ks.length; i ++){
               console.log(ks[i], r[i])
-              const pages:[{id:string, text:string, cover:string}] = r[i].lines.filter((l:{[id: string]: string}) => l.id != props.pageId)
+              const pages:[{id:string, text:string, cover:string}] = r[i].lines.filter(
+                (l:{[id: string]: string}) => l.id != props.pageId
+              ).sort((a:{[id: string]: string}, b:{[id: string]: string}) => {
+                const m = a.id.match(/\d{4}-\d{2}-\d{2}/)
+                const m2 = b.id.match(/\d{4}-\d{2}-\d{2}/)
+                if(m && !m2){return 1}
+                if(!m && m2){return -1}
+                return (a.modTime > b.modTime)?-1:1
+              })
               if(pages.length > 0){
                 rp[ks[i]] = pages
               }

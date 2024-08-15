@@ -45,6 +45,7 @@ const App: React.FC<AppProps> = (props) =>  {
   const [defaultLines, setDefaultLines] = useState<string[]>([""])
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [statusMessage, setStausMessage] = useState("")
+  const [logined, setLogined] = useState(false)
   const [isError, setIsError] = useState(false)
 
   const showListDialog = (items:DialogListItem[]) => {
@@ -73,6 +74,25 @@ const App: React.FC<AppProps> = (props) =>  {
     })
     return fetch(req)
   }
+
+  const loginCheck = (user:string) => {
+    const f = new FormData()
+    f.append('user', user)
+    const req = new Request(API_SERVER + "/loginCheck", {
+      method: "POST",
+      credentials: "include", // for save another domain
+      headers: {
+        'Accept': 'applicatoin/json',
+        'User': user, // this header is deleted by login-proxy but useful for debug
+      },
+      body: f,
+    })
+    return fetch(req)
+  }
+  const loginClick = () => {
+    document.location.href = API_SERVER + "/auth/login"
+  }
+  
 
   const deleteButtonClick = () => {
     deletePage(pageId.user, pageId.pageId).then((o) => {
@@ -454,6 +474,14 @@ const findBlock:BlockStyleHandler = useCallback((body: string, setRenderElement)
     })
   }, [props.user])
 
+  useEffect(() => {
+    loginCheck(props.user).then((response) => {
+      return response.json()
+    }).then((o) => {
+      setLogined(o.login)
+    })
+  },[props.user])
+
   // == Text Popup Handlers ============================
   const onBracket = (select: TextFragment|null) => {
     if(!select){
@@ -487,6 +515,10 @@ const findBlock:BlockStyleHandler = useCallback((body: string, setRenderElement)
       <div>
         <div className={isError?"error":""} id="controller">
           <div>{statusMessage}</div>
+          {logined?
+            "logined":
+            <div className="button" onClick={loginClick}>login</div>
+          }
           <div className="button" onClick={newDiary}>New Diary</div>
           <div className="button" onClick={deleteButtonClick}>Delete</div>
           <div className="button">Rename</div>
